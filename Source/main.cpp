@@ -68,6 +68,18 @@ void EnableDebugLayer()
     }
 }
 
+struct Vertex
+{
+    XMFLOAT3 position;//xyz座標
+    XMFLOAT2 uv;//uv情報
+};
+
+struct TexRGBA
+{
+    unsigned char R, G, B, A;
+};
+
+
 //ウィンドウサイズ
 const unsigned int window_width = 1280;
 const unsigned int window_height = 729;
@@ -101,7 +113,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         w.hInstance = GetModuleHandle(0);
     }
 
-    //OS に　アプリケーションの生成を通達する
+    //OSにアプリケーションの生成を通達する
     RegisterClassEx(&w);
 
 
@@ -150,7 +162,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             return -1;
         }
     }
-
+    
+    //利用可能な全てのディスプレイ サブシステム (1 つ以上の GPU、DAC、ビデオ メモリを含む)をadaptersに積む
     vector<IDXGIAdapter*> adapters;
     IDXGIAdapter* tmpAdapter = nullptr;
     for (int i = 0; dxgiFactory_->EnumAdapters(i, &tmpAdapter) != DXGI_ERROR_NOT_FOUND; i++)
@@ -195,11 +208,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ExceptionHandlingFormatHresult(result);
 
     //コマンド アロケーター　作成
-    result = dev_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAllocator_));
+    result = dev_->CreateCommandAllocator(
+        D3D12_COMMAND_LIST_TYPE_DIRECT, 
+        IID_PPV_ARGS(&cmdAllocator_)
+    );
     ExceptionHandlingFormatHresult(result);
     
     //コマンドリスト　作成
-    result = dev_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAllocator_, nullptr, IID_PPV_ARGS(&cmdList_));
+    result = dev_->CreateCommandList(
+        0, 
+        D3D12_COMMAND_LIST_TYPE_DIRECT, 
+        cmdAllocator_, 
+        nullptr, 
+        IID_PPV_ARGS(&cmdList_)
+    );
     ExceptionHandlingFormatHresult(result);
 
     //コマンド キュー設定&作成
@@ -304,11 +326,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ShowWindow(hwnd,SW_SHOW);
 
     //ここに座標を入れる(注意:座標は時計回りにする)
-    XMFLOAT3 vertices[] = {
-        {-0.4f,-0.7f,0.0f} ,//左下
-        {-0.4f,0.7f,0.0f} ,//左上
-        {0.4f,-0.7f,0.0f} ,//右下
-        {0.4f,0.7f,0.0f} ,//右上
+    Vertex vertices[] = {
+        {{-0.4f,-0.7f,0.0f} , {0.0f,1.0f}  },//左下
+        { {-0.4f,0.7f,0.0f} ,  {0.0f,0.0f}  },//左上
+        { {0.4f,-0.7f,0.0f} ,  {1.0f,1.0f}  },//右下
+        { {0.4f,0.7f,0.0f} ,   {1.0f,0.0f}  },//右上
     };
 
     //頂点バッファー設定&生成
@@ -359,7 +381,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
         //頂点情報のコピー(mapする)
-        XMFLOAT3* vertMap = nullptr;
+        Vertex* vertMap = nullptr;
         result = vertBuff->Map(0, nullptr, (void**)&vertMap);
         ExceptionHandlingFormatHresult(result);
         copy(begin(vertices), end(vertices), vertMap);
@@ -395,7 +417,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ibView.BufferLocation = idxBuff->GetGPUVirtualAddress();
         ibView.Format = DXGI_FORMAT_R16_UINT;
         ibView.SizeInBytes = sizeof(indices);
-
     }
 
 
@@ -484,6 +505,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ID3D12RootSignature* rootsignature = nullptr;
     {
         D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
+            {//位置情報
                     "POSITION",
                     0,
                     DXGI_FORMAT_R32G32B32_FLOAT,
@@ -491,6 +513,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                     D3D12_APPEND_ALIGNED_ELEMENT,
                     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
                     0
+            },
+            {//uv情報
+                    "TEXCOORD",
+                    0,
+                    DXGI_FORMAT_R32G32_FLOAT,
+                    0,
+                    D3D12_APPEND_ALIGNED_ELEMENT,
+                    D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+                    0
+            }
         };
 
         D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline = {};
@@ -577,7 +609,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         gpipeline.pRootSignature = rootsignature;
         
-        result = dev_->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
+        result = dev_->CreateGraphicsPipelineState(
+            &gpipeline, 
+            IID_PPV_ARGS(&pipelinestate)
+        );
         ExceptionHandlingFormatHresult(result);
 
         
@@ -593,6 +628,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         scissorrect.left = 0;//切り抜き左座標
         scissorrect.right = scissorrect.left + window_width;//切り抜き右座標
         scissorrect.bottom = scissorrect.top + window_height;//切り抜き下座標
+
     }
 
 
@@ -704,5 +740,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //クラスの登録を解除する
     UnregisterClass(w.lpszClassName,w.hInstance);
 
+    /*
+    dxgiFactory_->Release();
+    dev_->Release();
+    cmdAllocator_->Release();
+    cmdList_->Release();
+    cmdQueue_->Release();
+    swapchain_->Release();
+    rtvHeaps->Release();
+
+    for (auto& adapter : adapters)
+    {
+        adapter->Release();
+    }
+    tmpAdapter->Release();
+
+    for (auto& buffer : backBuffers)
+    {
+        buffer->Release();
+    }
+
+    fence->Release();
+    vsBlob->Release();
+    psBlob->Release();
+    errorBlob->Release();
+    pipelinestate->Release();
+    rootsignature->Release();
+    */
     return 0;
 }
