@@ -11,7 +11,7 @@
 
 #include "d3dx12.h"
 #include <iostream>
-
+#include <fbxsdk.h>
 using namespace std;
 using namespace DirectX;
 
@@ -326,6 +326,44 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     //window output
     ShowWindow(hwnd,SW_SHOW);
+
+    {//モデル読み込み
+        struct FBXHeader
+        {
+            float version;//
+            char model_name[20];//モデル名
+            char comment[256];//モデルコメント
+        };
+
+        FILE* fp;
+        char signature[3];
+        FBXHeader fbxHeader;
+
+        auto err = fopen_s(&fp, "Model/YBot.fbx", "rb");
+        if (fp == nullptr)//エラーチェック
+        {
+            char strerr[256];
+            strerror_s(strerr, 256, err);
+            //MessageBox(hwnd, strerr, L"Model Not Found.", MB_ICONERROR);
+            return -1;
+        }
+
+        fread(signature, sizeof(signature), 1, fp);
+        fread(&fbxHeader, sizeof(fbxHeader), 1, fp);
+
+        unsigned int vertNum;//頂点数
+        fread(&vertNum, sizeof(vertNum), 1, fp);
+
+        //fbxsdkテスト
+        //TODO:テストを確認できたら消す
+        //errorが起こる場合はhttps://yttm-work.jp/model_render/model_render_0006.html#head_line_01の
+        //dllファイルの設定を確認して設定
+        fbxsdk::FbxManager* fbx_manager = fbxsdk::FbxManager::Create();
+        fbx_manager->Destroy();
+
+        
+    }
+
 
     //ここに座標を入れる(注意:座標は時計回りにする)
     Vertex vertices[] = {
