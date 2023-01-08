@@ -12,6 +12,7 @@
 #include "d3dx12.h"
 #include <iostream>
 #include <fbxsdk.h>
+
 using namespace std;
 using namespace DirectX;
 
@@ -72,6 +73,9 @@ void EnableDebugLayer()
 
 struct Vertex
 {
+    Vertex(XMFLOAT3 position, XMFLOAT2 uv):
+        position(position),uv(uv)
+    {}
     XMFLOAT3 position;//xyz座標
     XMFLOAT2 uv;//uv情報
 };
@@ -80,6 +84,17 @@ struct TexRGBA
 {
     unsigned char R, G, B, A;
 };
+
+
+void RecursiveNode(FbxNode* node)
+{
+    const int childNodeNum = node->GetChildCount();
+    for (int i = 0; i < childNodeNum; i++)
+    {
+        FbxNode* child = node->GetChild(i);
+        RecursiveNode(child);
+    }
+}
 
 
 //ウィンドウサイズ
@@ -327,157 +342,206 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //window output
     ShowWindow(hwnd,SW_SHOW);
 
-    {//モデル読み込み
-        /*
-        struct FBXHeader
-        {
-            float version;//
-            char model_name[20];//モデル名
-            char comment[256];//モデルコメント
-        };
+    //モデル読み込み
+    /*
+    struct FBXHeader
+    {
+        float version;//
+        char model_name[20];//モデル名
+        char comment[256];//モデルコメント
+    };
 
-        FILE* fp;
-        char signature[3];
-        FBXHeader fbxHeader;
+    FILE* fp;
+    char signature[3];
+    FBXHeader fbxHeader;
 
-        fread(signature, sizeof(signature), 1, fp);
-        fread(&fbxHeader, sizeof(fbxHeader), 1, fp);
+    fread(signature, sizeof(signature), 1, fp);
+    fread(&fbxHeader, sizeof(fbxHeader), 1, fp);
 
-        unsigned int vertNum;//頂点数
-        fread(&vertNum, sizeof(vertNum), 1, fp);
-        */
+    unsigned int vertNum;//頂点数
+    fread(&vertNum, sizeof(vertNum), 1, fp);
+    */
 
-        //errorが起こる場合はhttps://yttm-work.jp/model_render/model_render_0006.html#head_line_01の
-        //「dllファイルの設定」を確認して設定
-        fbxsdk::FbxManager* fbx_manager = fbxsdk::FbxManager::Create();
+    //errorが起こる場合はhttps://yttm-work.jp/model_render/model_render_0006.html#head_line_01の
+    //「dllファイルの設定」を確認して設定
+    fbxsdk::FbxManager* fbx_manager = fbxsdk::FbxManager::Create();
 
-        //エラーチェック
-        if (fbx_manager == NULL)
-        {
-            return -1;
-        }
-        
-        //fbxファイル名 指定
-        const string filePath("./Model/YBot.fbx");
+    //エラーチェック
+    if (fbx_manager == NULL)
+    {
+        return -1;
+    }
+    
+    //fbxファイル名 指定
+    const string filePath("./Model/YBot.fbx");
 
-        //入出力設定を作成
-        FbxIOSettings* ios = FbxIOSettings::Create(fbx_manager, IOSROOT);
+    //入出力設定を作成
+    FbxIOSettings* ios = FbxIOSettings::Create(fbx_manager, IOSROOT);
 
-        //マネージャーに入出力設定をセット
-        fbx_manager->SetIOSettings(ios);
+    //マネージャーに入出力設定をセット
+    fbx_manager->SetIOSettings(ios);
 
-        //FBXインポータを初期化
-        FbxImporter* importer = FbxImporter::Create(fbx_manager, "");
+    //FBXインポータを初期化
+    FbxImporter* importer = FbxImporter::Create(fbx_manager, "");
 
-        //FBXファイルの読み込み
-        if (!importer->Initialize(filePath.c_str(), -1, fbx_manager->GetIOSettings()))
-        {
-            //失敗した場合,fbxManagerを破棄して終了
-            fbx_manager->Destroy();
-            return -1;
-        }
-
-
-
-
+    //FBXファイルの読み込み
+    if (!importer->Initialize(filePath.c_str(), -1, fbx_manager->GetIOSettings()))
+    {
+        //失敗した場合,fbxManagerを破棄して終了
+        fbx_manager->Destroy();
+        return -1;
+    }
+    
+    //FBXシーン(3D空間を構成するオブジェクト情報)を初期化する
+    FbxScene* scene = FbxScene::Create(fbx_manager, "");
+    if (!importer->Import(scene))
+    {
         //fbxManager破棄
         fbx_manager->Destroy();
+        importer->Destroy();
+        return -1;
     }
+    
+    //シーンの読み込みが完了すれば不要になるので破棄
+    importer->Destroy();
+
+    /*
+    FbxGeometryConverter geometryConverter(fbx_manager);
+    //三角形ポリゴンへのコンバート
+    if (!geometryConverter.Triangulate(scene, true))
+    {
+        return -1;
+    }
+    */
+    //geometryConverter.Triangulate(scene, true);
+    FbxNode* rootNode = scene->GetRootNode();
+
+    vector<Vertex> vertices;
+    unsigned int vertNum;
+    if (rootNode) {
+        for (int i = 0; i < rootNode->GetChildCount(); i++) {
+            FbxNode* childNode = rootNode->GetChild(i);
+
+            if (childNode->GetNodeAttribute() &&
+                childNode->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eMesh) {
+                FbxMesh* mesh = childNode->GetMesh();
+                vertNum = mesh->GetPolygonVertexCount();
+                // 頂点情報を取得する処理をここに記述します
+                int vertexCount = mesh->GetControlPointsCount();
+
+                for (int i = 0; i < vertexCount; i++) {
+                    const FbxVector4 vertex = mesh->GetControlPointAt(i);
+                    float pos_x = vertex.mData[0];
+                    float pos_y = vertex.mData[1];
+                    float pos_z = vertex.mData[2];
+                    
+                    //const FbxLayer* layer = mesh->GetLayer(i);
+                    //const FbxLayerElementUV* layerElement = layer->GetUVs();
+                    //float uv_x = layerElement->GetDirectArray().GetAt(0)[0];
+                    //float uv_y = layerElement->GetDirectArray().GetAt(0)[1];
+
+                    // 頂点座標を使用する処理をここに記述します
+                    //Vertex vertex(XMFLOAT3(pos_x, pos_y, pos_z), XMFLOAT2(0,0));
+
+                    vertices.push_back(Vertex(XMFLOAT3(pos_x, pos_y, pos_z), XMFLOAT2(0, 0)));
+                }
+            }
+        }
+    }
+
+    
+    fbx_manager->Destroy();
+    
 
 
     //ここに座標を入れる(注意:座標は時計回りにする)
-    Vertex vertices[] = {
-        {{-0.4f,-0.7f,0.0f} , {0.0f,1.0f}  },//左下
-        { {-0.4f,0.7f,0.0f} ,  {0.0f,0.0f}  },//左上
-        { {0.4f,-0.7f,0.0f} ,  {1.0f,1.0f}  },//右下
-        { {0.4f,0.7f,0.0f} ,   {1.0f,0.0f}  },//右上
-    };
+    //Vertex vertices[] = {
+    //    {{-0.4f,-0.7f,0.0f} , {0.0f,1.0f}  },//左下
+    //    { {-0.4f,0.7f,0.0f} ,  {0.0f,0.0f}  },//左上
+    //    { {0.4f,-0.7f,0.0f} ,  {1.0f,1.0f}  },//右下
+    //    { {0.4f,0.7f,0.0f} ,   {1.0f,0.0f}  },//右上
+    //};
+
+    //vector<> vertices();
 
     //頂点バッファー設定&生成
     D3D12_VERTEX_BUFFER_VIEW vbView = {};
     D3D12_INDEX_BUFFER_VIEW ibView = {};
-    D3D12_HEAP_PROPERTIES heapprop = {};
-    {
-        //頂点ヒープの設定
-        //ヒープの種類を指定，今回はCPUからアクセスできるようにしている
-        heapprop.Type = D3D12_HEAP_TYPE_UPLOAD;
-        //CPU ページ プロパティを指定,今回は特に考えない
-        heapprop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        //ヒープのメモリ プールを指定，今回は特に考えない
-        heapprop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    auto heapprop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 
-        //頂点バッファー設定
-        D3D12_RESOURCE_DESC resourceDesc = {};
-        //使用しているリソースのタイプを設定 
-        resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-        //幅でまかなうので全頂点(sizeof)とする
-        resourceDesc.Width = sizeof(vertices);
-        //幅でまかなうので1
-        resourceDesc.Height = 1;
-        //二次元なので1
-        resourceDesc.DepthOrArraySize = 1;
-        //
-        resourceDesc.MipLevels = 1;
-        //画像ではないので UNKNOWN
-        resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
-        //ピクセルあたりのマルチサンプル数なので1
-        resourceDesc.SampleDesc.Count = 1;
-        //オプションの指定は特にないのでNONE
-        resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-        //テクスチャのデータが行優先順で格納されているので
-        resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    //頂点バッファー設定
+    //D3D12_RESOURCE_DESC resourceDesc = {};
+    auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(vertices.size() * sizeof(Vertex));
+    ////使用しているリソースのタイプを設定 
+    //resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    ////幅でまかなうので全頂点(sizeof)とする
+    //resourceDesc.Width = sizeof(vertices);
+    ////幅でまかなうので1
+    //resourceDesc.Height = 1;
+    ////二次元なので1
+    //resourceDesc.DepthOrArraySize = 1;
+    ////
+    //resourceDesc.MipLevels = 1;
+    ////画像ではないので UNKNOWN
+    //resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+    ////ピクセルあたりのマルチサンプル数なので1
+    //resourceDesc.SampleDesc.Count = 1;
+    ////オプションの指定は特にないのでNONE
+    //resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+    ////テクスチャのデータが行優先順で格納されているので
+    //resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
-        //頂点バッファー生成
-        ID3D12Resource* vertBuff = nullptr;
-        result = dev_->CreateCommittedResource(
-            &heapprop,
-            D3D12_HEAP_FLAG_NONE,
-            &resourceDesc,
-            D3D12_RESOURCE_STATE_GENERIC_READ,
-            nullptr,
-            IID_PPV_ARGS(&vertBuff)
-        );
-        ExceptionHandlingFormatHresult(result);
+    //頂点バッファー生成
+    ID3D12Resource* vertBuff = nullptr;
+    result = dev_->CreateCommittedResource(
+        &heapprop,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&vertBuff)
+    );
+    ExceptionHandlingFormatHresult(result);
 
 
-        //頂点情報のコピー(mapする)
-        Vertex* vertMap = nullptr;
-        result = vertBuff->Map(0, nullptr, (void**)&vertMap);
-        ExceptionHandlingFormatHresult(result);
-        copy(begin(vertices), end(vertices), vertMap);
-        //mapを解除
-        vertBuff->Unmap(0, nullptr);
+    //頂点情報のコピー(mapする)
+    Vertex* vertMap = nullptr;
+    result = vertBuff->Map(0, nullptr, (void**)&vertMap);
+    ExceptionHandlingFormatHresult(result);
+    copy(begin(vertices), end(vertices), vertMap);
+    //mapを解除
+    vertBuff->Unmap(0, nullptr);
 
-        //バッファの仮想アドレス
-        vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
-        //全バイト数
-        vbView.SizeInBytes = sizeof(vertices);
-        //1頂点あたりのバイト数
-        vbView.StrideInBytes = sizeof(vertices[0]);
+    //バッファの仮想アドレス
+    vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
+    //全バイト数
+    vbView.SizeInBytes = sizeof(vertices);
+    //1頂点あたりのバイト数
+    vbView.StrideInBytes = sizeof(vertices[0]);
 
-        unsigned short indices[] = { 0,1,2, 2,1,3 };
+    unsigned short indices[] = { 0,1,2, 2,1,3 };
 
-        ID3D12Resource* idxBuff = nullptr;
-        //設定は、バッファのサイズ以外頂点バッファの設定を使いまわして
-        result = dev_->CreateCommittedResource(
-            &heapprop,
-            D3D12_HEAP_FLAG_NONE,
-            &resourceDesc,
-            D3D12_RESOURCE_STATE_GENERIC_READ,
-            nullptr,
-            IID_PPV_ARGS(&idxBuff));
+    ID3D12Resource* idxBuff = nullptr;
+    //設定は、バッファのサイズ以外頂点バッファの設定を使いまわして
+    result = dev_->CreateCommittedResource(
+        &heapprop,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&idxBuff));
 
-        //作ったバッファにインデックスデータをコピー
-        unsigned short* mappedIdx = nullptr;
-        idxBuff->Map(0, nullptr, (void**)&mappedIdx);
-        copy(begin(indices), end(indices), mappedIdx);
-        idxBuff->Unmap(0, nullptr);
+    //作ったバッファにインデックスデータをコピー
+    unsigned short* mappedIdx = nullptr;
+    idxBuff->Map(0, nullptr, (void**)&mappedIdx);
+    copy(begin(indices), end(indices), mappedIdx);
+    idxBuff->Unmap(0, nullptr);
 
-        //インデックスバッファビューを作成
-        ibView.BufferLocation = idxBuff->GetGPUVirtualAddress();
-        ibView.Format = DXGI_FORMAT_R16_UINT;
-        ibView.SizeInBytes = sizeof(indices);
-    }
+    //インデックスバッファビューを作成
+    ibView.BufferLocation = idxBuff->GetGPUVirtualAddress();
+    ibView.Format = DXGI_FORMAT_R16_UINT;
+    ibView.SizeInBytes = sizeof(indices);
+    
 
 
     //シェーダー読み込み
@@ -562,24 +626,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ID3D12RootSignature* rootsignature = nullptr;
     {
         D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-            {//位置情報
-                    "POSITION",
-                    0,
-                    DXGI_FORMAT_R32G32B32_FLOAT,
-                    0,
-                    D3D12_APPEND_ALIGNED_ELEMENT,
-                    D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-                    0
-            },
-            {//uv情報
-                    "TEXCOORD",
-                    0,
-                    DXGI_FORMAT_R32G32_FLOAT,
-                    0,
-                    D3D12_APPEND_ALIGNED_ELEMENT,
-                    D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-                    0
-            }
+        { "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+        { "NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+        { "TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+        { "BONE_NO",0,DXGI_FORMAT_R16G16_UINT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+        { "WEIGHT",0,DXGI_FORMAT_R8_UINT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+        //{ "EDGE_FLG",0,DXGI_FORMAT_R8_UINT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
         };
 
         D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline = {};
@@ -917,9 +969,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         //画面クリア
         //float clearColor[] = { 1.0f,0.0f,0.0f,1.0f };
         float r,g,b;
-        r = (float)(0xff & frame >> 16) / 255.0f;
-        g = (float)(0xff & frame >> 16) / 255.0f;
-        b = (float)(0xff & frame >> 16) / 255.0f;
+        r = 1.0f;
+        g = 1.0f;
+        b = 1.0f;
         float clearColor[] = { r,g,b,1.0f };
 
         cmdList_->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
@@ -938,11 +990,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         //cmdList_->SetGraphicsRootDescriptorTable(0, texDescHeap->GetGPUDescriptorHandleForHeapStart());
         cmdList_->SetGraphicsRootDescriptorTable(0, basicDescHeap->GetGPUDescriptorHandleForHeapStart());
 
+        cmdList_->DrawIndexedInstanced(vertNum, 1, 0, 0, 0);
+
         //auto heapHandle = basicDescHeap->GetGPUDescriptorHandleForHeapStart();
         //heapHandle.ptr += dev_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
         //cmdList_->SetGraphicsRootDescriptorTable(1, heapHandle);
 
-        cmdList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+        //cmdList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
         //元の状態(BENDER TARGET)
         barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
