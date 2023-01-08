@@ -328,6 +328,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ShowWindow(hwnd,SW_SHOW);
 
     {//モデル読み込み
+        /*
         struct FBXHeader
         {
             float version;//
@@ -339,29 +340,48 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         char signature[3];
         FBXHeader fbxHeader;
 
-        auto err = fopen_s(&fp, "Model/YBot.fbx", "rb");
-        if (fp == nullptr)//エラーチェック
-        {
-            char strerr[256];
-            strerror_s(strerr, 256, err);
-            //MessageBox(hwnd, strerr, L"Model Not Found.", MB_ICONERROR);
-            return -1;
-        }
-
         fread(signature, sizeof(signature), 1, fp);
         fread(&fbxHeader, sizeof(fbxHeader), 1, fp);
 
         unsigned int vertNum;//頂点数
         fread(&vertNum, sizeof(vertNum), 1, fp);
+        */
 
-        //fbxsdkテスト
-        //TODO:テストを確認できたら消す
         //errorが起こる場合はhttps://yttm-work.jp/model_render/model_render_0006.html#head_line_01の
-        //dllファイルの設定を確認して設定
+        //「dllファイルの設定」を確認して設定
         fbxsdk::FbxManager* fbx_manager = fbxsdk::FbxManager::Create();
-        fbx_manager->Destroy();
 
+        //エラーチェック
+        if (fbx_manager == NULL)
+        {
+            return -1;
+        }
         
+        //fbxファイル名 指定
+        const string filePath("./Model/YBot.fbx");
+
+        //入出力設定を作成
+        FbxIOSettings* ios = FbxIOSettings::Create(fbx_manager, IOSROOT);
+
+        //マネージャーに入出力設定をセット
+        fbx_manager->SetIOSettings(ios);
+
+        //FBXインポータを初期化
+        FbxImporter* importer = FbxImporter::Create(fbx_manager, "");
+
+        //FBXファイルの読み込み
+        if (!importer->Initialize(filePath.c_str(), -1, fbx_manager->GetIOSettings()))
+        {
+            //失敗した場合,fbxManagerを破棄して終了
+            fbx_manager->Destroy();
+            return -1;
+        }
+
+
+
+
+        //fbxManager破棄
+        fbx_manager->Destroy();
     }
 
 
