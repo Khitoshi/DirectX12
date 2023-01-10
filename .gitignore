@@ -37,6 +37,25 @@ bld/
 [Ll]ibrary/DirectXTex
 [Ll]ibrary/fbxsdk 2020.3.2
 
+![Ll]ibrary/DirectXTex/Lib/Desktop_2019_Win10/x64/Debug/DirectXTex.lib
+![Ll]ibrary/DirectXTex/Lib/Desktop_2019_Win10/x64/Release/DirectXTex.lib
+
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/debug/libfbxsdk.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/debug/libfbxsdk-md.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/debug/libfbxsdk-mt.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/debug/libxml2-md.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/debug/libxml2-mt.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/debug/zlib-md.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/debug/zlib-mt.lib
+
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/release/libfbxsdk.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/release/libfbxsdk-md.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/release/libfbxsdk-mt.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/release/libxml2-md.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/release/libxml2-mt.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/release/zlib-md.lib
+![Ll]ibrary/fbxsdk 2020.3.2/lib/vs2019/x64/release/zlib-mt.lib
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
