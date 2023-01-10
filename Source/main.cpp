@@ -342,118 +342,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //window output
     ShowWindow(hwnd,SW_SHOW);
 
-    //モデル読み込み
-    /*
-    struct FBXHeader
-    {
-        float version;//
-        char model_name[20];//モデル名
-        char comment[256];//モデルコメント
-    };
-
-    FILE* fp;
-    char signature[3];
-    FBXHeader fbxHeader;
-
-    fread(signature, sizeof(signature), 1, fp);
-    fread(&fbxHeader, sizeof(fbxHeader), 1, fp);
-
-    unsigned int vertNum;//頂点数
-    fread(&vertNum, sizeof(vertNum), 1, fp);
-    */
-
-    //errorが起こる場合はhttps://yttm-work.jp/model_render/model_render_0006.html#head_line_01の
-    //「dllファイルの設定」を確認して設定
-    fbxsdk::FbxManager* fbx_manager = fbxsdk::FbxManager::Create();
-
-    //エラーチェック
-    if (fbx_manager == NULL)
-    {
-        return -1;
-    }
     
-    //fbxファイル名 指定
-    const string filePath("./Model/YBot.fbx");
-
-    //入出力設定を作成
-    FbxIOSettings* ios = FbxIOSettings::Create(fbx_manager, IOSROOT);
-
-    //マネージャーに入出力設定をセット
-    fbx_manager->SetIOSettings(ios);
-
-    //FBXインポータを初期化
-    FbxImporter* importer = FbxImporter::Create(fbx_manager, "");
-
-    //FBXファイルの読み込み
-    if (!importer->Initialize(filePath.c_str(), -1, fbx_manager->GetIOSettings()))
-    {
-        //失敗した場合,fbxManagerを破棄して終了
-        fbx_manager->Destroy();
-        return -1;
-    }
-    
-    //FBXシーン(3D空間を構成するオブジェクト情報)を初期化する
-    FbxScene* scene = FbxScene::Create(fbx_manager, "");
-    if (!importer->Import(scene))
-    {
-        //fbxManager破棄
-        fbx_manager->Destroy();
-        importer->Destroy();
-        return -1;
-    }
-    
-    //シーンの読み込みが完了すれば不要になるので破棄
-    importer->Destroy();
-
-    /*
-    FbxGeometryConverter geometryConverter(fbx_manager);
-    //三角形ポリゴンへのコンバート
-    if (!geometryConverter.Triangulate(scene, true))
-    {
-        return -1;
-    }
-    */
-    //geometryConverter.Triangulate(scene, true);
-    FbxNode* rootNode = scene->GetRootNode();
-
-    vector<Vertex> vertices;
-    unsigned int vertNum;
-    if (rootNode) {
-        for (int i = 0; i < rootNode->GetChildCount(); i++) {
-            FbxNode* childNode = rootNode->GetChild(i);
-
-            if (childNode->GetNodeAttribute() &&
-                childNode->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eMesh) {
-                FbxMesh* mesh = childNode->GetMesh();
-                vertNum = mesh->GetPolygonVertexCount();
-                // 頂点情報を取得する処理をここに記述します
-                int vertexCount = mesh->GetControlPointsCount();
-
-                for (int i = 0; i < vertexCount; i++) {
-                    const FbxVector4 vertex = mesh->GetControlPointAt(i);
-                    float pos_x = vertex.mData[0];
-                    float pos_y = vertex.mData[1];
-                    float pos_z = vertex.mData[2];
-                    
-                    //layerがnullになっている
-                    const FbxLayer* layer = mesh->GetLayer(i);
-                    const FbxLayerElementUV* layerElement = layer->GetUVs();
-                    float uv_x = layerElement->GetDirectArray().GetAt(i)[0];
-                    float uv_y = layerElement->GetDirectArray().GetAt(i)[1];
-
-                    // 頂点座標を使用する処理をここに記述します
-                    //Vertex vertex(XMFLOAT3(pos_x, pos_y, pos_z), XMFLOAT2(0,0));
-
-                    vertices.push_back(Vertex(XMFLOAT3(pos_x, pos_y, pos_z), XMFLOAT2(uv_x,uv_y)));
-                }
-            }
-        }
-    }
-
-    
-    fbx_manager->Destroy();
-    
-
 
     //ここに座標を入れる(注意:座標は時計回りにする)
     //Vertex vertices[] = {
@@ -782,7 +671,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     TexMetadata metadata = {};
     ScratchImage scratchImg = {};
-    result = LoadFromWICFile(L"Texture/textest.png", WIC_FLAGS_NONE, &metadata, scratchImg);
+    result = LoadFromWICFile(L"Asset/Texture/textest.png", WIC_FLAGS_NONE, &metadata, scratchImg);
     auto img = scratchImg.GetImage(0, 0, 0);//生データ抽出
 
     //テクスチャバッファー作成
