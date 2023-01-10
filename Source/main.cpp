@@ -435,15 +435,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                     float pos_y = vertex.mData[1];
                     float pos_z = vertex.mData[2];
                     
-                    //const FbxLayer* layer = mesh->GetLayer(i);
-                    //const FbxLayerElementUV* layerElement = layer->GetUVs();
-                    //float uv_x = layerElement->GetDirectArray().GetAt(0)[0];
-                    //float uv_y = layerElement->GetDirectArray().GetAt(0)[1];
+                    //layerがnullになっている
+                    const FbxLayer* layer = mesh->GetLayer(i);
+                    const FbxLayerElementUV* layerElement = layer->GetUVs();
+                    float uv_x = layerElement->GetDirectArray().GetAt(i)[0];
+                    float uv_y = layerElement->GetDirectArray().GetAt(i)[1];
 
                     // 頂点座標を使用する処理をここに記述します
                     //Vertex vertex(XMFLOAT3(pos_x, pos_y, pos_z), XMFLOAT2(0,0));
 
-                    vertices.push_back(Vertex(XMFLOAT3(pos_x, pos_y, pos_z), XMFLOAT2(0, 0)));
+                    vertices.push_back(Vertex(XMFLOAT3(pos_x, pos_y, pos_z), XMFLOAT2(uv_x,uv_y)));
                 }
             }
         }
