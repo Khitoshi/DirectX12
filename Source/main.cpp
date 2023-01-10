@@ -729,7 +729,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     TexMetadata metadata = {};
     ScratchImage scratchImg = {};
-    result = LoadFromWICFile(L"Texture/textest.png", WIC_FLAGS_NONE, &metadata, scratchImg);
+    result = LoadFromWICFile(L"Asset/Texture/textest.png", WIC_FLAGS_NONE, &metadata, scratchImg);
     auto img = scratchImg.GetImage(0, 0, 0);//生データ抽出
 
     //テクスチャバッファー作成
