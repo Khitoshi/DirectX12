@@ -21,8 +21,8 @@ mono_crash.*
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-/x64/
-/x86/
+x64/
+x86/
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
@@ -32,6 +32,10 @@ bld/
 [Oo]ut/
 [Ll]og/
 [Ll]ogs/
+
+#Library
+[Ll]ibrary/DirectXTex
+[Ll]ibrary/fbxsdk 2020.3.2
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
