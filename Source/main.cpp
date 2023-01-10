@@ -327,63 +327,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //window output
     ShowWindow(hwnd,SW_SHOW);
 
-    {//モデル読み込み
-        /*
-        struct FBXHeader
-        {
-            float version;//
-            char model_name[20];//モデル名
-            char comment[256];//モデルコメント
-        };
-
-        FILE* fp;
-        char signature[3];
-        FBXHeader fbxHeader;
-
-        fread(signature, sizeof(signature), 1, fp);
-        fread(&fbxHeader, sizeof(fbxHeader), 1, fp);
-
-        unsigned int vertNum;//頂点数
-        fread(&vertNum, sizeof(vertNum), 1, fp);
-        */
-
-        //errorが起こる場合はhttps://yttm-work.jp/model_render/model_render_0006.html#head_line_01の
-        //「dllファイルの設定」を確認して設定
-        fbxsdk::FbxManager* fbx_manager = fbxsdk::FbxManager::Create();
-
-        //エラーチェック
-        if (fbx_manager == NULL)
-        {
-            return -1;
-        }
-        
-        //fbxファイル名 指定
-        const string filePath("./Model/YBot.fbx");
-
-        //入出力設定を作成
-        FbxIOSettings* ios = FbxIOSettings::Create(fbx_manager, IOSROOT);
-
-        //マネージャーに入出力設定をセット
-        fbx_manager->SetIOSettings(ios);
-
-        //FBXインポータを初期化
-        FbxImporter* importer = FbxImporter::Create(fbx_manager, "");
-
-        //FBXファイルの読み込み
-        if (!importer->Initialize(filePath.c_str(), -1, fbx_manager->GetIOSettings()))
-        {
-            //失敗した場合,fbxManagerを破棄して終了
-            fbx_manager->Destroy();
-            return -1;
-        }
-
-
-
-
-        //fbxManager破棄
-        fbx_manager->Destroy();
-    }
-
+    
 
     //ここに座標を入れる(注意:座標は時計回りにする)
     Vertex vertices[] = {
