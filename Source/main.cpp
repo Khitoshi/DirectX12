@@ -73,29 +73,16 @@ void EnableDebugLayer()
 
 struct Vertex
 {
-    Vertex(XMFLOAT3 position, XMFLOAT2 uv):
-        position(position),uv(uv)
-    {}
     XMFLOAT3 position;//xyz座標
+    XMFLOAT3 normal;//法線情報
     XMFLOAT2 uv;//uv情報
+
 };
 
 struct TexRGBA
 {
     unsigned char R, G, B, A;
 };
-
-
-void RecursiveNode(FbxNode* node)
-{
-    const int childNodeNum = node->GetChildCount();
-    for (int i = 0; i < childNodeNum; i++)
-    {
-        FbxNode* child = node->GetChild(i);
-        RecursiveNode(child);
-    }
-}
-
 
 //ウィンドウサイズ
 const unsigned int window_width = 1280;
@@ -342,7 +329,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //window output
     ShowWindow(hwnd,SW_SHOW);
 
-    
+    //TODO:ここにfbxsdkの処理等を書く
+
+
 
     //ここに座標を入れる(注意:座標は時計回りにする)
     //Vertex vertices[] = {
