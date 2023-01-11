@@ -1,121 +1,88 @@
-#include "ModelLoader.h"
+ï»¿#include "ModelLoader.h"
+#include <iostream>
+#include <functional>
+//#include <debugapi.h>
+//#include <sstream>
 
-bool FBXModelLoader::Load(const string& filePath, VertexInfo* vertexInfo)
+FBXModelLoader::FBXModelLoader(const char* fbx_filename, bool triangulate)
 {
-    //ƒ}ƒl[ƒWƒƒ[¶¬
-    FbxManager* manager = FbxManager::Create();
+    //ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã€€ä½œæˆ
+    FbxManager* manager(FbxManager::Create());
 
-    //ƒCƒ“ƒ|[ƒ^¶¬
-    FbxImporter* importer = FbxImporter::Create(manager,"");
-    if (!importer->Initialize(filePath.c_str(), -1, manager->GetIOSettings()))
+    //ã‚·ãƒ¼ãƒ³ã€€ä½œæˆ
+    FbxScene* scene(FbxScene::Create(manager, ""));
+
+    //ã‚¤ãƒ³ãƒãƒ¼ã‚¿ã€€ä½œæˆ
+    FbxImporter* importer(FbxImporter::Create(manager, ""));
+    bool importer_status(false);
+    try
     {
-        //¶¬¸”s
-        return false;
-    }
+        //importerã€€åˆæœŸåŒ–
+        importer_status = importer->Initialize(fbx_filename);
+        if (!importer_status) throw importer->GetStatus().GetErrorString();
 
-    //ƒV[ƒ“¶¬
-    FbxScene* scene = FbxScene::Create(manager, "");
-    importer->Import(scene);
-    //•s—v‚É‚È‚Á‚½‚Ì‚Å”jŠü
-    importer->Destroy();
+        //ã‚·ãƒ¼ãƒ³ã‚’ã‚¤ãƒ³ãƒãƒ¼ãƒˆ
+        importer_status = importer->Import(scene);
+        if (!importer_status)throw importer->GetStatus().GetErrorString();
 
-    //OŠpƒ|ƒŠƒSƒ“‚Ö‚ÌƒRƒ“ƒo[ƒg
-    FbxGeometryConverter geometryConverter(manager);
-    if (!geometryConverter.Triangulate(scene, true))
-    {
-        //ƒRƒ“ƒo[ƒg¸”s
-        return false;
-    }
-
-    //ƒƒbƒVƒ…æ“¾
-    FbxMesh* mesh = scene->GetSrcObject<FbxMesh>();
-    if (!mesh)
-    {
-        //æ“¾¸”s
-        return false;
-    }
-
-    //UVƒZƒbƒg–¼æ“¾
-    FbxStringList uvSetNameList;
-    mesh->GetUVSetNames(uvSetNameList);
-    const string uvSetName = uvSetNameList.GetStringAt(0);
-
-    //’¸“_À•Wî•ñ‚ÌƒŠƒXƒg¶¬
-    vector<vector<float>> vertexInfoList;
-    for (int i = 0; i < mesh->GetControlPointsCount(); i++)
-    {
-        const FbxVector4 point = mesh->GetControlPointAt(i);
-
-        //’¸“_À•Wæ“¾
-        //point[0];
-        //point[1];
-        //point[2];
-        // 
-        //’¸“_À•W “o˜^
-        vector<float> vertex;
-        vertex.push_back(point[0]);
-        vertex.push_back(point[1]);
-        vertex.push_back(point[2]);
-
-        vertexInfoList.push_back(vertex);
-
-    }
-
-    //’¸“_–ˆ‚Ìî•ñ‚ğæ“¾‚·‚é
-    vector<unsigned short> indices;
-    vector<array<int, 2>> oldNewIndexPairList;
-    
-    for (int polygonIndex = 0; polygonIndex < mesh->GetPolygonCount(); polygonIndex++)
-    {
-        for (int polygonVertexIndex = 0; polygonVertexIndex < mesh->GetPolygonSize(polygonIndex); polygonVertexIndex++)
+        //ä¸‰è§’ãƒãƒªã‚´ãƒ³åŒ–
+        FbxGeometryConverter converter(manager);
+        if (triangulate)
         {
-            //ƒCƒ“ƒfƒbƒNƒXÀ•W
-            auto vertexIndex = mesh->GetPolygonVertex(polygonIndex, polygonVertexIndex);
-
-            //’¸“_À•W
-            //XMFLOAT3 vertexInfo = vertexInfoList[vertexIndex];
-
-            //–@üÀ•W
-            FbxVector4 normalPosition;
-            mesh->GetPolygonVertexNormal(polygonIndex, polygonVertexIndex, normalPosition);
-
-            //UVÀ•W
-            FbxVector2 uvPosition;
-            bool isUnmapped;
-            mesh->GetPolygonVertexUV(polygonIndex, polygonVertexIndex, uvSetName.c_str(), uvPosition, isUnmapped);
-
-            //ƒCƒ“ƒfƒbƒNƒXÀ•W‚ğİ’è
-            indices.push_back(vertexIndex);
+            converter.Triangulate(scene, true, false);
+            converter.RemoveBadPolygonsFromMeshes(scene);
         }
-    }
 
-    //’¸“_î•ñ¶¬
-    vector<Vertex> vertices;
-    for (int i = 0; i < vertexInfoList.size(); i++)
-    {
-        vector<float> vertexInfo = vertexInfoList[i];
-        Vertex vertex = Vertex{
-            {vertexInfo[0],vertexInfo[1],vertexInfo[2]},//position
-            {vertexInfo[3],vertexInfo[4],vertexInfo[5]},//normal
-            {vertexInfo[6],vertexInfo[7]}//uv
+        //æƒ…å ± ç™»éŒ²
+        function<void(FbxNode*)> traverse{ [&](FbxNode* fbx_node) {
+
+            Scene::Node& node(scene_view_.nodes.emplace_back());
+            //è­˜åˆ¥ç•ªå· ç™»éŒ²
+            node.unique_id = fbx_node->GetUniqueID();
+            //åå‰ ç™»éŒ²
+            node.name = fbx_node->GetName();
+            //å±æ€§ ç™»éŒ²
+            node.attribute = fbx_node->GetNodeAttribute() ?
+                fbx_node->GetNodeAttribute()->GetAttributeType() : FbxNodeAttribute::EType::eUnknown;
+            //è¦ªã®ç•ªå· ç™»éŒ²
+            node.parent_index = scene_view_.indexof(fbx_node->GetParent() ? fbx_node->GetParent()->GetUniqueID() : 0);
+            //å­ä¾›ã®æƒ…å ±ã‚‚ç™»éŒ²ã™ã‚‹
+            for (int i = 0; i < fbx_node->GetChildCount(); i++)
+            {
+                traverse(fbx_node->GetChild(i));
+            }
+            }
         };
-        vertices.push_back(vertex);
+        //ã‚·ãƒ¼ãƒ³ã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹æƒ…å ±ã‚’ç™»éŒ²
+        traverse(scene->GetRootNode());
+    
+#if 1
+        for (const Scene::Node& node : scene_view_.nodes)
+        {
+            FbxNode* fbx_node{ scene->FindNodeByName(node.name.c_str()) };
+            // Display node data in the output window as debug
+            string node_name = fbx_node->GetName();
+            uint64_t uid = fbx_node->GetUniqueID();
+            uint64_t parent_uid = fbx_node->GetParent() ? fbx_node->GetParent()->GetUniqueID() : 0;
+            int32_t type = fbx_node->GetNodeAttribute() ? fbx_node->GetNodeAttribute()->GetAttributeType() :
+                0;
+            //stringstream debug_string;
+            //debug_string << node_name << ":" << uid << ":" << parent_uid << ":" << type << "Â¥n";
+            //OutputDebugStringA(debug_string.str().c_str());
+            int potate = 555;
+        };
+#endif
+    
+
+        //ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã€€ç ´æ£„
+        manager->Destroy();
+
+    }
+    catch (const std::string err_str)
+    {
+        cout << err_str << endl;
+        exit(-1);
     }
 
-    //”jŠü
-    scene->Destroy();
-    manager->Destroy();
-    *vertexInfo =
-    {
-        vertices,
-        indices
-    };
-    return true;
-}
 
-bool FBXModelLoader::IsExistNormalUVInfo(XMFLOAT3 vertexIndex) const
-{
-    return true;
-    //return vertexInfo.size() == 8; // ’¸“_3 + –@ü3 + UV2
 }
-

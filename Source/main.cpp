@@ -13,6 +13,8 @@
 #include <iostream>
 #include <fbxsdk.h>
 
+#include "ModelLoader.h"
+
 using namespace std;
 using namespace DirectX;
 
@@ -74,7 +76,7 @@ void EnableDebugLayer()
 struct Vertex
 {
     XMFLOAT3 position;//xyz座標
-    XMFLOAT3 normal;//法線情報
+    //XMFLOAT3 normal;//法線情報
     XMFLOAT2 uv;//uv情報
 
 };
@@ -330,18 +332,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ShowWindow(hwnd,SW_SHOW);
 
     //TODO:ここにfbxsdkの処理等を書く
-
-
+    unique_ptr<FBXModelLoader> modelloader[8];
+    modelloader[0] = make_unique<FBXModelLoader>("./Asset/Model/YBot.fbx");
 
     //ここに座標を入れる(注意:座標は時計回りにする)
-    //Vertex vertices[] = {
-    //    {{-0.4f,-0.7f,0.0f} , {0.0f,1.0f}  },//左下
-    //    { {-0.4f,0.7f,0.0f} ,  {0.0f,0.0f}  },//左上
-    //    { {0.4f,-0.7f,0.0f} ,  {1.0f,1.0f}  },//右下
-    //    { {0.4f,0.7f,0.0f} ,   {1.0f,0.0f}  },//右上
-    //};
+    Vertex vertices[] = {
+        {{-0.4f,-0.7f,0.0f} , {0.0f,1.0f}  },//左下
+        { {-0.4f,0.7f,0.0f} ,  {0.0f,0.0f}  },//左上
+        { {0.4f,-0.7f,0.0f} ,  {1.0f,1.0f}  },//右下
+        { {0.4f,0.7f,0.0f} ,   {1.0f,0.0f}  },//右上
+    };
 
-    //vector<> vertices();
+    //vector<Vertex> vertices;
 
     //頂点バッファー設定&生成
     D3D12_VERTEX_BUFFER_VIEW vbView = {};
@@ -350,7 +352,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     //頂点バッファー設定
     //D3D12_RESOURCE_DESC resourceDesc = {};
-    auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(vertices.size() * sizeof(Vertex));
+    //auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(vertices.size() * sizeof(Vertex));
     ////使用しているリソースのタイプを設定 
     //resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
     ////幅でまかなうので全頂点(sizeof)とする
@@ -371,6 +373,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
     //頂点バッファー生成
+    /*
     ID3D12Resource* vertBuff = nullptr;
     result = dev_->CreateCommittedResource(
         &heapprop,
@@ -381,7 +384,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         IID_PPV_ARGS(&vertBuff)
     );
     ExceptionHandlingFormatHresult(result);
-
 
     //頂点情報のコピー(mapする)
     Vertex* vertMap = nullptr;
@@ -421,6 +423,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ibView.Format = DXGI_FORMAT_R16_UINT;
     ibView.SizeInBytes = sizeof(indices);
     
+    */
 
 
     //シェーダー読み込み
@@ -869,7 +872,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         //cmdList_->SetGraphicsRootDescriptorTable(0, texDescHeap->GetGPUDescriptorHandleForHeapStart());
         cmdList_->SetGraphicsRootDescriptorTable(0, basicDescHeap->GetGPUDescriptorHandleForHeapStart());
 
-        cmdList_->DrawIndexedInstanced(vertNum, 1, 0, 0, 0);
+        //cmdList_->DrawIndexedInstanced(vertNum, 1, 0, 0, 0);
 
         //auto heapHandle = basicDescHeap->GetGPUDescriptorHandleForHeapStart();
         //heapHandle.ptr += dev_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
