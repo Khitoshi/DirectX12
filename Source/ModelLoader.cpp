@@ -73,6 +73,7 @@ FBXModelLoader::FBXModelLoader(const char* fbx_filename, bool triangulate)
         };
 #endif
     
+        FetchMeshes(scene, meshes_);
 
         //マネージャー　破棄
         manager->Destroy();
@@ -85,4 +86,89 @@ FBXModelLoader::FBXModelLoader(const char* fbx_filename, bool triangulate)
     }
 
 
+}
+
+void FBXModelLoader::FetchMeshes(FbxScene* scene, vector<Mesh>& meshes)
+{
+    
+    for (const Scene::Node& node : scene_view_.nodes)
+    {
+        
+        if (node.attribute != FbxNodeAttribute::EType::eMesh)continue;
+
+        //FbxNode* fbx_node{ scene->FindNodeByName(node.name.c_str()) };
+        //FbxMesh* fbx_mesh{ fbx_node->GetMesh() };
+
+        FbxNode* fbx_node(scene->FindNodeByName(node.name.c_str()));
+        FbxMesh* fbx_mesh(fbx_node->GetMesh());
+
+        //各種情報の登録
+        Mesh& mesh(meshes.emplace_back());
+        mesh.unique_id = fbx_mesh->GetNode()->GetUniqueID();
+        mesh.name = fbx_mesh->GetNode()->GetName();
+        mesh.node_index = scene_view_.indexof(mesh.unique_id);
+
+        //polygon数 取得
+        const int polygon_count(fbx_mesh->GetPolygonCount());
+
+        //polygonに合わせたサイズに変更　*3LL とは　long long の 3　という意味*
+        mesh.vertexces.resize(polygon_count * 3LL);
+        mesh.indices.resize(polygon_count * 3LL);
+
+        //uv名　取得
+        FbxStringList uv_names;
+        fbx_mesh->GetUVSetNames(uv_names);
+
+        //頂点バッファ　取得
+        const FbxVector4* control_points(fbx_mesh->GetControlPoints());
+
+        for (int polygon_index = 0; polygon_index < polygon_count; polygon_index++)
+        {
+            for (int position_in_polygon = 0; position_in_polygon < 3; position_in_polygon++)
+            {
+                //頂点番号 
+                const int vertex_index(polygon_index * 3 + position_in_polygon);
+
+                //polygonの頂点情報取得
+                const int polygon_vertex(fbx_mesh->GetPolygonVertex(polygon_index, position_in_polygon));
+                
+                //頂点情報
+                Vertex vertex;
+                
+                //位置 登録
+                vertex.position.x = static_cast<float>(control_points[polygon_vertex][0]);
+                vertex.position.y = static_cast<float>(control_points[polygon_vertex][1]);
+                vertex.position.z = static_cast<float>(control_points[polygon_vertex][2]);
+                
+                //ジオメトリ要素のある法線　番号 がある場合
+                if (fbx_mesh->GetElementNormalCount() > 0)
+                {
+                    //法線 取得
+                    FbxVector4 normal;
+                    fbx_mesh->GetPolygonVertexNormal(polygon_index, position_in_polygon,normal);
+                    
+                    //法線 登録
+                    vertex.normal.x = static_cast<float>(normal[0]);
+                    vertex.normal.y = static_cast<float>(normal[1]);
+                    vertex.normal.z = static_cast<float>(normal[2]);
+                }
+
+                //uv
+                if (fbx_mesh->GetElementUVCount() > 0)
+                {
+                    FbxVector2 uv;
+                    bool unmapped_uv;
+                    fbx_mesh->GetPolygonVertexUV(polygon_index, position_in_polygon, uv_names[0], uv, unmapped_uv);
+                    vertex.texcoord.x = static_cast<float>(uv[0]);
+                    vertex.texcoord.y = 1.0f - static_cast<float>(uv[1]);
+                }
+
+                //上記で取得した頂点情報をmeshに登録
+                mesh.vertexces.at(vertex_index) = move(vertex);
+                mesh.indices.at(vertex_index) = vertex_index;
+            }
+            
+        }
+    }
+    
 }

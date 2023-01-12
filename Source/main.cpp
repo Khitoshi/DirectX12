@@ -12,7 +12,7 @@
 #include "d3dx12.h"
 #include <iostream>
 #include <fbxsdk.h>
-
+#include <iterator>
 #include "ModelLoader.h"
 
 using namespace std;
@@ -73,6 +73,7 @@ void EnableDebugLayer()
     }
 }
 
+/*
 struct Vertex
 {
     XMFLOAT3 position;//xyz座標
@@ -80,7 +81,7 @@ struct Vertex
     XMFLOAT2 uv;//uv情報
 
 };
-
+*/
 struct TexRGBA
 {
     unsigned char R, G, B, A;
@@ -332,23 +333,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ShowWindow(hwnd,SW_SHOW);
 
     //TODO:ここにfbxsdkの処理等を書く
-    unique_ptr<FBXModelLoader> modelloader[8];
-    modelloader[0] = make_unique<FBXModelLoader>("./Asset/Model/YBot.fbx");
+    unique_ptr<FBXModelLoader> modelloader;
+    modelloader = make_unique<FBXModelLoader>("./Asset/Model/YBot.fbx");
 
     //ここに座標を入れる(注意:座標は時計回りにする)
-    Vertex vertices[] = {
+    /*Vertex vertices[] = {
         {{-0.4f,-0.7f,0.0f} , {0.0f,1.0f}  },//左下
         { {-0.4f,0.7f,0.0f} ,  {0.0f,0.0f}  },//左上
         { {0.4f,-0.7f,0.0f} ,  {1.0f,1.0f}  },//右下
         { {0.4f,0.7f,0.0f} ,   {1.0f,0.0f}  },//右上
-    };
+    };*/
 
     //vector<Vertex> vertices;
 
+    
     //頂点バッファー設定&生成
-    D3D12_VERTEX_BUFFER_VIEW vbView = {};
-    D3D12_INDEX_BUFFER_VIEW ibView = {};
-    auto heapprop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+    CD3DX12_HEAP_PROPERTIES heapprop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+    auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(modelloader->GetSceneView().nodes.size() * sizeof(Scene::Node));
+    
 
     //頂点バッファー設定
     //D3D12_RESOURCE_DESC resourceDesc = {};
@@ -373,7 +375,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
     //頂点バッファー生成
-    /*
     ID3D12Resource* vertBuff = nullptr;
     result = dev_->CreateCommittedResource(
         &heapprop,
@@ -386,23 +387,43 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ExceptionHandlingFormatHresult(result);
 
     //頂点情報のコピー(mapする)
-    Vertex* vertMap = nullptr;
+    //Scene::Node* vertMap;
+    
+    vector<Scene::Node> vertMap(modelloader->GetSceneView().nodes.size());
+    //vertMap.nodes(modelloader->GetSceneView().nodes);
+    
     result = vertBuff->Map(0, nullptr, (void**)&vertMap);
     ExceptionHandlingFormatHresult(result);
-    copy(begin(vertices), end(vertices), vertMap);
+    //modelのnode情報をコピーする
+    for (int i = 0; i < modelloader->GetSceneView().nodes.size();i++)
+    {
+        vertMap.at(i).attribute = modelloader->GetSceneView().nodes.at(i).attribute;
+        vertMap.at(i).name = modelloader->GetSceneView().nodes.at(i).name;
+        vertMap.at(i).parent_index = modelloader->GetSceneView().nodes.at(i).parent_index;
+        vertMap.at(i).unique_id = modelloader->GetSceneView().nodes.at(i).unique_id;
+    }
+    //以下はerrorになる
+    //vertMap = modelloader->GetSceneView().nodes;
+    //std::copy(modelloader->GetSceneView().nodes.begin(), modelloader->GetSceneView().nodes.end(), back_inserter(vertMap.nodes));
+    //std::copy(modelloader->GetSceneView().nodes.begin(), modelloader->GetSceneView().nodes.end(), vertMap);
+    
     //mapを解除
     vertBuff->Unmap(0, nullptr);
-
+    
+    D3D12_VERTEX_BUFFER_VIEW vbView = {};
     //バッファの仮想アドレス
     vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
     //全バイト数
-    vbView.SizeInBytes = sizeof(vertices);
+    vbView.SizeInBytes = sizeof(modelloader->GetSceneView().nodes.size() * sizeof(Scene::Node));
     //1頂点あたりのバイト数
-    vbView.StrideInBytes = sizeof(vertices[0]);
+    vbView.StrideInBytes = sizeof(Scene::Node);
 
-    unsigned short indices[] = { 0,1,2, 2,1,3 };
+    //unsigned short indices[] = { 0,1,2, 2,1,3 };
 
     ID3D12Resource* idxBuff = nullptr;
+    heapprop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+    resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(modelloader->GetSize());
+
     //設定は、バッファのサイズ以外頂点バッファの設定を使いまわして
     result = dev_->CreateCommittedResource(
         &heapprop,
@@ -411,19 +432,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
         IID_PPV_ARGS(&idxBuff));
+    ExceptionHandlingFormatHresult(result);
 
     //作ったバッファにインデックスデータをコピー
-    unsigned short* mappedIdx = nullptr;
+    vector<vector<uint32_t>> mappedIdx;
     idxBuff->Map(0, nullptr, (void**)&mappedIdx);
-    copy(begin(indices), end(indices), mappedIdx);
-    idxBuff->Unmap(0, nullptr);
 
+    //indicesのコピー
+    for (const Mesh& mesh : modelloader->GetMeshes())
+    {
+        mappedIdx.push_back(mesh.indices);
+    }
+    //copy(modelloader->GetMeshes().at(0).indices.begin(), modelloader->GetMeshes().at(0).indices.end(), mappedIdx);
+    //map解除
+    idxBuff->Unmap(0, nullptr);
+    
     //インデックスバッファビューを作成
+    D3D12_INDEX_BUFFER_VIEW ibView = {};
     ibView.BufferLocation = idxBuff->GetGPUVirtualAddress();
     ibView.Format = DXGI_FORMAT_R16_UINT;
-    ibView.SizeInBytes = sizeof(indices);
+    ibView.SizeInBytes = sizeof(modelloader->GetSize());
     
-    */
+    
 
 
     //シェーダー読み込み
@@ -872,7 +902,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         //cmdList_->SetGraphicsRootDescriptorTable(0, texDescHeap->GetGPUDescriptorHandleForHeapStart());
         cmdList_->SetGraphicsRootDescriptorTable(0, basicDescHeap->GetGPUDescriptorHandleForHeapStart());
 
-        //cmdList_->DrawIndexedInstanced(vertNum, 1, 0, 0, 0);
+        cmdList_->DrawIndexedInstanced(modelloader->GetSize(), 1, 0, 0, 0);
 
         //auto heapHandle = basicDescHeap->GetGPUDescriptorHandleForHeapStart();
         //heapHandle.ptr += dev_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
