@@ -19,20 +19,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     std::unique_ptr<Camera> camera3d;
     camera3d = make_unique<Camera>();
     //カメラの位置を設定
-    camera3d->SetPosition(0.0f, 0.0f, 100.0f);
+    camera3d->GetPosition().Set(0.0f, 0.0f, 100.0f);
     //カメラのターゲットを設定
-    camera3d->SetTarget(0.0f, 0.0f, 0.0f);
+    camera3d->GetTarget().Set(0.0f, 0.0f, 0.0f);
 
     //ライト
     std::unique_ptr<Light> light;
     light = make_unique<Light>();
     //ライトは右から当たっている
-    light->SetDirectionLightDirection(1.0f, -1.0f, -1.0f);
-    light->direction_Light_.direction.Normalize();
+    light->GetDirectionLight().direction.Set(1.0f, -1.0f, -1.0f);
+    light->GetDirectionLight().direction.Normalize();
     //ライトの色は白
-    light->SetDirectionLightColor(0.5f, 0.5f, 0.5f);
+    light->GetDirectionLight().color.Set(0.5f, 0.5f, 0.5f);
     //視点の位置を設定する
-    light->eye_Position_.Set(camera3d->GetPosition());
+    light->GetEyePosition().Set(camera3d->GetPosition());
 
 
 
