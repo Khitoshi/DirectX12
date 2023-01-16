@@ -1,5 +1,6 @@
 #include "GraphicsEngine.h"
 #include <d3dx12.h>
+#include "RenderContext.h"
 //デフォルト コンストラクタ
 GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, const UINT frameBufferHeight):
 	hWnd(hwnd),
@@ -61,6 +62,9 @@ bool GraphicsEngine::Init()
 
 	//GPUと同期オブジェクト生成
 	this->CreateSynchronizationWithGPUObject();
+
+	this->render_Conext_ = std::make_unique<RenderContext>();
+	this->render_Conext_->Init(this->command_List_.Get());
 
     return true;
 }

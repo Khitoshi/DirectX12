@@ -7,8 +7,10 @@
 #include <dxgi1_4.h>
 #include <dxgi1_5.h>
 #include <wrl.h>
-
+#include <memory>
 using namespace Microsoft::WRL;
+
+class RenderContext;
 
 class GraphicsEngine
 {
@@ -84,6 +86,9 @@ private:
 	void CreateSynchronizationWithGPUObject();
 
 public:
+
+	ID3D12Device5* GetD3DDevice()const { return this->device_.Get(); }
+
 private:
 	//フレームバッファの数(表と裏で2枚)
 	enum { FRAME_BUFFER_COUNT = 2 };
@@ -117,6 +122,7 @@ private:
 	ComPtr<ID3D12GraphicsCommandList4> command_List_;
 	ComPtr<ID3D12Fence> fence_;
 
+	std::unique_ptr< RenderContext> render_Conext_;
 
 	//現在のバックバッファの番号。
 	unsigned int current_Back_Buffer_Index_;
