@@ -67,13 +67,14 @@ void IndexBuffer::Init(GraphicsEngine* graphicsEngine,int size, int stride)
 //インデックスデータをインデックスバッファにコピー
 void IndexBuffer::Copy(uint16_t* srcIndecies)
 {
-    uint32_t* date = nullptr;
+
+    uint32_t* data = nullptr;
 
     //インデックスバッファにコピー(map)する
-    this->index_Buffer_->Map(0, nullptr, reinterpret_cast<void**>(&date));
+    this->index_Buffer_->Map(0, nullptr, reinterpret_cast<void**>(&data));
     for (int i = 0; i < this->index_Count_; i++)
     {
-        date[i] = srcIndecies[i];
+        data[i] = srcIndecies[i];
     }
 
     //mapを解除
@@ -83,13 +84,13 @@ void IndexBuffer::Copy(uint16_t* srcIndecies)
 //インデックスデータをインデックスバッファにコピー
 void IndexBuffer::Copy(uint32_t* srcIndecies)
 {
-    uint32_t* date = nullptr;
+    uint32_t* data = nullptr;
 
     //インデックスバッファにコピー(map)する
-    this->index_Buffer_->Map(0, nullptr, reinterpret_cast<void**>(&date));
+    this->index_Buffer_->Map(0, nullptr, reinterpret_cast<void**>(&data));
     for (int i = 0; i < this->index_Count_; i++)
     {
-        date[i] = srcIndecies[i];
+        data[i] = srcIndecies[i];
     }
 
     //mapを解除

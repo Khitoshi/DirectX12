@@ -50,13 +50,13 @@ void VertexBuffer::Init(GraphicsEngine* graphicsEngine, int size, int stride)
 
 void VertexBuffer::Copy(void* strVertices)
 {
-    uint8_t* date = nullptr;
+    uint8_t* data = nullptr;
     
     //map開始
-    vertex_Buffer_->Map(0, nullptr, (void**)date);
+    vertex_Buffer_->Map(0, nullptr, (void**)data);
 
-    //メモリをコピー　(mapしているのでdateがvertexbufferに入る)
-    memcpy(date, strVertices, this->vertex_Buffer_View_.SizeInBytes);
+    //メモリをコピー　(mapしているのでdataがvertexbufferに入る)
+    memcpy(data, strVertices, this->vertex_Buffer_View_.SizeInBytes);
     
     //map解除
     this->vertex_Buffer_->Unmap(0,nullptr);

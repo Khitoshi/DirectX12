@@ -5,10 +5,13 @@
 
 using namespace Microsoft::WRL;
 
+class GraphicsEngine;
 class VertexBuffer;
 class IndexBuffer;
 class RootSignature;
 class PipelineState;
+class DescriptorHeap;
+
 
 class RenderContext
 {
@@ -89,11 +92,17 @@ public://set method
     /// </summary>
     /// <param name="descriptorHeap">ディスクリプタヒープ</param>
     void SetDescriptorHeap(ID3D12DescriptorHeap* descriptorHeap);
+    void SetComputeDescriptorHeap(GraphicsEngine* graphicsEngine, DescriptorHeap& descriptorHeap);
 
-    //TODO:　ここまでできた。次回はDescriptorHeap.h作成する
+    /// <summary>
+    /// ディスクリプタテーブルを設定。
+    /// </summary>
+    /// <param name="RootParameterIndex"></param>
+    /// <param name="BaseDescriptor"></param>
+    void SetComputeRootDescriptorTable(UINT RootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor);
 
 public://get method
-    D3D12_VIEWPORT GetViewport()const { return this->current_Viewport; }
+    D3D12_VIEWPORT GetViewport()const { return this->current_Viewport_; }
 
 private:
     //ディスクリプタヒープの最大数。
@@ -105,9 +114,9 @@ private:
 
 private:
     //コマンド リスト
-    ComPtr<ID3D12GraphicsCommandList4> command_List;
+    ComPtr<ID3D12GraphicsCommandList4> command_List_;
     //現在のビューポート。
-    D3D12_VIEWPORT current_Viewport;
+    D3D12_VIEWPORT current_Viewport_;
     //ディスクリプタヒープ
     ComPtr<ID3D12DescriptorHeap> descriptor_Heap_[MAX_DESCRIPTOR_HEAP];
 

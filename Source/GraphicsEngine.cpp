@@ -1,6 +1,8 @@
 #include "GraphicsEngine.h"
 #include <d3dx12.h>
 #include "RenderContext.h"
+
+
 //デフォルト コンストラクタ
 GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, const UINT frameBufferHeight):
 	hWnd(hwnd),
@@ -23,7 +25,10 @@ GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, co
 
 	rtv_Descriptor_Size_(0),
 	dsv_Descriptor_Size_(0),
+	cbr_Srv_Descriptor_Size_(0),
+	sampler_Descriptor_Size_(0),
 	fence_Value_(0),
+	frame_Index(0),
 	fence_Event_()
 {}
 

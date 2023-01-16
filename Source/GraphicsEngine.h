@@ -87,7 +87,29 @@ private:
 
 public:
 
+	/// <summary>
+	/// デバイス取得
+	/// </summary>
+	/// <returns>this device</returns>
 	ID3D12Device5* GetD3DDevice()const { return this->device_.Get(); }
+
+	/// <summary>
+	/// バックバッファの番号を取得。
+	/// </summary>
+	/// <returns>バックバッファの番号。</returns>
+	UINT GetBackBufferIndex() const { return this->frame_Index; }
+
+	/// <summary>
+	/// サンプラのディスクリプタヒープサイズを取得。
+	/// </summary>
+	/// <returns>this sapmer descriptor size</returns>
+	UINT GetSapmerDescriptorSize() const { return this->sampler_Descriptor_Size_; }
+
+	/// <summary>
+	/// CBR_SRVのディスクリプタのサイズを取得。
+	/// </summary>
+	/// <returns>this cbr srv descriptor size</returns>
+	UINT GetCbrSrvDescriptorSize() const { return this->cbr_Srv_Descriptor_Size_; }
 
 private:
 	//フレームバッファの数(表と裏で2枚)
@@ -131,6 +153,14 @@ private:
 	UINT rtv_Descriptor_Size_;
 	//深度ステンシルバッファのディスクリプタのサイズ。
 	UINT dsv_Descriptor_Size_;
+	//CBR_SRVのディスクリプタのサイズ。
+	UINT cbr_Srv_Descriptor_Size_;
+	//サンプラのディスクリプタのサイズ。			
+	UINT sampler_Descriptor_Size_;
 	UINT64 fence_Value_;
+	// GPUとの同期で使用する変数。
+	UINT frame_Index;
+
+
 	HANDLE fence_Event_;
 };
