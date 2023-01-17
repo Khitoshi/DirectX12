@@ -158,6 +158,8 @@
     <ClCompile Include="Source\IndexBuffer.cpp" />
     <ClCompile Include="Source\Light.cpp" />
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Math.cpp" />
+    <ClCompile Include="Source\NullTextureMaps.cpp" />
     <ClCompile Include="Source\PipelineState.cpp" />
     <ClCompile Include="Source\RenderContext.cpp" />
     <ClCompile Include="Source\RootSignature.cpp" />
@@ -208,12 +210,18 @@
     <ClInclude Include="Source\IShaderResource.h" />
     <ClInclude Include="Source\IUnorderAccessResrouce.h" />
     <ClInclude Include="Source\Light.h" />
+    <ClInclude Include="Source\Math.h" />
+    <ClInclude Include="Source\Matrix.h" />
+    <ClInclude Include="Source\Model.h" />
+    <ClInclude Include="Source\NullTextureMaps.h" />
     <ClInclude Include="Source\PipelineState.h" />
+    <ClInclude Include="Source\Quaternion.h" />
     <ClInclude Include="Source\RenderContext.h" />
     <ClInclude Include="Source\RenderContext_inline.h" />
     <ClInclude Include="Source\RootSignature.h" />
     <ClInclude Include="Source\System.h" />
     <ClInclude Include="Source\Vector3.h" />
+    <ClInclude Include="Source\Vector4.h" />
     <ClInclude Include="Source\VertexBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

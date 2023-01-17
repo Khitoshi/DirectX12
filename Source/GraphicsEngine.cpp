@@ -1,7 +1,8 @@
 #include "GraphicsEngine.h"
 #include <d3dx12.h>
 #include "RenderContext.h"
-
+#include "NullTextureMaps.h"
+#include "Camera.h"
 
 //デフォルト コンストラクタ
 GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, const UINT frameBufferHeight):
@@ -20,7 +21,8 @@ GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, co
 	command_Allocator_(),
 	command_List_(),
 	fence_(),
-
+	view_Port_(),
+	scissor_Rect_(),
 	current_Back_Buffer_Index_(0),
 
 	rtv_Descriptor_Size_(0),
@@ -36,7 +38,8 @@ GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, co
 GraphicsEngine::~GraphicsEngine()
 {}
 
-bool GraphicsEngine::Init()
+//初期化
+bool GraphicsEngine::Init(Camera& camera)
 {
     //DXGIオブジェクトの生成
     this->CreateDXGIFactory();
@@ -70,6 +73,42 @@ bool GraphicsEngine::Init()
 
 	this->render_Conext_ = std::make_unique<RenderContext>();
 	this->render_Conext_->Init(this->command_List_.Get());
+
+	//ビューポート初期化
+	//TODO: 関数にする
+	this->view_Port_.TopLeftX = 0;
+	this->view_Port_.TopLeftY = 0;
+	this->view_Port_.Width = static_cast<FLOAT>(this->frame_Buffer_Width_);
+	this->view_Port_.Height = static_cast<FLOAT>(this->frame_Buffer_Height_);
+	this->view_Port_.MaxDepth = D3D12_MAX_DEPTH;
+	this->view_Port_.MinDepth = D3D12_MIN_DEPTH;
+
+	//シザリング初期化
+	//TODO: 関数にする
+	this->scissor_Rect_.left = 0;
+	this->scissor_Rect_.top = 0;
+	this->scissor_Rect_.right = this->frame_Buffer_Width_;
+	this->scissor_Rect_.bottom = this->frame_Buffer_Height_;
+
+	//CBR_SVRのディスクリプタのサイズを取得
+	this->cbr_Srv_Descriptor_Size_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	//Samplerのディスクリプタのサイズを取得
+	this->sampler_Descriptor_Size_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+
+	this->null_Texture_Maps_ = std::make_unique<NullTextureMaps>();
+	this->null_Texture_Maps_->Init();
+
+	//std::unique_ptr<Camera> camera_2d;
+	std::unique_ptr<Camera> camera_3d;
+
+	//camera_2d = std::make_unique<Camera>();
+	//camera_2d->set
+	camera_3d = std::make_unique<Camera>();
+	camera_3d->GetPosition().Set(0.0f, 50.0f, 200.0f);
+	camera_3d->GetTarget().Set(0.0f, 50.0f, 0.0f);
+	
+	camera = *camera_3d;
 
     return true;
 }

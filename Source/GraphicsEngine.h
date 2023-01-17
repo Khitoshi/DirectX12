@@ -11,6 +11,8 @@
 using namespace Microsoft::WRL;
 
 class RenderContext;
+class NullTextureMaps;
+class Camera;
 
 class GraphicsEngine
 {
@@ -31,8 +33,9 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
+	/// <param name="camera">カメラ情報</param>
 	/// <returns>trueで初期化に成功:falseで初期化に失敗</returns>
-	bool Init();
+	bool Init(Camera& camera);
 
 private:
 	/// <summary>
@@ -143,8 +146,14 @@ private:
 	//コマンドリスト
 	ComPtr<ID3D12GraphicsCommandList4> command_List_;
 	ComPtr<ID3D12Fence> fence_;
-
 	std::unique_ptr< RenderContext> render_Conext_;
+	//ビューポート。
+	D3D12_VIEWPORT view_Port_;
+	//シザリング矩形。
+	D3D12_RECT scissor_Rect_;
+
+	//ヌルテクスチャ
+	std::unique_ptr<NullTextureMaps> null_Texture_Maps_;
 
 	//現在のバックバッファの番号。
 	unsigned int current_Back_Buffer_Index_;
@@ -161,6 +170,8 @@ private:
 	// GPUとの同期で使用する変数。
 	UINT frame_Index;
 
-
 	HANDLE fence_Event_;
+
+	//std::unique_ptr<Camera> camera_2d;
+	//std::unique_ptr<Camera> camera_3d;
 };

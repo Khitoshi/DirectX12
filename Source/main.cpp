@@ -11,17 +11,17 @@ using namespace std;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
+    std::unique_ptr<Camera> camera_3d;
+    camera_3d = make_unique<Camera>();
     std::unique_ptr<System>system;
     system = make_unique<System>();
-    system->InitGraphicSystem(hInstance, hPrevInstance, lpCmdLine, nCmdShow, TEXT("DirectX12 自作ライブラリ"));
+    system->InitGraphicSystem(hInstance, hPrevInstance, lpCmdLine, nCmdShow, TEXT("DirectX12 自作ライブラリ"),*camera_3d);
     
     //3D用　カメラ
-    std::unique_ptr<Camera> camera3d;
-    camera3d = make_unique<Camera>();
     //カメラの位置を設定
-    camera3d->GetPosition().Set(0.0f, 0.0f, 100.0f);
+    camera_3d->GetPosition().Set(0.0f, 0.0f, 100.0f);
     //カメラのターゲットを設定
-    camera3d->GetTarget().Set(0.0f, 0.0f, 0.0f);
+    camera_3d->GetTarget().Set(0.0f, 0.0f, 0.0f);
 
     //ライト
     std::unique_ptr<Light> light;
@@ -32,7 +32,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     //ライトの色は白
     light->GetDirectionLight().color.Set(0.5f, 0.5f, 0.5f);
     //視点の位置を設定する
-    light->GetEyePosition().Set(camera3d->GetPosition());
+    light->GetEyePosition().Set(camera_3d->GetPosition());
 
 
 

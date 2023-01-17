@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+class Camera;
 
 class System
 {
@@ -7,7 +8,7 @@ public:
     System();
     ~System();
 
-    void InitGraphicSystem(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName);
+    void InitGraphicSystem(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName, Camera& camera);
 private:
 
     void InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName);

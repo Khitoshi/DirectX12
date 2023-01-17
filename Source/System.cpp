@@ -1,6 +1,7 @@
 #include "System.h"
 #include "GraphicsEngine.h"
 #include <memory>
+#include "Camera.h"
 
 using namespace std;
 
@@ -28,13 +29,13 @@ System::~System()
 {
 }
 
-void System::InitGraphicSystem(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName)
+void System::InitGraphicSystem(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName,Camera& camera)
 {
 	InitWindow(hInstance, hPrevInstance, lpCmdLine, nCmdShow, appName);
 	
 	unique_ptr<GraphicsEngine>graphics_engine;
 	graphics_engine = make_unique<GraphicsEngine>(hWnd_,frame_Buffer_width_, frame_Buffer_height_);
-	graphics_engine->Init();
+	graphics_engine->Init(camera);
 	return;
 }
 

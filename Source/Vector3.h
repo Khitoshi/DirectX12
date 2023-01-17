@@ -272,6 +272,24 @@ public:
 	}
 
 public:
+#pragma region Get static method
+	//const Vector2 g_vec2Zero = { 0.0f, 0.0f };
+	const static Vector3 Vec3Zero() { return Vector3(0.0f, 0.0f, 0.0f); }
+	const static Vector3 Vec3Right() { return Vector3(1.0f, 0.0f, 0.0f); }
+	const static Vector3 Vec3Left() { return Vector3(-1.0f, 0.0f, 0.0f); }
+	const static Vector3 Vec3Up() { return Vector3(0.0f, 1.0f, 0.0f); }
+	const static Vector3 Vec3Down() { return Vector3(0.0f, -1.0f, 0.0f); }
+	const static Vector3 Vec3Front() { return Vector3(0.0f, 0.0f, 1.0f); }
+	const static Vector3 Vec3Back() { return Vector3(0.0f, 0.0f, -1.0f); }
+	const static Vector3 Vec3AxisX() { return Vector3(1.0f, 0.0f, 0.0f); }
+	const static Vector3 Vec3AxisY() { return Vector3(0.0f, 1.0f, 0.0f); }
+	const static Vector3 Vec3AxisZ() { return Vector3(0.0f, 0.0f, 1.0f); }
+	const static Vector3 Vec3One() { return Vector3(1.0f, 1.0f, 1.0f); }
+
+#pragma endregion
+
+
+public:
 	union
 	{
 		XMFLOAT3 vec;
