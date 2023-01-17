@@ -51,6 +51,14 @@ public:
 	void Set(const Vector3 v);
 
 	/// <summary>
+	/// ベクトルに設定
+	/// </summary>
+	/// <typeparam name="TVector"></typeparam>
+	/// <param name="_v"></param>
+	template<class T>
+	void Set(T& _v) { Set(_v.x, _v.y, _v.z); }
+
+	/// <summary>
 	/// ベクトルの加算
 	/// </summary>
 	/// <remarks>
@@ -94,6 +102,7 @@ public:
 	/// <remarks>
 	/// float d = this->x * v.x + this->y * v.y + this->z * v.z;
 	/// return d;
+	/// </remarks>
 	/// <param name="v"></param>
 	float Dot(const Vector3& v);
 
@@ -274,17 +283,17 @@ public:
 public:
 #pragma region Get static method
 	//const Vector2 g_vec2Zero = { 0.0f, 0.0f };
-	const static Vector3 Vec3Zero() { return Vector3(0.0f, 0.0f, 0.0f); }
-	const static Vector3 Vec3Right() { return Vector3(1.0f, 0.0f, 0.0f); }
-	const static Vector3 Vec3Left() { return Vector3(-1.0f, 0.0f, 0.0f); }
-	const static Vector3 Vec3Up() { return Vector3(0.0f, 1.0f, 0.0f); }
-	const static Vector3 Vec3Down() { return Vector3(0.0f, -1.0f, 0.0f); }
-	const static Vector3 Vec3Front() { return Vector3(0.0f, 0.0f, 1.0f); }
-	const static Vector3 Vec3Back() { return Vector3(0.0f, 0.0f, -1.0f); }
-	const static Vector3 Vec3AxisX() { return Vector3(1.0f, 0.0f, 0.0f); }
-	const static Vector3 Vec3AxisY() { return Vector3(0.0f, 1.0f, 0.0f); }
-	const static Vector3 Vec3AxisZ() { return Vector3(0.0f, 0.0f, 1.0f); }
-	const static Vector3 Vec3One() { return Vector3(1.0f, 1.0f, 1.0f); }
+	const static Vector3 GetVec3Zero() { return Vector3(0.0f, 0.0f, 0.0f); }
+	const static Vector3 GetVec3Right() { return Vector3(1.0f, 0.0f, 0.0f); }
+	const static Vector3 GetVec3Left() { return Vector3(-1.0f, 0.0f, 0.0f); }
+	const static Vector3 GetVec3Up() { return Vector3(0.0f, 1.0f, 0.0f); }
+	const static Vector3 GetVec3Down() { return Vector3(0.0f, -1.0f, 0.0f); }
+	const static Vector3 GetVec3Front() { return Vector3(0.0f, 0.0f, 1.0f); }
+	const static Vector3 GetVec3Back() { return Vector3(0.0f, 0.0f, -1.0f); }
+	const static Vector3 GetVec3AxisX() { return Vector3(1.0f, 0.0f, 0.0f); }
+	const static Vector3 GetVec3AxisY() { return Vector3(0.0f, 1.0f, 0.0f); }
+	const static Vector3 GetVec3AxisZ() { return Vector3(0.0f, 0.0f, 1.0f); }
+	const static Vector3 GetVec3One() { return Vector3(1.0f, 1.0f, 1.0f); }
 
 #pragma endregion
 

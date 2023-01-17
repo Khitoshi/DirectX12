@@ -1,7 +1,10 @@
 #pragma once
-#include "Vector4.h"
-#include "Vector3.h"
-#include "Math.h"
+#include <DirectXMath.h>
+
+#include "Matrix.h"
+
+class Math;
+
 /// <summary>
 /// クオータニオン
 /// </summary>
@@ -9,175 +12,57 @@ class Quaternion : public Vector4
 {
 public:
 	//static const Quaternion Identity;		//!<単位クォータニオン。
-	Quaternion()
-	{
-		x = y = z = 0.0f;
-		w = 1.0f;
-	}
-	/// <summary>
-	/// コンストラクタ。
-	/// </summary>
-	Quaternion(float x, float y, float z, float w) :
-		Vector4(x, y, z, w)
-	{
-	}
-	/// <summary>
-	/// X軸周りの回転クォータニオンを作成。
-	/// </summary>
-	/// <param name="axis"></param>
-	/// <param name="angle"></param>
-	void SetRotationX(float angle)
-	{
-		SetRotation(Vector3::Vec3AxisX(), angle);
-	}
-	/// <summary>
-	/// X軸周りの回転クォータニオンを作成。
-	/// </summary>
-	/// <param name="angle">回転角度。単位Degree</param>
-	void SetRotationDegX(float angle)
-	{
-		SetRotationDeg(Vector3::Vec3AxisX(), angle);
-	}
-	/// <summary>
-	/// Y軸周りの回転クォータニオンを作成。
-	/// </summary>
-	/// <param name="axis"></param>
-	/// <param name="angle"></param>
-	void SetRotationY(float angle)
-	{
-		SetRotation(Vector3::Vec3AxisY(), angle);
-	}
-	/// <summary>
-	/// Y軸周りの回転クォータニオンを作成。
-	/// </summary>
-	/// <param name="angle">回転角度。単位Degree</param>
-	void SetRotationDegY(float angle)
-	{
-		SetRotationDeg(Vector3::Vec3AxisY(), angle);
-	}
 
 	/// <summary>
-	/// Z軸周りの回転クォータニオンを作成。
+	/// デフォルト コンストラクタ
 	/// </summary>
-	/// <param name="axis"></param>
-	/// <param name="angle"></param>
-	void SetRotationZ(float angle)
-	{
-		SetRotation(Vector3::Vec3AxisZ(), angle);
-	}
-	/// <summary>
-	/// Z軸周りの回転クォータニオンを作成。
-	/// </summary>
-	/// <param name="angle">回転角度。単位Degree</param>
-	void SetRotationDegZ(float angle)
-	{
-		SetRotationDeg(Vector3::Vec3AxisZ(), angle);
-	}
-
-
+	Quaternion();
+	
 
 	/// <summary>
-	/// 任意の軸周りの回転クォータニオンを作成。
+	/// コピー コンストラクタ。
 	/// </summary>
-	/// <param name="axis">回転軸</param>
-	/// <param name="angle">回転角度。単位ラジアン。</param>
-	void SetRotation(const Vector3& axis, float angle)
-	{
-		float s;
-		float halfAngle = angle * 0.5f;
-		s = sinf(halfAngle);
-		w = cosf(halfAngle);
-		x = axis.x * s;
-		y = axis.y * s;
-		z = axis.z * s;
-	}
-	/// <summary>
-	/// 任意の軸周りの回転クォータニオンを作成。
-	/// </summary>
-	/// <param name="axis">回転軸</param>
-	/// <param name="angle">回転角度。単位Degree</param>
-	void SetRotationDeg(const Vector3& axis, float angle)
-	{
-		float s;
-		float halfAngle = Math::DegToRad(angle) * 0.5f;
-		s = sinf(halfAngle);
-		w = cosf(halfAngle);
-		x = axis.x * s;
-		y = axis.y * s;
-		z = axis.z * s;
-	}
-	/// <summary>
-	/// 行列からクォータニオンを作成。
-	/// </summary>
-	/// <param name="m">行列</param>
-	void SetRotation(const Matrix& m);
-	/// <summary>
-	/// fromベクトルからtoベクトルに回転させるクォータニオンを作成。
-	/// </summary>
-	/// <param name="from">回転前のベクトル</param>
-	/// <param name="to">回転後のベクトル</param>
-	void SetRotation(Vector3 from, Vector3 to);
+	Quaternion(float x, float y, float z, float w);
+
+
 	/// <summary>
 	/// 球面線形補完
 	/// </summary>
 	/// <param name="t">補完率</param>
 	/// <param name="q1">開始クォータニオン。</param>
 	/// <param name="q2">終了クォータニオン。</param>
-	void Slerp(float t, Quaternion q1, Quaternion q2)
-	{
-		DirectX::XMVECTOR xmv = DirectX::XMQuaternionSlerp(
-			DirectX::XMLoadFloat4(&q1.vec),
-			DirectX::XMLoadFloat4(&q2.vec),
-			t
-		);
-		DirectX::XMStoreFloat4(&vec, xmv);
-	}
+	void Slerp(float t, Quaternion q1, Quaternion q2);
+
 	/// <summary>
 	/// Y軸周りの回転を加算。
 	/// </summary>
 	/// <returns>加算する回転角度。ラジアン単位。</returns>
-	void AddRotationY(float angle)
-	{
-		Quaternion addRot;
-		addRot.SetRotation(Vector3::Vec3AxisY(), angle);
-		*this *= addRot;
-	}
+	void AddRotationY(float angle);
+
 	/// <summary>
 	/// クォータニオン同士の乗算
 	/// </summary>
 	/// <param name="rot"></param>
-	void Multiply(const Quaternion& rot)
-	{
-		float pw, px, py, pz;
-		float qw, qx, qy, qz;
+	void Multiply(const Quaternion& rot);
 
-		qw = w; qx = x; qy = y; qz = z;
-		pw = rot.w; px = rot.x; py = rot.y; pz = rot.z;
-
-		w = pw * qw - px * qx - py * qy - pz * qz;
-		x = pw * qx + px * qw + py * qz - pz * qy;
-		y = pw * qy - px * qz + py * qw + pz * qx;
-		z = pw * qz + px * qy - py * qx + pz * qw;
-
-	}
 	/// <summary>
 	/// クォータニオン同士の乗算。
 	/// </summary>
 	/// <param name="rot0"></param>
 	/// <param name="rot1"></param>
-	void Multiply(const Quaternion& rot0, const Quaternion& rot1)
-	{
-		float pw, px, py, pz;
-		float qw, qx, qy, qz;
+	void Multiply(const Quaternion& rot0, const Quaternion& rot1);
 
-		qw = rot0.w; qx = rot0.x; qy = rot0.y; qz = rot0.z;
-		pw = rot1.w; px = rot1.x; py = rot1.y; pz = rot1.z;
+	/// <summary>
+	/// ベクトルにクォータニオンを適用する。
+	/// </summary>
+	void Apply(Vector4& _v) const;
 
-		w = pw * qw - px * qx - py * qy - pz * qz;
-		x = pw * qx + px * qw + py * qz - pz * qy;
-		y = pw * qy - px * qz + py * qw + pz * qx;
-		z = pw * qz + px * qy - py * qx + pz * qw;
-	}
+	/// <summary>
+	/// ベクトルにクォータニオンを適用する。
+	/// </summary>
+	void Apply(Vector3& _v) const;
+
+public://operator
 	/// <summary>
 	/// クォータニオンの代入乗算演算子
 	/// </summary>
@@ -186,21 +71,120 @@ public:
 		Multiply(rot0, *this);
 		return *this;
 	}
+
+public://get method 
+#pragma region get method
+
+#pragma endregion
+
+#pragma region get static method
 	/// <summary>
-	/// ベクトルにクォータニオンを適用する。
+	/// 単位クォータニオン
 	/// </summary>
-	void Apply(Vector4& _v) const
-	{
-		DirectX::XMVECTOR xmv = DirectX::XMVector3Rotate(_v, *this);
-		DirectX::XMStoreFloat4(&_v.vec, xmv);
-	}
+	/// <returns></returns>
+	static Quaternion GetIdentity() { return Quaternion(0.0f, 0.0f, 0.0f, 1.0f); }
+#pragma endregion
+
+public://set method
+#pragma region set method
 	/// <summary>
-	/// ベクトルにクォータニオンを適用する。
+	/// X軸周りの回転クォータニオンを作成。
 	/// </summary>
-	void Apply(Vector3& _v) const
+	/// <param name="axis"></param>
+	/// <param name="angle"></param>
+	void SetRotationX(float angle) { SetRotation(Vector3::GetVec3AxisX(), angle); }
+
+	/// <summary>
+	/// X軸周りの回転クォータニオンを作成。
+	/// </summary>
+	/// <param name="angle">回転角度。単位Degree</param>
+	void SetRotationDegX(float angle) { SetRotationDeg(Vector3::GetVec3AxisX(), angle); }
+
+	/// <summary>
+	/// Y軸周りの回転クォータニオンを作成。
+	/// </summary>
+	/// <param name="axis"></param>
+	/// <param name="angle"></param>
+	void SetRotationY(float angle) { SetRotation(Vector3::GetVec3AxisY(), angle); };
+
+	/// <summary>
+	/// Y軸周りの回転クォータニオンを作成。
+	/// </summary>
+	/// <param name="angle">回転角度。単位Degree</param>
+	void SetRotationDegY(float angle) { SetRotationDeg(Vector3::GetVec3AxisY(), angle); }
+
+	/// <summary>
+	/// Z軸周りの回転クォータニオンを作成。
+	/// </summary>
+	/// <param name="axis"></param>
+	/// <param name="angle"></param>
+	void SetRotationZ(float angle) { SetRotation(Vector3::GetVec3AxisZ(), angle); }
+
+	/// <summary>
+	/// Z軸周りの回転クォータニオンを作成。
+	/// </summary>
+	/// <param name="angle">回転角度。単位Degree</param>
+	void SetRotationDegZ(float angle) { SetRotationDeg(Vector3::GetVec3AxisZ(), angle); }
+
+	/// <summary>
+	/// 任意の軸周りの回転クォータニオンを作成。
+	/// </summary>
+	/// <param name="axis">回転軸</param>
+	/// <param name="angle">回転角度。単位ラジアン。</param>
+	void SetRotation(const Vector3& axis, float angle);
+
+	/// <summary>
+	/// 任意の軸周りの回転クォータニオンを作成。
+	/// </summary>
+	/// <param name="axis">回転軸</param>
+	/// <param name="angle">回転角度。単位Degree</param>
+	void SetRotationDeg(const Vector3& axis, float angle);
+
+	/// <summary>
+	/// 行列からクォータニオンを作成。
+	/// </summary>
+	/// <param name="m">行列</param>
+	void SetRotation(const Matrix& m)
 	{
-		DirectX::XMVECTOR xmv = DirectX::XMVector3Rotate(_v, *this);
-		DirectX::XMStoreFloat3(&_v.vec, xmv);
+		DirectX::XMStoreFloat4(
+			&vec,
+			DirectX::XMQuaternionRotationMatrix(m)
+		);
 	}
-public:
+
+	/// <summary>
+	/// fromベクトルからtoベクトルに回転させるクォータニオンを作成。
+	/// </summary>
+	/// <param name="from">回転前のベクトル</param>
+	/// <param name="to">回転後のベクトル</param>
+	void SetRotation(Vector3 from, Vector3 to)
+	{
+		from.Normalize();
+		to.Normalize();
+		auto t = ::Dot(from, to);
+		Vector3 rotAxis;
+		if (t > 0.998f) {
+			//ほぼ同じ向きなので単位クォータニオンにする。
+			*this = Quaternion::GetIdentity();
+		}
+		else if (t < -0.998f) {
+			//ほぼ逆向きなので、
+			if (fabsf(to.x) < 1.0f) {
+				//
+				rotAxis = Cross(Vector3::GetVec3AxisX(), to);
+			}
+			else {
+				rotAxis = Cross(Vector3::GetVec3AxisY(), to);
+			}
+		}
+		else {
+			rotAxis = Cross(from, to);
+		}
+		rotAxis.Normalize();
+		SetRotation(rotAxis, acosf(t));
+
+	}
+
+#pragma endregion
+
 };

@@ -1,8 +1,13 @@
 #pragma once
-#include <DirectXMath.h>
+
 #include "Vector3.h"
 #include "Vector4.h"
-#include "Quaternion.h"
+
+//#include "Quaternion.h"
+
+
+//TODO:include 重複している可能性があるのでcppで書かれている物を確認する
+//hでは#pragma onceを付けているので多分大丈夫
 using namespace DirectX;
 
 /// <summary>
@@ -151,13 +156,7 @@ public:
 	/// クォータニオンから回転行列を作成。
 	/// </summary>
 	/// <param name="q">クォータニオン。</param>
-	void MakeRotationFromQuaternion(const Quaternion& q)
-	{
-		DirectX::XMStoreFloat4x4(
-			&mat,
-			DirectX::XMMatrixRotationQuaternion(q)
-		);
-	}
+	void MakeRotationFromQuaternion(const Quaternion& q);
 
 	/// <summary>
 	/// 任意の軸周りの回転行列を作成。

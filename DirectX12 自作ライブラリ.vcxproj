@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Bone.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\ConstantBuffer.cpp" />
     <ClCompile Include="Source\DescriptorHeap.cpp" />
@@ -159,8 +160,11 @@
     <ClCompile Include="Source\Light.cpp" />
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\Math.cpp" />
+    <ClCompile Include="Source\Matrix.cpp" />
+    <ClCompile Include="Source\Model.cpp" />
     <ClCompile Include="Source\NullTextureMaps.cpp" />
     <ClCompile Include="Source\PipelineState.cpp" />
+    <ClCompile Include="Source\Quaternion.cpp" />
     <ClCompile Include="Source\RenderContext.cpp" />
     <ClCompile Include="Source\RootSignature.cpp" />
     <ClCompile Include="Source\System.cpp" />
@@ -201,6 +205,7 @@
     <None Include="Shader\BasicShaderHeader.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Bone.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\ConstantBuffer.h" />
     <ClInclude Include="Source\DescriptorHeap.h" />
@@ -213,12 +218,14 @@
     <ClInclude Include="Source\Math.h" />
     <ClInclude Include="Source\Matrix.h" />
     <ClInclude Include="Source\Model.h" />
+    <ClInclude Include="Source\ModelData.h" />
     <ClInclude Include="Source\NullTextureMaps.h" />
     <ClInclude Include="Source\PipelineState.h" />
     <ClInclude Include="Source\Quaternion.h" />
     <ClInclude Include="Source\RenderContext.h" />
     <ClInclude Include="Source\RenderContext_inline.h" />
     <ClInclude Include="Source\RootSignature.h" />
+    <ClInclude Include="Source\Skeleton.h" />
     <ClInclude Include="Source\System.h" />
     <ClInclude Include="Source\Vector3.h" />
     <ClInclude Include="Source\Vector4.h" />
