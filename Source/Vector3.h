@@ -104,7 +104,7 @@ public:
 	/// return d;
 	/// </remarks>
 	/// <param name="v"></param>
-	float Dot(const Vector3& v);
+	float Dot(const Vector3& v)const;
 
 	/// <summary>
 	/// 外積を計算
@@ -309,3 +309,63 @@ public:
 		};
 	};
 };
+
+/// <summary>
+/// ベクトル同士の加算。
+/// </summary>
+static inline Vector3 operator+(const Vector3& v0, const Vector3& v1)
+{
+	Vector3 result;
+	result.Add(v0, v1);
+	return result;
+}
+/// <summary>
+/// ベクトルとスカラーの乗算。
+/// </summary>
+static inline Vector3 operator*(const Vector3& v, float s)
+{
+	Vector3 result;
+	result = v;
+	result.Scale(s);
+	return result;
+}
+
+/// <summary>
+/// ベクトルとスカラーの除算。
+/// </summary>
+static inline Vector3 operator/(const Vector3& v, float s)
+{
+	Vector3 result;
+	result = v;
+	result.Div(s);
+	return result;
+}
+
+/// <summary>
+/// ベクトル同士の減算。
+/// </summary>
+static inline Vector3 operator-(const Vector3& v0, const Vector3& v1)
+{
+	Vector3 result;
+	result.Subtract(v0, v1);
+	return result;
+}
+
+/// <summary>
+/// 外積を計算。
+/// </summary>
+static inline Vector3 Cross(const Vector3& v0, const Vector3& v1)
+{
+	Vector3 result;
+	result.Cross(v0, v1);
+	return result;
+}
+
+
+/// <summary>
+/// 内積を計算。
+/// </summary>
+static inline float Dot(const Vector3& v0, const Vector3& v1)
+{
+	return v0.Dot(v1);
+}

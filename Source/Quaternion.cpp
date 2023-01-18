@@ -1,7 +1,7 @@
 #include "Quaternion.h"
 
 #include "Math.h"
-
+#include "Matrix.h"
 //デフォルト コンストラクタ
 Quaternion::Quaternion()
 {
@@ -102,4 +102,12 @@ void Quaternion::SetRotationDeg(const Vector3& axis, float angle)
 	x = axis.x * s;
 	y = axis.y * s;
 	z = axis.z * s;
+}
+
+void Quaternion::SetRotation(const Matrix& m)
+{
+	DirectX::XMStoreFloat4(
+		&vec,
+		DirectX::XMQuaternionRotationMatrix(m)
+	);
 }

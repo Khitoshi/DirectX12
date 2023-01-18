@@ -3,11 +3,8 @@
 #include "Vector3.h"
 #include "Vector4.h"
 
-//#include "Quaternion.h"
+#include "Quaternion.h"
 
-
-//TODO:include 重複している可能性があるのでcppで書かれている物を確認する
-//hでは#pragma onceを付けているので多分大丈夫
 using namespace DirectX;
 
 /// <summary>
@@ -328,3 +325,14 @@ public:
 	//単位行列
 	static const Matrix Identity;
 };
+
+
+/// <summary>
+/// クォータニオン同士の乗算。
+/// </summary>
+static inline Quaternion operator*(const Quaternion& q1, const Quaternion q2)
+{
+	Quaternion qRet;
+	qRet.Multiply(q2, q1);
+	return qRet;
+}

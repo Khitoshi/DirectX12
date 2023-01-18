@@ -1,9 +1,13 @@
 #pragma once
 #include <DirectXMath.h>
 
-#include "Matrix.h"
+#include "Math.h"
+#include "Vector4.h"
+#include "Vector3.h"
+//#include "Matrix.h"
+using namespace DirectX;
 
-class Math;
+class Matrix;
 
 /// <summary>
 /// クオータニオン
@@ -144,13 +148,7 @@ public://set method
 	/// 行列からクォータニオンを作成。
 	/// </summary>
 	/// <param name="m">行列</param>
-	void SetRotation(const Matrix& m)
-	{
-		DirectX::XMStoreFloat4(
-			&vec,
-			DirectX::XMQuaternionRotationMatrix(m)
-		);
-	}
+	void SetRotation(const Matrix& m);
 
 	/// <summary>
 	/// fromベクトルからtoベクトルに回転させるクォータニオンを作成。

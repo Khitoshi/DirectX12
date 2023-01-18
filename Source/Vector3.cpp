@@ -78,7 +78,7 @@ void Vector3::Subtract(const Vector3& v0, const Vector3& v1)
 }
 
 //“àÏ‚ðŒvŽZ
-float Vector3::Dot(const Vector3& v)
+float Vector3::Dot(const Vector3& v)const
 {
     XMVECTOR xmv0 = XMLoadFloat3(&this->vec);
     XMVECTOR xmv1 = XMLoadFloat3(&v.vec);

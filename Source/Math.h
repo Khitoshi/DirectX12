@@ -1,6 +1,12 @@
 #pragma once
 
+#include <DirectXMath.h>
+
 #include "Quaternion.h"
+
+#include "Vector3.h"
+
+using namespace DirectX;
 
 class Math
 {
@@ -72,111 +78,10 @@ public:
 		int v[4];
 	};
 };
-/// <summary>
-/// ベクトル同士の加算。
-/// </summary>
-static inline Vector3 operator+(const Vector3& v0, const Vector3& v1)
-{
-	Vector3 result;
-	result.Add(v0, v1);
-	return result;
-}
-/// <summary>
-/// ベクトルとスカラーの乗算。
-/// </summary>
-
-static inline Vector3 operator*(const Vector3& v, float s)
-{
-	Vector3 result;
-	result = v;
-	result.Scale(s);
-	return result;
-}
-/// <summary>
-/// ベクトルとスカラーの除算。
-/// </summary>
-static inline Vector3 operator/(const Vector3& v, float s)
-{
-	Vector3 result;
-	result = v;
-	result.Div(s);
-	return result;
-}
-/// <summary>
-/// ベクトル同士の減算。
-/// </summary>
-static inline Vector3 operator-(const Vector3& v0, const Vector3& v1)
-{
-	Vector3 result;
-	result.Subtract(v0, v1);
-	return result;
-}
-
-/// <summary>
-/// 外積を計算。
-/// </summary>
-static inline Vector3 Cross(const Vector3& v0, const Vector3& v1)
-{
-	Vector3 result;
-	result.Cross(v0, v1);
-	return result;
-}
-/// <summary>
-/// 内積を計算。
-/// </summary>
-static inline float Dot(const Vector3& v0, const Vector3& v1)
-{
-	return v0.Dot(v1);
-}
-
-/// <summary>
-/// ベクトル同士の加算。
-/// </summary>
-
-static inline Vector4 operator+(const Vector4& v0, const Vector4& v1)
-{
-	Vector4 result;
-	result.Add(v0, v1);
-	return result;
-}
-/// <summary>
-/// ベクトルとスカラーの乗算。
-/// </summary>
-
-static inline Vector4 operator*(const Vector4& v, float s)
-{
-	Vector4 result;
-	result = v;
-	result.Scale(s);
-	return result;
-}
-
-/// <summary>
-/// ベクトル同士の減算。
-/// </summary>
-static inline Vector4 operator-(const Vector4& v0, const Vector4& v1)
-{
-	Vector4 result;
-	result.Subtract(v0, v1);
-	return result;
-}
 
 
-/// <summary>
-/// 内積を計算。
-/// </summary>
-static inline float Dot(const Vector4& v0, const Vector4& v1)
-{
-	return v0.Dot(v1);
-}
 
 
-/// <summary>
-/// クォータニオン同士の乗算。
-/// </summary>
-static inline Quaternion operator*(const Quaternion& q1, const Quaternion q2)
-{
-	Quaternion qRet;
-	qRet.Multiply(q2, q1);
-	return qRet;
-}
+
+
+

@@ -260,3 +260,46 @@ public:
 		float v[4];
 	};
 };
+
+
+/// <summary>
+/// ベクトル同士の減算。
+/// </summary>
+static inline Vector4 operator-(const Vector4& v0, const Vector4& v1)
+{
+	Vector4 result;
+	result.Subtract(v0, v1);
+	return result;
+}
+
+
+/// <summary>
+/// ベクトル同士の加算。
+/// </summary>
+static inline Vector4 operator+(const Vector4& v0, const Vector4& v1)
+{
+	Vector4 result;
+	result.Add(v0, v1);
+	return result;
+}
+
+
+/// <summary>
+/// ベクトルとスカラーの乗算。
+/// </summary>
+static inline Vector4 operator*(const Vector4& v, float s)
+{
+	Vector4 result;
+	result = v;
+	result.Scale(s);
+	return result;
+}
+
+
+/// <summary>
+/// 内積を計算。
+/// </summary>
+static inline float Dot(const Vector4& v0, const Vector4& v1)
+{
+	return v0.Dot(v1);
+}
