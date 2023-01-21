@@ -7,14 +7,14 @@
 #include "Camera.h"
 #include "Light.h"
 
-using namespace std;
+#pragma warning(disable : 4996)
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
     std::unique_ptr<Camera> camera_3d;
-    camera_3d = make_unique<Camera>();
+    camera_3d = std::make_unique<Camera>();
     std::unique_ptr<System>system;
-    system = make_unique<System>();
+    system = std::make_unique<System>();
     system->InitGraphicSystem(hInstance, hPrevInstance, lpCmdLine, nCmdShow, TEXT("DirectX12 自作ライブラリ"),*camera_3d);
     
     //3D用　カメラ
@@ -25,7 +25,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
     //ライト
     std::unique_ptr<Light> light;
-    light = make_unique<Light>();
+    light = std::make_unique<Light>();
     //ライトは右から当たっている
     light->GetDirectionLight().direction.Set(1.0f, -1.0f, -1.0f);
     light->GetDirectionLight().direction.Normalize();

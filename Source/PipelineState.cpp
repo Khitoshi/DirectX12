@@ -27,7 +27,7 @@ void PipelineState::Init(GraphicsEngine* graphicsEngine, D3D12_GRAPHICS_PIPELINE
     {
         MessageBoxA(nullptr, "パイプラインステートの作成に失敗しました。\n", "エラー", MB_OK);
         std::abort();
-        exit(-1);
+        std::abort();
     }
 }
 
@@ -47,6 +47,6 @@ void PipelineState::Init(GraphicsEngine* graphicsEngine, D3D12_COMPUTE_PIPELINE_
     {
         MessageBoxA(nullptr, "パイプラインステートの作成に失敗しました。\n", "エラー", MB_OK);
         std::abort();
-        exit(-1);
+        std::abort();
     }
 }

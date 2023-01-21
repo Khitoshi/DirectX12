@@ -1,6 +1,7 @@
 #include "ConstantBuffer.h"
 #include "GraphicsEngine.h"
-//#include <Windows.h>
+#include <Windows.h>
+
 
 //デフォルト コンストラクタ
 ConstantBuffer::ConstantBuffer() :

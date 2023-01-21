@@ -27,7 +27,11 @@ public:
 	void Init(GraphicsEngine* graphicsEngine, D3D12_COMPUTE_PIPELINE_STATE_DESC desc);
 
 public:
-ID3D12PipelineState* GetPipelineState() { return this->pipeline_State_.Get(); }
+	/// <summary>
+	/// パイプラインステートを取得
+	/// </summary>
+	/// <returns>this Pipeline State</returns>
+	ID3D12PipelineState* GetPipelineState() { return this->pipeline_State_.Get(); }
 
 private:
 	//パイプライン ステート

@@ -37,6 +37,7 @@ bld/
 
 /[Ll]ibrary/DirectXTex
 /[Ll]ibrary/fbxsdk 2020.3.2
+/[Ll]ibrary/DirectXTK
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

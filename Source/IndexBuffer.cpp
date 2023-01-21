@@ -49,7 +49,7 @@ void IndexBuffer::Init(GraphicsEngine* graphicsEngine,int size, int stride)
     if (FAILED(hr))
     {
         //TODO :MYASSERTを実装する
-        exit(-1);
+        std::abort();
     }
 
     //インデックスバッファのビュー 生成

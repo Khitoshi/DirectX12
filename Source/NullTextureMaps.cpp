@@ -1,6 +1,8 @@
 #include "NullTextureMaps.h"
 #include <memory>
 #include <Windows.h>
+
+
 NullTextureMaps::NullTextureMaps():
 	albedo_Map_(),
 	albedo_Map_File_Path_(),

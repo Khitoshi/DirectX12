@@ -38,6 +38,7 @@ public:
 	bool Init(Camera& camera);
 
 private:
+#pragma region Create Method
 	/// <summary>
 	/// DXGIオブジェクトの生成
 	/// </summary>
@@ -88,8 +89,11 @@ private:
 	/// </summary>
 	void CreateSynchronizationWithGPUObject();
 
-public:
+#pragma endregion
 
+
+public:
+#pragma region Get Method
 	/// <summary>
 	/// デバイス取得
 	/// </summary>
@@ -113,6 +117,11 @@ public:
 	/// </summary>
 	/// <returns>this cbr srv descriptor size</returns>
 	UINT GetCbrSrvDescriptorSize() const { return this->cbr_Srv_Descriptor_Size_; }
+
+	ID3D12CommandQueue* GetCommandQueue()const { return this->command_Queue_.Get(); }
+
+#pragma endregion
+
 
 private:
 	//フレームバッファの数(表と裏で2枚)

@@ -34,7 +34,7 @@ void VertexBuffer::Init(GraphicsEngine* graphicsEngine, int size, int stride)
     if (FAILED(hr))
     {
         //TODO:MYASSERTを実装する
-        exit(-1);
+        std::abort();
     }
 
     //頂点バッファの名前 セット

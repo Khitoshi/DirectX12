@@ -17,6 +17,9 @@
     <Filter Include="ソース ファイル\Light">
       <UniqueIdentifier>{19195cab-7a25-4c1b-b8b8-436b7cedc82f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\System\Math">
+      <UniqueIdentifier>{fce4ca7f-1a8f-41d9-9d68-7843fd635887}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\main.cpp">
@@ -29,9 +32,6 @@
       <Filter>ソース ファイル\Light</Filter>
     </ClCompile>
     <ClCompile Include="Source\System.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Vector3.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\GraphicsEngine.cpp">
@@ -70,10 +70,49 @@
     <ClCompile Include="Source\Bone.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Quaternion.cpp">
+    <ClCompile Include="Source\Skeleton.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
+    <ClCompile Include="Source\TksFile.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MeshParts.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StructuredBuffer.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TkmFile.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Material.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Texture.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Vector2.cpp">
+      <Filter>ソース ファイル\System\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Vector3.cpp">
+      <Filter>ソース ファイル\System\Math</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Matrix.cpp">
+      <Filter>ソース ファイル\System\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Quaternion.cpp">
+      <Filter>ソース ファイル\System\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\tkEngine.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePad.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TResourceBank.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,9 +137,6 @@
       <Filter>ソース ファイル\Light</Filter>
     </ClInclude>
     <ClInclude Include="Source\GraphicsEngine.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Vector3.h">
       <Filter>ソース ファイル\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\System.h">
@@ -142,16 +178,7 @@
     <ClInclude Include="Source\NullTextureMaps.h">
       <Filter>ソース ファイル\System</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Vector4.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Quaternion.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Math.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Matrix.h">
       <Filter>ソース ファイル\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Model.h">
@@ -166,5 +193,48 @@
     <ClInclude Include="Source\Bone.h">
       <Filter>ソース ファイル\System</Filter>
     </ClInclude>
+    <ClInclude Include="Source\TksFile.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MeshParts.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StructuredBuffer.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TkmFile.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Texture.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Material.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vector2.h">
+      <Filter>ソース ファイル\System\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vector3.h">
+      <Filter>ソース ファイル\System\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vector4.h">
+      <Filter>ソース ファイル\System\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Matrix.h">
+      <Filter>ソース ファイル\System\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Quaternion.h">
+      <Filter>ソース ファイル\System\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\tkEngine.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePad.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TResourceBank.h" />
   </ItemGroup>
 </Project>

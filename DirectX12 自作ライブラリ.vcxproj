@@ -121,13 +121,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Library\DirectXTex;%(AdditionalIncludeDirectories);$(SolutionDir)\Library\fbxsdk 2020.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Library\DirectXTex;%(AdditionalIncludeDirectories);$(SolutionDir)\Library\fbxsdk 2020.3.2\include;$(SolutionDir)\Library\DirectXTK\Inc;$(SolutionDir)\Library\DirectXTK\Src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;DirectXTex.lib;DirectXTex.lib;%(AdditionalDependencies);libfbxsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Library\DirectXTex\Lib\Desktop_2019_Win10\x64\Debug;$(SolutionDir)\Library\fbxsdk 2020.3.2\lib\vs2019\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;DirectXTex.lib;%(AdditionalDependencies);libfbxsdk.lib;;DirectXTK12.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Library\DirectXTex\Lib\Desktop_2019_Win10\x64\Debug;$(SolutionDir)\Library\fbxsdk 2020.3.2\lib\vs2019\x64\debug;$(SolutionDir)\Library\DirectXTK\Bin\Desktop_2019_Win10\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,15 +139,15 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)\Library\DirectXTex;$(SolutionDir)\Library\fbxsdk 2020.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)\Library\DirectXTex;$(SolutionDir)\Library\fbxsdk 2020.3.2\include;$(SolutionDir)\Library\DirectXTK\Inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;DirectXTex.lib;%(AdditionalDependencies);libfbxsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)/Library\DirectXTex\Lib\Desktop_2019_Win10\x64\Release;$(SolutionDir)\Library\fbxsdk 2020.3.2\lib\vs2019\x64\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;DirectXTex.lib;%(AdditionalDependencies);libfbxsdk.lib;%(AdditionalDependencies);DirectXTK12.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)/Library\DirectXTex\Lib\Desktop_2019_Win10\x64\Release;$(SolutionDir)\Library\fbxsdk 2020.3.2\lib\vs2019\x64\release;$(SolutionDir)\Library\DirectXTK\Bin\Desktop_2019_Win10\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -155,19 +155,31 @@
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\ConstantBuffer.cpp" />
     <ClCompile Include="Source\DescriptorHeap.cpp" />
+    <ClCompile Include="Source\GamePad.cpp" />
     <ClCompile Include="Source\GraphicsEngine.cpp" />
     <ClCompile Include="Source\IndexBuffer.cpp" />
     <ClCompile Include="Source\Light.cpp" />
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Material.cpp" />
     <ClCompile Include="Source\Math.cpp" />
     <ClCompile Include="Source\Matrix.cpp" />
+    <ClCompile Include="Source\MeshParts.cpp" />
     <ClCompile Include="Source\Model.cpp" />
     <ClCompile Include="Source\NullTextureMaps.cpp" />
     <ClCompile Include="Source\PipelineState.cpp" />
     <ClCompile Include="Source\Quaternion.cpp" />
     <ClCompile Include="Source\RenderContext.cpp" />
     <ClCompile Include="Source\RootSignature.cpp" />
+    <ClCompile Include="Source\Shader.cpp" />
+    <ClCompile Include="Source\Skeleton.cpp" />
+    <ClCompile Include="Source\StructuredBuffer.cpp" />
     <ClCompile Include="Source\System.cpp" />
+    <ClCompile Include="Source\Texture.cpp" />
+    <ClCompile Include="Source\tkEngine.cpp" />
+    <ClCompile Include="Source\TkmFile.cpp" />
+    <ClCompile Include="Source\TksFile.cpp" />
+    <ClCompile Include="Source\TResourceBank.cpp" />
+    <ClCompile Include="Source\Vector2.cpp" />
     <ClCompile Include="Source\Vector3.cpp" />
     <ClCompile Include="Source\VertexBuffer.cpp" />
   </ItemGroup>
@@ -210,13 +222,16 @@
     <ClInclude Include="Source\ConstantBuffer.h" />
     <ClInclude Include="Source\DescriptorHeap.h" />
     <ClInclude Include="Source\DescriptorHeap_inline.h" />
+    <ClInclude Include="Source\GamePad.h" />
     <ClInclude Include="Source\GraphicsEngine.h" />
     <ClInclude Include="Source\IndexBuffer.h" />
     <ClInclude Include="Source\IShaderResource.h" />
     <ClInclude Include="Source\IUnorderAccessResrouce.h" />
     <ClInclude Include="Source\Light.h" />
+    <ClInclude Include="Source\Material.h" />
     <ClInclude Include="Source\Math.h" />
     <ClInclude Include="Source\Matrix.h" />
+    <ClInclude Include="Source\MeshParts.h" />
     <ClInclude Include="Source\Model.h" />
     <ClInclude Include="Source\ModelData.h" />
     <ClInclude Include="Source\NullTextureMaps.h" />
@@ -225,8 +240,16 @@
     <ClInclude Include="Source\RenderContext.h" />
     <ClInclude Include="Source\RenderContext_inline.h" />
     <ClInclude Include="Source\RootSignature.h" />
+    <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\Skeleton.h" />
+    <ClInclude Include="Source\StructuredBuffer.h" />
     <ClInclude Include="Source\System.h" />
+    <ClInclude Include="Source\Texture.h" />
+    <ClInclude Include="Source\tkEngine.h" />
+    <ClInclude Include="Source\TkmFile.h" />
+    <ClInclude Include="Source\TksFile.h" />
+    <ClInclude Include="Source\TResourceBank.h" />
+    <ClInclude Include="Source\Vector2.h" />
     <ClInclude Include="Source\Vector3.h" />
     <ClInclude Include="Source\Vector4.h" />
     <ClInclude Include="Source\VertexBuffer.h" />

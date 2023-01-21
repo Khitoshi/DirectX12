@@ -186,3 +186,13 @@ public://set method
 #pragma endregion
 
 };
+
+/// <summary>
+/// クォータニオン同士の乗算。
+/// </summary>
+static inline Quaternion operator*(const Quaternion& q1, const Quaternion q2)
+{
+	Quaternion qRet;
+	qRet.Multiply(q2, q1);
+	return qRet;
+}

@@ -326,13 +326,15 @@ public:
 	static const Matrix Identity;
 };
 
-
 /// <summary>
-/// クォータニオン同士の乗算。
+/// 行列同士の乗算
 /// </summary>
-static inline Quaternion operator*(const Quaternion& q1, const Quaternion q2)
+/// <remarks>
+/// 乗算は左から右に向かってかかっていく。
+/// </remarks>
+static inline Matrix operator*(const Matrix& m1, const Matrix m2)
 {
-	Quaternion qRet;
-	qRet.Multiply(q2, q1);
-	return qRet;
+	Matrix mRet;
+	mRet.Multiply(m1, m2);
+	return mRet;
 }

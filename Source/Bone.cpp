@@ -8,7 +8,7 @@ Bone::Bone(
     int parentBoneNo,
     int boneId) :
     bone_Name_(boneName),
-    parent_Bone_Index_(parentBoneNo),
+    parent_Bone_Number_(parentBoneNo),
     bone_Id_(boneId),
 
     bind_Pose_(bindPose),
@@ -17,11 +17,9 @@ Bone::Bone(
     world_Matrix_(),
     offset_Local_Matrix_(),
 
-    //positoin_(Vector3(0, 0, 0)),
-    positoin_(),
-    //scale_(Vector3(0, 0, 0)),
-    scale_(),
-    rotation_(),
+    positoin_(Vector3(0,0,0)),
+    scale_(Vector3(0, 0, 0)),
+    rotation_(Quaternion(0.0f,0.0f,0.0f,0.0f)),
 
     bone_children_()
 {

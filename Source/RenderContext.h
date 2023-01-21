@@ -35,6 +35,7 @@ public:
     void Init(ID3D12GraphicsCommandList4* commandList);
 
 public://set method
+#pragma region Set Method
     /// <summary>
     /// 頂点バッファ 設定
     /// </summary>
@@ -85,15 +86,19 @@ public://set method
     /// </summary>
     /// <param name="pipelineState">パイプラインステート</param>
     void SetPipelineState(ID3D12PipelineState* pipelineState);
-    void SetPipelineState(PipelineState* pipelineState);
+    void SetPipelineState(PipelineState& pipelineState);
     
     /// <summary>
-    /// ディスクリプタヒープ 設定
+    /// ディスクリプタヒープを設定。
     /// </summary>
-    /// <param name="descriptorHeap">ディスクリプタヒープ</param>
-    void SetDescriptorHeap(ID3D12DescriptorHeap* descriptorHeap);
-    void SetComputeDescriptorHeap(GraphicsEngine* graphicsEngine, DescriptorHeap& descriptorHeap);
+    void SetDescriptorHeap(ID3D12DescriptorHeap* descHeap)
+    {
+        this->descriptor_Heap_[0] = descHeap;
+        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
+    }
 
+    void SetDescriptorHeap(GraphicsEngine* graphicsEngine,DescriptorHeap& descHeap);
+    void SetComputeDescriptorHeap(GraphicsEngine* graphicsEngine,DescriptorHeap& descHeap);
     /// <summary>
     /// ディスクリプタテーブルを設定。
     /// </summary>
@@ -101,8 +106,16 @@ public://set method
     /// <param name="BaseDescriptor"></param>
     void SetComputeRootDescriptorTable(UINT RootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor);
 
+#pragma endregion
+
 public://get method
     D3D12_VIEWPORT GetViewport()const { return this->current_Viewport_; }
+
+private:
+    void SetGraphicsRootDescriptorTable(UINT RootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor)
+    {
+        this->command_List_->SetGraphicsRootDescriptorTable(RootParameterIndex, BaseDescriptor);
+    }
 
 private:
     //ディスクリプタヒープの最大数。

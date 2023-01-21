@@ -1,6 +1,7 @@
 #pragma once
 #include "d3dx12.h"
 
+class GraphicsEngine;
 class IShaderResource {
 public:
 	virtual ~IShaderResource()
@@ -10,6 +11,7 @@ public:
 	/// SRVに登録。
 	/// </summary>
 	/// <param name="descriptorHandle">CPU ディスクリプタ　ハンドル</param>
-	virtual void RegistShaderResourceView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo) = 0;
-
+	/// <param name="bufferNumber">バッファの番号</param>
+	/// <param name="graphicsEngine">デバイス取得用</param>
+	virtual void RegistShaderResourceView(GraphicsEngine* graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber) = 0;
 };

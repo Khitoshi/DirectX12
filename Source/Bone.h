@@ -4,7 +4,6 @@
 #include "Matrix.h"
 #include <string>
 #include <list>
-
 /// <summary>
 /// ボーン。
 /// </summary>
@@ -71,7 +70,7 @@ public:
 	/// 親のボーン番号を取得。
 	/// </summary>
 	/// <returns></returns>
-	int GetParentBoneIndex() const{return this->parent_Bone_Index_;}
+	int GetParentBoneNumber() const{return this->parent_Bone_Number_;}
 
 	/// <summary>
 	/// ボーン番号を取得。
@@ -109,7 +108,7 @@ private:
 	//ボーンの名前
 	std::wstring	bone_Name_;
 	//親のボーン番号
-	int				parent_Bone_Index_;
+	int				parent_Bone_Number_;
 	//ボーン番号
 	int				bone_Id_;
 

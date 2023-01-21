@@ -137,7 +137,7 @@ void GraphicsEngine::CreateDXGIFactory()
     if (FAILED(hr))
     {
         MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateDXGIFactoryで生成に失敗しました"), TEXT("エラー"), MB_OK);
-        exit(-1);
+		std::abort();
     }
 }
 
@@ -271,7 +271,7 @@ void GraphicsEngine::CreateD3DDevice()
 	if (!this->device_) {
 		//D3Dデバイスの作成に失敗した。
 		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateD3DDeviceで生成に失敗しました"), TEXT("エラー"), MB_OK);
-		exit(-1);
+		std::abort();
 	}
 }
 
@@ -289,7 +289,7 @@ void GraphicsEngine::CreateCommandQueue()
 	if (FAILED(hr))
 	{
 		MessageBox(this->hWnd, TEXT("コマンドキューの作成に失敗しました。"), TEXT("エラー"), MB_OK);
-		exit(-1);
+		std::abort();
 	}
 }
 
@@ -322,7 +322,7 @@ void GraphicsEngine::CreateSwapChain()
 	if (FAILED(hr))
 	{
 		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateSwapChainの生成に失敗しました"), TEXT("エラー"), MB_OK);
-		exit(-1);
+		std::abort();
 	}
 
 	//IDXGISwapChain4のインターフェスを取得
@@ -347,7 +347,7 @@ void GraphicsEngine::CreateDescriptorHeapForFrameBuffer()
 	if (FAILED(hr)) {
 		//レンダリングターゲットビューのディスクリプタヒープ用のディスクリプタヒープの作成に失敗した。
 		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateDescriptorHeapForFrameBufferの生成に失敗しました"), TEXT("エラー"), MB_OK);
-		exit(-1);
+		std::abort();
 	}
 	//ディスクリプタのサイズを取得。
 	rtv_Descriptor_Size_ = this->device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -360,7 +360,7 @@ void GraphicsEngine::CreateDescriptorHeapForFrameBuffer()
 	if (FAILED(hr)) {
 		//深度ステンシルビューのディスクリプタヒープ用のディスクリプタヒープの作成に失敗した。
 		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateDescriptorHeapForFrameBufferの生成に失敗しました"), TEXT("エラー"), MB_OK);
-		exit(-1);
+		std::abort();
 	}
 	//ディスクリプタのサイズを取得。
 	this->dsv_Descriptor_Size_ = this->device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
@@ -388,7 +388,7 @@ void GraphicsEngine::CreateRTVForFameBuffer()
 		{
 			//中身がnullの場合
 			MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateRTVForFameBufferの生成に失敗"), TEXT("エラー"), MB_OK);
-			exit(-1);
+			std::abort();
 		}
 	}
 }
@@ -429,7 +429,7 @@ void GraphicsEngine::CreateDSVForFrameBuffer()
 	if (FAILED(hr))
 	{
 		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateDSVForFrameBufferの生成に失敗"), TEXT("エラー"), MB_OK);
-		exit(-1);
+		std::abort();
 	}
 
 	//ディスクリプタヒープの生成
@@ -450,7 +450,7 @@ void GraphicsEngine::CreateCommandAllocator()
 	//生成チェック
 	if (FAILED(hr)) {
 		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateCommandAllocatorの生成に失敗"), TEXT("エラー"), MB_OK);
-		exit(-1);
+		std::abort();
 	}
 }
 
@@ -464,7 +464,7 @@ void GraphicsEngine::CreateCommandList()
 	if (FAILED(hr))
 	{
 		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateCommandListの生成に失敗"), TEXT("エラー"), MB_OK);
-		exit(-1);
+		std::abort();
 	}
 
 	//コマンドリストは開かれている状態で生成されるので，一度閉じる
@@ -481,7 +481,7 @@ void GraphicsEngine::CreateSynchronizationWithGPUObject()
 	if (FAILED(hr))
 	{
 		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateSynchronizationWithGPUObjectの生成に失敗"), TEXT("エラー"), MB_OK);
-		exit(-1);
+		std::abort();
 	}
 	this->fence_Value_ = 1;
 
@@ -489,6 +489,6 @@ void GraphicsEngine::CreateSynchronizationWithGPUObject()
 	this->fence_Event_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	if (this->fence_Event_ == nullptr) {
 		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateSynchronizationWithGPUObjectの生成に失敗"), TEXT("エラー"), MB_OK);
-		exit(-1);
+		std::abort();
 	}
 }

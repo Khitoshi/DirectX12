@@ -207,6 +207,7 @@ public:
 		return XMLoadFloat3(&vec);
 	}
 
+#pragma region Operator
 	/// <summary>
 	/// ‘ã“ü‰‰ŽZŽq
 	/// </summary>
@@ -279,6 +280,10 @@ public:
 		this->Div(s);
 		return *this;
 	}
+
+#pragma endregion
+
+	
 
 public:
 #pragma region Get static method

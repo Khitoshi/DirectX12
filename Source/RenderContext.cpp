@@ -103,9 +103,9 @@ void RenderContext::SetPipelineState(ID3D12PipelineState* pipelineState)
 }
 
 //パイプラインステート 設定
-void RenderContext::SetPipelineState(PipelineState* pipelineState)
+void RenderContext::SetPipelineState(PipelineState& pipelineState)
 {
-    this->command_List_->SetPipelineState(pipelineState->GetPipelineState());
+    this->command_List_->SetPipelineState(pipelineState.GetPipelineState());
 }
 
 void RenderContext::SetComputeRootDescriptorTable(UINT RootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor)

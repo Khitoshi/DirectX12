@@ -1,7 +1,6 @@
 #pragma once
 #include <Windows.h>
 class Camera;
-
 class System
 {
 public:

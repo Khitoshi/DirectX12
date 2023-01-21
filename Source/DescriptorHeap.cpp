@@ -110,7 +110,7 @@ void DescriptorHeap::Commit(GraphicsEngine* graphicsEngine)
             MessageBox(nullptr, L"DescriptorHeap::Commit ディスクリプタヒープの作成に失敗しました。", L"エラー", MB_OK);
             std::abort();
             //強制終了
-            exit(-1);
+            std::abort();
         }
     }
 
@@ -140,7 +140,7 @@ void DescriptorHeap::Commit(GraphicsEngine* graphicsEngine)
         {
             if (this->shader_Resources_[i] != nullptr) 
             {
-                this->shader_Resources_[i]->RegistShaderResourceView(cpu_Handle, buffer_Index);
+                this->shader_Resources_[i]->RegistShaderResourceView(graphicsEngine,cpu_Handle, buffer_Index);
             }
             //次に進める。
             cpu_Handle.ptr += graphicsEngine->GetCbrSrvDescriptorSize();
@@ -249,6 +249,6 @@ void DescriptorHeap::RegistResource(int registerIndex, T res, T resTable[], int&
         MessageBox(nullptr, errorMessage, L"DescriptorHeap::RegistResourceで失敗", MB_OK);
         std::abort();
         //強制終了
-        exit(-1);
+        std::abort();
     }
 }

@@ -3,8 +3,6 @@
 #include <memory>
 #include "Camera.h"
 
-using namespace std;
-
 //メッセージプロシージャ
 LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -33,8 +31,8 @@ void System::InitGraphicSystem(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPW
 {
 	InitWindow(hInstance, hPrevInstance, lpCmdLine, nCmdShow, appName);
 	
-	unique_ptr<GraphicsEngine>graphics_engine;
-	graphics_engine = make_unique<GraphicsEngine>(hWnd_,frame_Buffer_width_, frame_Buffer_height_);
+	std::unique_ptr<GraphicsEngine>graphics_engine;
+	graphics_engine = std::make_unique<GraphicsEngine>(hWnd_,frame_Buffer_width_, frame_Buffer_height_);
 	graphics_engine->Init(camera);
 	return;
 }

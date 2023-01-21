@@ -2,15 +2,18 @@
 #include <utility>
 #include "IShaderResource.h"
 
-//#include ""
+#include "Skeleton.h"
 
 
-class ModelData
+//モデルの上方向
+enum EnModelUpAxis {
+    enModelUpAxisY,		//モデルの上方向がY軸。
+    enModelUpAxisZ,		//モデルの上方向がZ軸。
+};
+
+
+struct ModelInitData
 {
-public:
-    ModelData();
-    ~ModelData();
-
     //ファイルパス
     const char* model_File_Path_;
     //.fxファイルのファイルパス。
