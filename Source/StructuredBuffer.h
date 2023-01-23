@@ -55,9 +55,10 @@ public:
     /// 初期化判別用フラグ取得
     /// </summary>
     /// <returns>true = 初期化済み</returns>
-    bool IsInited() const { this->is_Inited_; }
+    bool IsInited() const { return this->is_Inited_; }
 
-    ID3D12Resource* GetResouce();
+    //GPUからアクセスできるバッファーの取得
+    ID3D12Resource* GetResouce(GraphicsEngine* graphicsEngine);
 
 #pragma endregion
 

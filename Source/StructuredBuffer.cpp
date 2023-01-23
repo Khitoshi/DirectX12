@@ -107,3 +107,10 @@ void StructuredBuffer::Update(GraphicsEngine* graphicsEngine, void* data)
     memcpy(this->buffers_On_CPU_[back_baffer_index], data, this->element_Number_ * this->element_Size_);
 }
 
+ID3D12Resource* StructuredBuffer::GetResouce(GraphicsEngine* graphicsEngine)
+{
+
+    auto buck_buffer_index = graphicsEngine->GetBackBufferIndex();
+    return this->buffers_On_GPU_[buck_buffer_index].Get();
+}
+

@@ -34,6 +34,11 @@ public:
     /// <param name="commandList">コマンドリスト</param>
     void Init(ID3D12GraphicsCommandList4* commandList);
 
+    void DrawIndexedInstanced(UINT indexCount, UINT numInstance)
+    {
+        this->command_List_->DrawIndexedInstanced(indexCount, numInstance, 0, 0, 0);
+    }
+
 public://set method
 #pragma region Set Method
     /// <summary>

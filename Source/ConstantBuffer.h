@@ -41,8 +41,11 @@ public:
 	/// </summary>
 	/// <param name="data">コピー元のデータ</param>
 	void CopyToVRAM(GraphicsEngine* graphicsEngine, void* data);
-	//template<class T>
-	//void CopyToVRAM(GraphicsEngine* graphicsEngine, T& data);
+	template<class T>
+	void CopyToVRAM(GraphicsEngine* graphicsEngine, T& data)
+	{
+		CopyToVRAM(graphicsEngine, &data);
+	}
 	
 	/// <summary>
 	/// ディスクリプタヒープに定数バッファビューを登録
@@ -59,6 +62,20 @@ public:
 	/// <param name="graphicsEngine"></param>
 	/// <returns></returns>
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress(GraphicsEngine* graphicsEngine);
+
+public:
+#pragma region Get Method
+	/// <summary>
+	/// 利用可能なバッファかどうかを判定。
+	/// </summary>
+	/// <returns></returns>
+	bool IsValid() const
+	{
+		return this->is_Valid_;
+	}
+#pragma endregion
+
+
 private:
 	//定数バッファ。
 	ComPtr<ID3D12Resource> constant_Buffer_[2];

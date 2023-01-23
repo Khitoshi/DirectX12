@@ -311,6 +311,22 @@ public:
 	}
 
 public:
+#pragma region Get Method
+
+	static const Matrix GetIdentity()
+	{
+		return Matrix(
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+		);
+	}
+
+#pragma endregion
+
+
+public:
 	union {
 		XMFLOAT4X4 mat;
 		struct {

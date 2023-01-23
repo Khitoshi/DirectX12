@@ -14,7 +14,7 @@
 #include "IndexBuffer.h"
 #include "DescriptorHeap.h"
 #include "MeshParts.h"
-
+#include "tkEngine.h"
 class Material;
 class Skeleton;
 
@@ -34,11 +34,11 @@ class MeshParts
 {
 private:
     //拡張SRVが設定されるレジスタの開始番号
-    enum { MESHPARTS = 10 };
+    enum { EXPAND_SRV_REG__START_NO = 10 };
     //拡張SRVの最大数
     enum { MAX_MODEL_EXPAND_SRV = 6 };
     //１つのマテリアルで使用されるSRVの数
-    enum { NUM_SRV_ONE_MATERIAL = MESHPARTS + MAX_MODEL_EXPAND_SRV };
+    enum { NUM_SRV_ONE_MATERIAL = EXPAND_SRV_REG__START_NO + MAX_MODEL_EXPAND_SRV };
     //１つのマテリアルで使用されるCBVの数
     enum { NUM_CBV_ONE_MATERIAL = 6 };
 public:
@@ -68,6 +68,7 @@ public:
     /// <param name="colorBufferFormat">このモデルをレンダリングするカラーバッファのフォーマット</param>
     /// <param name="samplerFilter">サンプラフィルタ</param>
     void InitFromTkmFile(
+        tkEngine* tk,
         GraphicsEngine* graphicsEngine,
         const TkmFile& tkmFile,
         const char* fxFilePath,
@@ -88,7 +89,9 @@ public:
     /// <param name="matrixWorld">ワールド 行列</param>
     /// <param name="matrixView">ビュー 行列</param>
     /// <param name="matrixProjection">プロジェクション 行列</param>
-    void Draw(RenderContext& renderContext,
+    void Draw(
+        GraphicsEngine* graphicsEngine,
+        RenderContext& renderContext,
         const Matrix& matrixWorld,
         const Matrix& matrixView,
         const Matrix& matrixProjection
@@ -101,13 +104,13 @@ public:
     /// <param name="numInstance">インスタンス数</param>
     /// <param name="mView">ビュー行列</param>
     /// <param name="mProj">プロジェクション行列</param>
-    void DrawInstancing(RenderContext& renderContext, int numInstance, const Matrix& matrixView, const Matrix& matrixProjection);
+    void DrawInstancing(GraphicsEngine* graphicsEngine,RenderContext& renderContext, int numInstance, const Matrix& matrixView, const Matrix& matrixProjection);
 
     /// <summary>
-    /// スケルトンを関連付ける。
+    /// スケルトンを関連付ける
     /// </summary>
     /// <param name="skeleton">スケルトン</param>
-    void BindSkeleton(Skeleton& skeleton);
+    void BindSkeleton(GraphicsEngine* graphicsEngine,Skeleton& skeleton);
 
     /// <summary>
     /// メッシュに対して問い合わせを行う。
@@ -146,6 +149,8 @@ private:
     /// <param name="colorBufferFormat">このモデルをレンダリングするカラーバッファのフォーマット</param>
     /// <param name="samplerFilter">サンプラフィルタ</param>
     void CreateMeshFromTkmMesh(
+        tkEngine* tk,
+        GraphicsEngine* graphicsEngine,
         const TkmFile::SMesh& mesh,
         int meshNo,
         int& materialNum,
@@ -165,7 +170,7 @@ private:
     /// <param name="mWorld">ワールド行列</param>
     /// <param name="mView">ビュー行列</param>
     /// <param name="mProj">プロジェクション行列</param>
-    void DrawCommon(RenderContext& renderContext, const Matrix& matrixWorld, const Matrix& matrixView, const Matrix& matrixProjection);
+    void DrawCommon(GraphicsEngine* graphicsEngine,RenderContext& renderContext, const Matrix& matrixWorld, const Matrix& matrixView, const Matrix& matrixProjection);
 
 
 public:
@@ -174,7 +179,7 @@ public:
     /// 拡張SRVが設定されるレジスタの開始番号 取得
     /// </summary>
     /// <returns>static int</returns>
-    const static int GetMESHPARTS() { return MESHPARTS; }
+    const static int GetEXPANDSRVREGSTARTNO() { return EXPAND_SRV_REG__START_NO; }
 
     /// <summary>
     /// 拡張SRVの最大数 取得
