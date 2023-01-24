@@ -65,6 +65,8 @@ namespace {
 GamePad::EnXInputPadState GamePad::pad_States_[4] = { GamePad::EnXInputPadState::Undef };
 
 
+#pragma comment(lib,"XInput.lib")
+#pragma comment(lib,"Xinput9_1_0.lib")
 //デフォルト コンストラクタ
 GamePad::GamePad():
 	state_(),
@@ -101,8 +103,7 @@ void GamePad::Update()
 	for (int i = pad_No_; i < MAX_PAD; i++)
 	{
 		//未調査のパッド
-		//TODO:未解決の外部シンボルが出る
-		//result = XInputGetState(i, &this->state_.state);
+		result = XInputGetState(i, &this->state_.state);
 		if (result == ERROR_SUCCESS)
 		{
 			//接続成功
