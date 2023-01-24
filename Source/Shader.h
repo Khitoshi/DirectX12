@@ -46,7 +46,7 @@ public:
 	/// <summary>
 	/// レイトレーシング用のシェーダーをロード
 	/// </summary>
-	void LoadRaytracing(const wchar_t* filePath);
+	//void LoadRaytracing(const wchar_t* filePath);
 
 private:
 	/// <summary>

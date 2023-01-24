@@ -96,8 +96,8 @@ bool GraphicsEngine::Init(Camera& camera)
 	//Samplerのディスクリプタのサイズを取得
 	this->sampler_Descriptor_Size_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 
-	this->null_Texture_Maps_ = std::make_unique<NullTextureMaps>();
-	this->null_Texture_Maps_->Init();
+	//this->null_Texture_Maps_ = std::make_unique<NullTextureMaps>();
+	this->null_Texture_Maps_.Init();
 
 	//std::unique_ptr<Camera> camera_2d;
 	std::unique_ptr<Camera> camera_3d;

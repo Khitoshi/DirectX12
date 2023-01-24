@@ -2,7 +2,8 @@
 
 #include <d3dx12.h>
 #include <wrl.h>
-
+//#include "DescriptorHeap.h"
+#include "DescriptorHeap_inline.h"
 using namespace Microsoft::WRL;
 
 class GraphicsEngine;
@@ -10,8 +11,7 @@ class VertexBuffer;
 class IndexBuffer;
 class RootSignature;
 class PipelineState;
-class DescriptorHeap;
-
+//class DescriptorHeap;
 
 class RenderContext
 {
@@ -34,6 +34,20 @@ public:
     /// <param name="commandList">コマンドリスト</param>
     void Init(ID3D12GraphicsCommandList4* commandList);
 
+    /// <summary>
+    /// インスタンシング描画
+    /// </summary>
+    /// <param name="indexCount">インデックス数</param>
+    void DrawIndexed(UINT indexCount)
+    {
+        this->command_List_->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+    }
+
+    /// <summary>
+    /// インスタンシング描画
+    /// </summary>
+    /// <param name="indexCount">インデックス数</param>
+    /// <param name="numInstance">インスタンス数</param>
     void DrawIndexedInstanced(UINT indexCount, UINT numInstance)
     {
         this->command_List_->DrawIndexedInstanced(indexCount, numInstance, 0, 0, 0);
@@ -101,9 +115,38 @@ public://set method
         this->descriptor_Heap_[0] = descHeap;
         this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
     }
+    void SetDescriptorHeap(GraphicsEngine* graphicsEngine,DescriptorHeap& descriptorHeap)
+    {
+        this->descriptor_Heap_[0] = descriptorHeap.GetDescriptorHeap(graphicsEngine);
+        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
 
-    void SetDescriptorHeap(GraphicsEngine* graphicsEngine,DescriptorHeap& descHeap);
-    void SetComputeDescriptorHeap(GraphicsEngine* graphicsEngine,DescriptorHeap& descHeap);
+        //ディスクリプタテーブルに登録する。
+        if (descriptorHeap.IsRegistConstantBuffer()) {
+            SetGraphicsRootDescriptorTable(0, descriptorHeap.GetConstantBufferGpuDescriptorStartHandle(graphicsEngine));
+        }
+        if (descriptorHeap.IsRegistShaderResource()) {
+            SetGraphicsRootDescriptorTable(1, descriptorHeap.GetShaderResourceGpuDescriptorStartHandle(graphicsEngine));
+        }
+        if (descriptorHeap.IsRegistUavResource()) {
+            SetGraphicsRootDescriptorTable(2, descriptorHeap.GetUavResourceGpuDescriptorStartHandle(graphicsEngine));
+        }
+    }
+    void SetComputeDescriptorHeap(GraphicsEngine* graphicsEngine, DescriptorHeap& descriptorHeap)
+    {
+        this->descriptor_Heap_[0] = descriptorHeap.GetDescriptorHeap(graphicsEngine);
+        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
+
+        //ディスクリプタテーブルに登録する。
+        if (descriptorHeap.IsRegistConstantBuffer()) {
+            SetComputeRootDescriptorTable(0, descriptorHeap.GetConstantBufferGpuDescriptorStartHandle(graphicsEngine));
+        }
+        if (descriptorHeap.IsRegistShaderResource()) {
+            SetComputeRootDescriptorTable(1, descriptorHeap.GetShaderResourceGpuDescriptorStartHandle(graphicsEngine));
+        }
+        if (descriptorHeap.IsRegistUavResource()) {
+            SetComputeRootDescriptorTable(2, descriptorHeap.GetUavResourceGpuDescriptorStartHandle(graphicsEngine));
+        }
+    }
     /// <summary>
     /// ディスクリプタテーブルを設定。
     /// </summary>

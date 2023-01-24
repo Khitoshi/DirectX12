@@ -1,9 +1,9 @@
 #include "MeshParts.h"
 #include "TkmFile.h"
-#include "RenderContext.h"
+//#include "RenderContext.h"
+#include "RenderContext_inline.h"
 #include "Material.h"
 #include "Skeleton.h"
-
 //コンストラクタ
 MeshParts::MeshParts():
     common_Constant_Buffer_(),
@@ -85,18 +85,23 @@ void MeshParts::Draw(
     //描画共通処理を行う
     DrawCommon(graphicsEngine,renderContext, matrixWorld, matrixView, matrixProjection);
 
-    int descriptor_heap_number = 0;
-    for (auto& mesh : this->meshs_)
-    {
-        //頂点バッファを設定
+    int descriptorHeapNo = 0;
+    for (auto& mesh : this->meshs_) {
+        // 頂点バッファを設定。
         renderContext.SetVertexBuffer(mesh->vertexBuffer);
-        //マテリアルごとにドロー
-        for (int material_number = 0; material_number < mesh->materials.size(); material_number++)
-        {
-            //このマテリアルが張られているメッシュの描画開始
-            mesh->materials[material_number]->BeginRender(renderContext, mesh->skinFlags[material_number]);
-
+        //マテリアルごとにドロー。
+        for (int matNo = 0; matNo < mesh->materials.size(); matNo++) {
+            //このマテリアルが貼られているメッシュの描画開始。
+            mesh->materials[matNo]->BeginRender(renderContext, mesh->skinFlags[matNo]);
+            // ディスクリプタヒープを設定。
             renderContext.SetDescriptorHeap(graphicsEngine,this->descriptor_Heap_);
+            // インデックスバッファを設定。
+            auto& ib = mesh->indexBufferArray[matNo];
+            renderContext.SetIndexBuffer(*ib);
+
+            //ドローコールを実行。
+            renderContext.DrawIndexed(ib->GetIndexCount());
+            descriptorHeapNo++;
         }
     }
 
@@ -121,7 +126,7 @@ void MeshParts::DrawInstancing(GraphicsEngine* graphicsEngine,RenderContext& ren
             mesh->materials[materialNo]->BeginRender(renderContext, mesh->skinFlags[materialNo]);
 
             //ディスクリプタヒープ 設定
-            renderContext.SetDescriptorHeap(graphicsEngine, this->descriptor_Heap_);
+            //renderContext.SetDescriptorHeap(graphicsEngine, this->descriptor_Heap_);
 
             //インデックスバッファ設定
             auto& ib = mesh->indexBufferArray[materialNo];

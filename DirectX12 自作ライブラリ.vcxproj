@@ -121,12 +121,12 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Library\DirectXTex;%(AdditionalIncludeDirectories);$(SolutionDir)\Library\fbxsdk 2020.3.2\include;$(SolutionDir)\Library\DirectXTK\Inc;$(SolutionDir)\Library\DirectXTK\Src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Library\DirectXTex;%(AdditionalIncludeDirectories);$(SolutionDir)\Library\fbxsdk 2020.3.2\include;$(SolutionDir)\Library\DirectXTK\Inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;DirectXTex.lib;%(AdditionalDependencies);libfbxsdk.lib;;DirectXTK12.lib</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;%(AdditionalDependencies);libfbxsdk.lib;DirectXTK12.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\Library\DirectXTex\Lib\Desktop_2019_Win10\x64\Debug;$(SolutionDir)\Library\fbxsdk 2020.3.2\lib\vs2019\x64\debug;$(SolutionDir)\Library\DirectXTK\Bin\Desktop_2019_Win10\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

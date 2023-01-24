@@ -7,9 +7,15 @@ NullTextureMaps::NullTextureMaps():
 	albedo_Map_(),
 	albedo_Map_File_Path_(),
 	albedo_Map_Size_(),
+
 	normal_Map_(),
 	normal_Map_File_Path_(),
 	normal_Map_Size_(),
+
+	scecular_Map_(),
+	scecular_Map_File_Path_(),
+	scecular_Map_Size_(),
+
 	zero_Value_Map_(),
 	zero_Value_Map_File_Path_(),
 	zero_Value_Map_Size_()

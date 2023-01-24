@@ -3,24 +3,8 @@
 #include "DescriptorHeap.h"
 #include "GraphicsEngine.h"
 
-//ディスクリプタヒープ 設定
-inline void RenderContext::SetDescriptorHeap(GraphicsEngine* graphicsEngine,DescriptorHeap& descriptorHeap)
-{
-    this->descriptor_Heap_[0] = descriptorHeap.GetDescriptorHeap(graphicsEngine);
-    this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
 
-    //ディスクリプタテーブルに登録する。
-    if (descriptorHeap.IsRegistConstantBuffer()) {
-        SetGraphicsRootDescriptorTable(0, descriptorHeap.GetConstantBufferGpuDescriptorStartHandle());
-    }
-    if (descriptorHeap.IsRegistShaderResource()) {
-        SetGraphicsRootDescriptorTable(1, descriptorHeap.GetShaderResourceGpuDescriptorStartHandle());
-    }
-    if (descriptorHeap.IsRegistUavResource()) {
-        SetGraphicsRootDescriptorTable(2, descriptorHeap.GetUavResourceGpuDescriptorStartHandle());
-    }
-}
-
+/*
 // ディスクリプタヒープ 設定
 inline void RenderContext::SetComputeDescriptorHeap(GraphicsEngine* graphicsEngine, DescriptorHeap& descriptorHeap)
 {
@@ -38,3 +22,4 @@ inline void RenderContext::SetComputeDescriptorHeap(GraphicsEngine* graphicsEngi
         SetComputeRootDescriptorTable(2, descriptorHeap.GetUavResourceGpuDescriptorStartHandle(graphicsEngine));
     }
 }
+*/

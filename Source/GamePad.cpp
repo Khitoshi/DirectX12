@@ -101,7 +101,8 @@ void GamePad::Update()
 	for (int i = pad_No_; i < MAX_PAD; i++)
 	{
 		//未調査のパッド
-		result = XInputGetState(i, &this->state_.state);
+		//TODO:未解決の外部シンボルが出る
+		//result = XInputGetState(i, &this->state_.state);
 		if (result == ERROR_SUCCESS)
 		{
 			//接続成功

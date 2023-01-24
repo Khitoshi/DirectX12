@@ -61,7 +61,7 @@ private:
 	/// <summary>
 	/// パイプラインステートの初期化
 	/// </summary>
-	void InitPipelineState(const std::array < DXGI_FORMAT, static_cast<int>(D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT)>& colorBufferFormat);
+	void InitPipelineState(GraphicsEngine* graphicsEngine,const std::array < DXGI_FORMAT, static_cast<int>(D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT)>& colorBufferFormat);
 
 	/// <summary>
 	/// シェーダー初期化
@@ -82,7 +82,7 @@ private:
 	/// テクスチャを初期化。
 	/// </summary>
 	/// <param name="tkmMat"></param>
-	void InitTexture(const TkmFile::SMaterial& tkmMat);
+	void InitTexture(tkEngine* tk,GraphicsEngine* graphicsEngine, const TkmFile::SMaterial& tkmMat);
 
 public:
 #pragma region Get Method
@@ -171,14 +171,23 @@ private:
 #pragma endregion
 
 #pragma region Shader
+	////スキンなしモデル用の頂点シェーダー
+	//std::unique_ptr<Shader> vs_Non_Skin_Model_;
+	//
+	////スキンありモデル用の頂点シェーダー
+	//std::unique_ptr<Shader> vs_Skin_Model_;
+	//
+	////モデル用のピクセルシェーダー
+	//std::unique_ptr<Shader> ps_Model_;
+
 	//スキンなしモデル用の頂点シェーダー
-	std::unique_ptr<Shader> vs_Non_Skin_Model_;
+	Shader* vs_Non_Skin_Model_;
 
 	//スキンありモデル用の頂点シェーダー
-	std::unique_ptr<Shader> vs_Skin_Model_;
+	Shader* vs_Skin_Model_;
 
 	//モデル用のピクセルシェーダー
-	std::unique_ptr<Shader> ps_Model_;
+	Shader* ps_Model_;
 
 #pragma endregion
 

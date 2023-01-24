@@ -38,6 +38,7 @@ void Shader::LoadCS(const char* filePath, const char* entryFuncName)
 }
 
 //レイトレーシング用のシェーダーをロード
+/*
 void Shader::LoadRaytracing(const wchar_t* filePath)
 {
     //ファイルを読み込む
@@ -137,7 +138,7 @@ void Shader::LoadRaytracing(const wchar_t* filePath)
         result->GetResult(&this->dxc_Blob_);
     }
 
-}
+}*/
 
 //シェーダーをロード
 void Shader::Load(const char* filePath, const char* entryFuncName, const char* shaderModel)

@@ -8,10 +8,10 @@
 #include <dxgi1_5.h>
 #include <wrl.h>
 #include <memory>
+#include "NullTextureMaps.h"
 using namespace Microsoft::WRL;
 
 class RenderContext;
-class NullTextureMaps;
 class Camera;
 
 class GraphicsEngine
@@ -120,6 +120,8 @@ public:
 
 	ID3D12CommandQueue* GetCommandQueue()const { return this->command_Queue_.Get(); }
 
+	const NullTextureMaps& GetNullTextureMaps()const { return this->null_Texture_Maps_; }
+
 #pragma endregion
 
 
@@ -162,7 +164,7 @@ private:
 	D3D12_RECT scissor_Rect_;
 
 	//ヌルテクスチャ
-	std::unique_ptr<NullTextureMaps> null_Texture_Maps_;
+	NullTextureMaps null_Texture_Maps_;
 
 	//現在のバックバッファの番号。
 	unsigned int current_Back_Buffer_Index_;
