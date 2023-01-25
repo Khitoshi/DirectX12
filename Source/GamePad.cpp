@@ -67,6 +67,7 @@ GamePad::EnXInputPadState GamePad::pad_States_[4] = { GamePad::EnXInputPadState:
 
 #pragma comment(lib,"XInput.lib")
 #pragma comment(lib,"Xinput9_1_0.lib")
+
 //デフォルト コンストラクタ
 GamePad::GamePad():
 	state_(),

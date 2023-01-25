@@ -122,6 +122,11 @@ public:
 
 	const NullTextureMaps& GetNullTextureMaps()const { return this->null_Texture_Maps_; }
 
+	//フレームバッファの幅 取得
+	const UINT GetFrameBufferWidth() { return this->frame_Buffer_Width_; }
+	//フレームバッファの高さ 取得
+	const UINT GetFrameBufferHeight() { return this->frame_Buffer_Width_; }
+
 #pragma endregion
 
 
