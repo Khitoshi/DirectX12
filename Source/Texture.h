@@ -51,7 +51,7 @@ public:
     void RegistShaderResourceView(GraphicsEngine* graphicsEngine,D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo);
 
 private:
-
+#pragma region Load Texture Method
     /// <summary>
     /// DDSファイルからテクスチャをロード。
     /// </summary>
@@ -67,6 +67,7 @@ private:
     /// <param name="device">D3Dデバイス</param>
     void LoadTextureFromMemory(GraphicsEngine* graphicsEngine,const char* memory, unsigned int size);
 
+#pragma endregion
 
 public:
 #pragma region Get method

@@ -34,7 +34,5 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     //Ž‹“_‚ÌˆÊ’u‚ðÝ’è‚·‚é
     light->GetEyePosition().Set(camera_3d->GetPosition());
 
-
-
     return 0;
 }

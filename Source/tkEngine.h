@@ -112,7 +112,7 @@ public:
 private:
 
 	//グラフィックエンジン。
-	GraphicsEngine* graphics_Engine_;
+	std::unique_ptr<GraphicsEngine> graphics_Engine_;
 	//.tkm fileバンク。
 	TResourceBank<TkmFile> tkm_File_Bank_;
 	//シェーダーバンク

@@ -37,6 +37,23 @@ public:
 	/// <returns>trueで初期化に成功:falseで初期化に失敗</returns>
 	bool Init(Camera& camera);
 
+	/// <summary>
+	/// レンダリング開始
+	/// </summary>
+	/// <remarks>
+	/// 1フレームのレンダリングの開始時に呼び出してください
+	/// </remarks>
+	void BeginRender(Camera& camera);
+
+	/// <summary>
+	/// レンダリング終了
+	/// </summary>
+	/// <remarks>
+	/// 1フレームのレンダリングの終了時に呼び出してください
+	/// </remarks>
+	void EndRender();
+
+
 private:
 #pragma region Create Method
 	/// <summary>
@@ -91,7 +108,6 @@ private:
 
 #pragma endregion
 
-
 public:
 #pragma region Get Method
 	/// <summary>
@@ -127,8 +143,10 @@ public:
 	//フレームバッファの高さ 取得
 	const UINT GetFrameBufferHeight() { return this->frame_Buffer_Width_; }
 
-#pragma endregion
+	//フレームバッファの数 取得
+	const static UINT GetFrameBufferCount() { return FRAME_BUFFER_COUNT; }
 
+#pragma endregion
 
 private:
 	//フレームバッファの数(表と裏で2枚)
@@ -161,8 +179,12 @@ private:
 	ComPtr<ID3D12CommandAllocator> command_Allocator_;
 	//コマンドリスト
 	ComPtr<ID3D12GraphicsCommandList4> command_List_;
+	//パイプラインステート
+	ComPtr<ID3D12PipelineState> pipeline_State_;
+	//フェンス
 	ComPtr<ID3D12Fence> fence_;
-	std::unique_ptr< RenderContext> render_Conext_;
+	//レンダーコンテキスト
+	std::unique_ptr<RenderContext> render_Conext_;
 	//ビューポート。
 	D3D12_VIEWPORT view_Port_;
 	//シザリング矩形。
@@ -187,6 +209,9 @@ private:
 	UINT frame_Index;
 
 	HANDLE fence_Event_;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE current_Frame_Buffer_RTV_Handle_;
+	D3D12_CPU_DESCRIPTOR_HANDLE current_Frame_Buffer_DSV_Handle_;
 
 	//std::unique_ptr<Camera> camera_2d;
 	//std::unique_ptr<Camera> camera_3d;

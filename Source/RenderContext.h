@@ -5,12 +5,12 @@
 //#include "DescriptorHeap.h"
 #include "DescriptorHeap_inline.h"
 using namespace Microsoft::WRL;
-
 class GraphicsEngine;
 class VertexBuffer;
 class IndexBuffer;
 class RootSignature;
 class PipelineState;
+class RenderTarget;
 //class DescriptorHeap;
 
 class RenderContext
@@ -26,7 +26,6 @@ public:
     /// デフォルト デストラクタ
     /// </summary>
     ~RenderContext();
-
 
     /// <summary>
     /// 初期化
@@ -52,6 +51,64 @@ public:
     {
         this->command_List_->DrawIndexedInstanced(indexCount, numInstance, 0, 0, 0);
     }
+
+    void Reset(ID3D12CommandAllocator* commandAllocator, ID3D12PipelineState* pipelineState)
+    {
+        this->command_List_->Reset(commandAllocator, pipelineState);
+        //スクラッチリソースをクリア
+        this->scratch_Resource_List_.clear();
+    }
+
+#pragma region Clear Method
+
+    /// <summary>
+    /// 複数枚のレンダリングターゲットをクリア。
+    /// </summary>
+    /// <remarks>
+    /// クリアカラーはレンダリングターゲットの初期化時に指定したカラーです。
+    /// </remarks>
+    /// <param name="numRt">レンダリングターゲットの数</param>
+    /// <param name="renderTargets">レンダリングターゲットの数</param>
+    void ClearRenderTargetViews(
+        int numRt,
+        RenderTarget* renderTargets[]
+    );
+    /// <summary>
+    /// レンダリングターゲットのクリア。
+    /// </summary>
+    /// <param name="rtvHandle">CPUのレンダリングターゲットビューのディスクリプタハンドル</param>
+    /// <param name="clearColor">クリアカラー</param>
+    void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, const float* clearColor)
+    {
+        m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+    }
+    /// <summary>
+    /// レンダリングターゲットのクリア。
+    /// </summary>
+    /// <param name="renderTarget"></param>
+    void ClearRenderTargetView(RenderTarget& renderTarget)
+    {
+        RenderTarget* rtArray[] = { &renderTarget };
+        ClearRenderTargetViews(1, rtArray);
+    }
+    /// <summary>
+    /// デプスステンシルビューをクリア
+    /// </summary>
+    /// <param name="renderTarget">レンダリングターゲット</param>
+    /// <param name="clearValue">クリア値</param>
+    void ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, float clearValue)
+    {
+        m_commandList->ClearDepthStencilView(
+            dsvHandle,
+            D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+            clearValue,
+            0,
+            0,
+            nullptr);
+    }
+
+#pragma endregion
+
 
 public://set method
 #pragma region Set Method
@@ -180,5 +237,5 @@ private:
     D3D12_VIEWPORT current_Viewport_;
     //ディスクリプタヒープ
     ComPtr<ID3D12DescriptorHeap> descriptor_Heap_[MAX_DESCRIPTOR_HEAP];
-
+    std::vector<ComPtr<ID3D12Resource>> scratch_Resource_List_;
 };

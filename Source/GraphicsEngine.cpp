@@ -20,7 +20,9 @@ GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, co
 	depth_Stencil_Buffer_(),
 	command_Allocator_(),
 	command_List_(),
+	pipeline_State_(),
 	fence_(),
+	render_Conext_(),
 	view_Port_(),
 	scissor_Rect_(),
 	current_Back_Buffer_Index_(0),
@@ -31,12 +33,17 @@ GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, co
 	sampler_Descriptor_Size_(0),
 	fence_Value_(0),
 	frame_Index(0),
-	fence_Event_()
+
+	fence_Event_(),
+
+	current_Frame_Buffer_RTV_Handle_(),
+	current_Frame_Buffer_DSV_Handle_()
 {}
 
 //デフォルト デストラクタ
 GraphicsEngine::~GraphicsEngine()
-{}
+{
+}
 
 //初期化
 bool GraphicsEngine::Init(Camera& camera)
@@ -111,6 +118,36 @@ bool GraphicsEngine::Init(Camera& camera)
 	camera = *camera_3d;
 
     return true;
+}
+
+void GraphicsEngine::BeginRender(Camera& camera)
+{
+	//カメラ更新
+	camera.Update(this);
+
+	//コマンドアロケーターをリセット
+	this->command_Allocator_->Reset();
+
+	//レンダリングコンテキストもリセット
+	this->render_Conext_->Reset(this->command_Allocator_.Get(), this->pipeline_State_.Get());
+
+	//ビューポート設定
+	this->render_Conext_->SetViewportAndScissor(this->view_Port_);
+
+	this->current_Frame_Buffer_RTV_Handle_ = this->rtv_Heap_->GetCPUDescriptorHandleForHeapStart();
+	this->current_Frame_Buffer_RTV_Handle_.ptr += this->frame_Index * this->rtv_Descriptor_Size_;
+	//深度ステンシルバッファのディスクリプタヒープの開始アドレスを取得。
+	this->current_Frame_Buffer_DSV_Handle_ = this->dsv_Heap_->GetCPUDescriptorHandleForHeapStart();
+	//バックバッファがレンダリングターゲットとして設定可能になるまで待つ。
+	this->render_Conext_.WaitUntilToPossibleSetRenderTarget(this->render_Targets_[this->frame_Index]);
+
+	//レンダリングターゲットを設定。
+	this->render_Conext_.SetRenderTarget(this->current_Frame_Buffer_RTV_Handle_, this->current_Frame_Buffer_DSV_Handle_);
+
+	const float clearColor[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	this->render_Conext_.ClearRenderTargetView(this->current_Frame_Buffer_RTV_Handle_, clearColor);
+	this->render_Conext_.ClearDepthStencilView(this->current_Frame_Buffer_DSV_Handle_, 1.0f);
+
 }
 
 //DXGIオブジェクトの生成

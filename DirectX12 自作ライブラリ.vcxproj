@@ -169,6 +169,7 @@
     <ClCompile Include="Source\PipelineState.cpp" />
     <ClCompile Include="Source\Quaternion.cpp" />
     <ClCompile Include="Source\RenderContext.cpp" />
+    <ClCompile Include="Source\RenderTarget.cpp" />
     <ClCompile Include="Source\RootSignature.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
     <ClCompile Include="Source\Skeleton.cpp" />
@@ -239,6 +240,7 @@
     <ClInclude Include="Source\Quaternion.h" />
     <ClInclude Include="Source\RenderContext.h" />
     <ClInclude Include="Source\RenderContext_inline.h" />
+    <ClInclude Include="Source\RenderTarget.h" />
     <ClInclude Include="Source\RootSignature.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\Skeleton.h" />

@@ -2,6 +2,7 @@
 #include "GraphicsEngine.h"
 #include <memory>
 #include "Camera.h"
+#include "tkEngine.h"
 
 //メッセージプロシージャ
 LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -31,9 +32,14 @@ void System::InitGraphicSystem(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPW
 {
 	InitWindow(hInstance, hPrevInstance, lpCmdLine, nCmdShow, appName);
 	
-	std::unique_ptr<GraphicsEngine>graphics_engine;
-	graphics_engine = std::make_unique<GraphicsEngine>(hWnd_,frame_Buffer_width_, frame_Buffer_height_);
-	graphics_engine->Init(camera);
+	//std::unique_ptr<GraphicsEngine>graphics_engine;
+	//graphics_engine = std::make_unique<GraphicsEngine>(hWnd_,frame_Buffer_width_, frame_Buffer_height_);
+	//graphics_engine->Init(camera);
+
+	std::unique_ptr<tkEngine> engine;
+	engine = std::make_unique<tkEngine>();
+	engine->Init();
+
 	return;
 }
 
