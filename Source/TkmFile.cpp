@@ -264,11 +264,11 @@ void TkmFile::Load(const char* filePath)
 			BuildMaterial(material, fp, filePath);
 		}
 
-		//続いて頂点バッファ。
+		//続いて頂点バッファ
 		mesh_parts.vertexBuffer.resize(meshPartsHeader.numVertex);
 		for (unsigned int vertNo = 0; vertNo < meshPartsHeader.numVertex; vertNo++) {
 			tkmFileFormat::SVertex vertexTmp;
-			fread(&vertexTmp, sizeof(vertexTmp), 1, fp);
+			int err = fread(&vertexTmp, sizeof(vertexTmp), 1, fp);
 			auto& vertex = mesh_parts.vertexBuffer[vertNo];
 			vertex.pos.Set(vertexTmp.pos[0], vertexTmp.pos[1], vertexTmp.pos[2]);
 			//	vertex.normal.Set(vertexTmp.normal[0], vertexTmp.normal[1], vertexTmp.normal[2]);
@@ -284,7 +284,7 @@ void TkmFile::Load(const char* filePath)
 		}
 
 		//続いてインデックスバッファ。
-		//インデックスバッファはマテリアルの数分だけ存在するんじゃよ。
+		//インデックスバッファはマテリアルの数分だけ存在する
 		if (meshPartsHeader.indexSize == 2) {
 			//16bitのインデックスバッファ。
 			mesh_parts.indexBuffer16Array.resize(meshPartsHeader.numMaterial);
@@ -337,9 +337,10 @@ std::string TkmFile::LoadTextureFileName(FILE* fp)
 	//0 の場合 ファイルが無い
 	if (file_name_length <= 0)
 	{
-		//テクスチャのロードに失敗
-		MessageBoxA(nullptr, "テクスチャのロードに失敗", "エラー", MB_OK);
-		std::abort();
+		return texture_name;
+		/*//テクスチャのロードに失敗*/
+		//MessageBoxA(nullptr, "テクスチャのロードに失敗", "エラー", MB_OK);
+		//std::abort();
 	}
 
 	//ファイルネーム生成
@@ -376,6 +377,8 @@ void TkmFile::BuildMaterial(SMaterial& tkmMaterial, FILE* fp, const char* filePa
 	tkmMaterial.normalMapFileName = LoadTextureFileName(fp);
 	//スペキュラマップ
 	tkmMaterial.specularMapFileName = LoadTextureFileName(fp);
+	//リフレクションマップのファイル名をロード。
+	tkmMaterial.reflectionMapFileName = LoadTextureFileName(fp);
 	//屈折マップ
 	tkmMaterial.refractionMapFileName = LoadTextureFileName(fp);
 
@@ -392,12 +395,7 @@ void TkmFile::BuildMaterial(SMaterial& tkmMaterial, FILE* fp, const char* filePa
 		int file_path_length = static_cast<int>(tex_file_path.length());
 
 		//ファイルの存在確認
-		if (file_path_length <= 0)
-		{
-			//テクスチャのロードに失敗
-			MessageBoxA(nullptr, "マテリアルを構築でテクスチャロードに失敗", "エラー", MB_OK);
-			std::abort();
-		}
+		if (texFileName.length() <= 0) { return; }
 
 		//モデルのファイルパスからラストのフォルダ区切りを探す
 		auto replaseStartPos = tex_file_path.find_last_of('/');

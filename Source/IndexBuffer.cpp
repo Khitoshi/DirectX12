@@ -36,7 +36,7 @@ void IndexBuffer::Init(GraphicsEngine* graphicsEngine,int size, int stride)
     auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(this->size_In_Bytes_);
 
     //RESOURCE ¶¬
-    HRESULT hr = device->CreateCommittedResource(
+    HRESULT hr = device.CreateCommittedResource(
         &heapProp,
         D3D12_HEAP_FLAG_NONE,
         &resourceDesc,

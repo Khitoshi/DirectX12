@@ -21,7 +21,7 @@ void VertexBuffer::Init(GraphicsEngine* graphicsEngine, int size, int stride)
     auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
 
     //RESOURCE 生成
-    HRESULT hr = device->CreateCommittedResource(
+    HRESULT hr = device.CreateCommittedResource(
         &heapProp,
         D3D12_HEAP_FLAG_NONE,
         &resourceDesc,
@@ -50,13 +50,14 @@ void VertexBuffer::Init(GraphicsEngine* graphicsEngine, int size, int stride)
 
 void VertexBuffer::Copy(void* strVertices)
 {
-    uint8_t* data = nullptr;
+    uint8_t* data;
     
     //map開始
-    vertex_Buffer_->Map(0, nullptr, (void**)data);
+    this->vertex_Buffer_->Map(0, nullptr, (void**)&data);
 
     //メモリをコピー　(mapしているのでdataがvertexbufferに入る)
-    memcpy(data, strVertices, this->vertex_Buffer_View_.SizeInBytes);
+    //memcpy(data, strVertices, this->vertex_Buffer_View_.SizeInBytes);
+    memcpy(data, strVertices, vertex_Buffer_View_.SizeInBytes);
     
     //map解除
     this->vertex_Buffer_->Unmap(0,nullptr);

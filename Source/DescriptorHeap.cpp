@@ -99,7 +99,7 @@ void DescriptorHeap::Commit(GraphicsEngine* graphicsEngine)
     for (auto& descriptor_Heap : this->descriptor_Heap_) 
     {
         //ディスクリプタヒープ 生成
-        HRESULT hr = device->CreateDescriptorHeap(&srv_Heap_Desc, IID_PPV_ARGS(&descriptor_Heap));
+        HRESULT hr = device.CreateDescriptorHeap(&srv_Heap_Desc, IID_PPV_ARGS(&descriptor_Heap));
         //ディスクリプタ数 インクリメント
         this->num_Descriptor_Heap_++;
 
@@ -140,7 +140,7 @@ void DescriptorHeap::Commit(GraphicsEngine* graphicsEngine)
         {
             if (this->shader_Resources_[i] != nullptr) 
             {
-                this->shader_Resources_[i]->RegistShaderResourceView(graphicsEngine,cpu_Handle, buffer_Index);
+                this->shader_Resources_[i]->RegistShaderResourceView(*graphicsEngine,cpu_Handle, buffer_Index);
             }
             //次に進める。
             cpu_Handle.ptr += graphicsEngine->GetCbrSrvDescriptorSize();
@@ -189,7 +189,7 @@ void DescriptorHeap::CommitSamplerHeap(GraphicsEngine* graphicsEngine)
     //ディスクリプタヒープ　生成 loop
     for (auto& descriptor_Heap : this->descriptor_Heap_) {
         //生成
-        HRESULT hr = device->CreateDescriptorHeap(&srv_Heap_Desc, IID_PPV_ARGS(&descriptor_Heap));
+        HRESULT hr = device.CreateDescriptorHeap(&srv_Heap_Desc, IID_PPV_ARGS(&descriptor_Heap));
 
         //生成 チェック
         if (FAILED(hr)) {
@@ -210,7 +210,7 @@ void DescriptorHeap::CommitSamplerHeap(GraphicsEngine* graphicsEngine)
 
         for (int i = 0; i < this->num_Sampler_Desc_; i++) {
             //サンプラステートをディスクリプタヒープに登録
-            device->CreateSampler(&this->sampler_Descs_[i], cpuHandle);
+            device.CreateSampler(&this->sampler_Descs_[i], cpuHandle);
             cpuHandle.ptr += graphicsEngine->GetSapmerDescriptorSize();
         }
         this->sampler_Gpu_Descriptor_Start_[buffer_Index] = gpuHandle;

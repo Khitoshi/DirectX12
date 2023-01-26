@@ -78,7 +78,8 @@ public:
 
 private:
 	//定数バッファ。
-	ComPtr<ID3D12Resource> constant_Buffer_[2];
+	//ComPtr<ID3D12Resource> constant_Buffer_[2];
+	ID3D12Resource* constant_Buffer_[2];
 
 	//CPU側からアクセスできるする定数バッファのアドレス。
 	void* const_Buffer_CPU_[2];

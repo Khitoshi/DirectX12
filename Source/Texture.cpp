@@ -56,13 +56,13 @@ void Texture::InitFromD3DResource(ID3D12Resource* texture)
 }
 
 //SRVに登録
-void Texture::RegistShaderResourceView(GraphicsEngine* graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
+void Texture::RegistShaderResourceView(GraphicsEngine& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
 {
     //テクスチャが存在しない場合
-    if (!this->texture_) return;
+    if (this->texture_.Get() == nullptr) return;
 
     //デバイス取得
-    auto device = graphicsEngine->GetD3DDevice();
+    auto device = graphicsEngine.GetD3DDevice();
 
     //シェーダーリソースビュー　設定
     D3D12_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc;
@@ -72,7 +72,10 @@ void Texture::RegistShaderResourceView(GraphicsEngine* graphicsEngine, D3D12_CPU
     shader_resource_view_desc.Texture2D.MipLevels = this->texture_Desc_.MipLevels;
     
     //シェーダーリソースビュー 生成
-    device->CreateShaderResourceView(this->texture_.Get(), &shader_resource_view_desc, descriptorHandle);
+    device.CreateShaderResourceView(
+        this->texture_.Get(), 
+        &shader_resource_view_desc, 
+        descriptorHandle);
 }
 
 //.DDS file からテクスチャをロード

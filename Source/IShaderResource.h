@@ -13,5 +13,5 @@ public:
 	/// <param name="descriptorHandle">CPU ディスクリプタ　ハンドル</param>
 	/// <param name="bufferNumber">バッファの番号</param>
 	/// <param name="graphicsEngine">デバイス取得用</param>
-	virtual void RegistShaderResourceView(GraphicsEngine* graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber) = 0;
+	virtual void RegistShaderResourceView(GraphicsEngine& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber) = 0;
 };

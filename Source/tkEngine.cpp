@@ -27,10 +27,18 @@ void tkEngine::EndFrame()
 }
 
 //ゲームエンジンの初期化
-void tkEngine::Init(HWND hwnd, UINT frameBufferWidth, UINT frameBufferHeight)
+void tkEngine::Init(
+    HWND hwnd, 
+    UINT frameBufferWidth, 
+    UINT frameBufferHeight, 
+    Camera& camera
+)
 {
+    //this->graphics_Engine_.reset(&graphicsEngine);
+
     graphics_Engine_ = std::make_unique<GraphicsEngine>(hwnd, frameBufferWidth, frameBufferHeight);
-    graphics_Engine_->Init();
+
+    graphics_Engine_->Init(camera);
     //ゲームパッドの初期化。
     //for (int i = 0; i < GamePad::CONNECT_PAD_MAX; i++) {
     //    g_pad[i] = &m_pad[i];

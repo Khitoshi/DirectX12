@@ -162,7 +162,6 @@ private:
         D3D12_FILTER samplerFilter
     );
 
-    
     /// <summary>
     /// 描画処理の共通処理
     /// </summary>
@@ -171,7 +170,6 @@ private:
     /// <param name="mView">ビュー行列</param>
     /// <param name="mProj">プロジェクション行列</param>
     void DrawCommon(GraphicsEngine* graphicsEngine,RenderContext& renderContext, const Matrix& matrixWorld, const Matrix& matrixView, const Matrix& matrixProjection);
-
 
 public:
 #pragma region Get method

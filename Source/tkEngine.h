@@ -7,6 +7,7 @@
 #include "TResourceBank.h"
 #include "TkmFile.h"
 #include "Shader.h"
+#include "Camera.h"
 
 class tkEngine
 {
@@ -34,7 +35,12 @@ public:
 	/// <summary>
 	/// ƒQ[ƒ€ƒGƒ“ƒWƒ“‚Ì‰Šú‰»
 	/// </summary>
-	void Init(HWND hwnd, UINT frameBufferWidth, UINT frameBufferHeight);
+	void Init(
+		HWND hwnd, 
+		UINT frameBufferWidth,
+		UINT frameBufferHeight,
+		//GraphicsEngine& graphicsEngine,
+		Camera& camera);
 
 public:
 #pragma region Register
@@ -106,6 +112,8 @@ public:
 		programName += entryPointFuncName;
 		return this->shader_Bank_.Get(programName.c_str());
 	}
+
+	GraphicsEngine* GetGraphicsEngine() { return this->graphics_Engine_.get(); }
 
 #pragma endregion
 

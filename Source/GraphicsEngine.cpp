@@ -37,8 +37,11 @@ GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, co
 	fence_Event_(),
 
 	current_Frame_Buffer_RTV_Handle_(),
-	current_Frame_Buffer_DSV_Handle_()
-{}
+	current_Frame_Buffer_DSV_Handle_(),
+	directXTKG_Fx_Memroy_()
+
+{
+}
 
 //デフォルト デストラクタ
 GraphicsEngine::~GraphicsEngine()
@@ -103,8 +106,8 @@ bool GraphicsEngine::Init(Camera& camera)
 	//Samplerのディスクリプタのサイズを取得
 	this->sampler_Descriptor_Size_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 
-	//this->null_Texture_Maps_ = std::make_unique<NullTextureMaps>();
-	this->null_Texture_Maps_.Init();
+	this->null_Texture_Maps_ = std::make_unique<NullTextureMaps>();
+	this->null_Texture_Maps_->Init();
 
 	//std::unique_ptr<Camera> camera_2d;
 	std::unique_ptr<Camera> camera_3d;
@@ -120,6 +123,7 @@ bool GraphicsEngine::Init(Camera& camera)
     return true;
 }
 
+//レンダリング開始
 void GraphicsEngine::BeginRender(Camera& camera)
 {
 	//カメラ更新
@@ -139,15 +143,56 @@ void GraphicsEngine::BeginRender(Camera& camera)
 	//深度ステンシルバッファのディスクリプタヒープの開始アドレスを取得。
 	this->current_Frame_Buffer_DSV_Handle_ = this->dsv_Heap_->GetCPUDescriptorHandleForHeapStart();
 	//バックバッファがレンダリングターゲットとして設定可能になるまで待つ。
-	this->render_Conext_.WaitUntilToPossibleSetRenderTarget(this->render_Targets_[this->frame_Index]);
+	this->render_Conext_->WaitUntilToPossibleSetRenderTarget(this->render_Targets_[this->frame_Index].Get());
 
 	//レンダリングターゲットを設定。
-	this->render_Conext_.SetRenderTarget(this->current_Frame_Buffer_RTV_Handle_, this->current_Frame_Buffer_DSV_Handle_);
+	this->render_Conext_->SetRenderTarget(this->current_Frame_Buffer_RTV_Handle_, this->current_Frame_Buffer_DSV_Handle_);
 
+	//画面クリアカラー設定
 	const float clearColor[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-	this->render_Conext_.ClearRenderTargetView(this->current_Frame_Buffer_RTV_Handle_, clearColor);
-	this->render_Conext_.ClearDepthStencilView(this->current_Frame_Buffer_DSV_Handle_, 1.0f);
+	this->render_Conext_->ClearRenderTargetView(this->current_Frame_Buffer_RTV_Handle_, clearColor);
+	this->render_Conext_->ClearDepthStencilView(this->current_Frame_Buffer_DSV_Handle_, 1.0f);
+}
 
+//レンダリング終了
+void GraphicsEngine::EndRender()
+{
+	// レンダリングターゲットへの描き込み完了待ち
+	this->render_Conext_->WaitUntilFinishDrawingToRenderTarget(this->render_Targets_[this->frame_Index].Get());
+
+
+	this->directXTKG_Fx_Memroy_->Commit(this->command_Queue_.Get());
+
+	//レンダリングコンテキストを閉じる。
+	this->render_Conext_->Close();
+
+	//コマンドを実行。
+	ID3D12CommandList* ppCommandLists[] = { this->command_List_.Get() };
+	this->command_Queue_->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+
+	this->swap_Chain_->Present(1, 0);
+
+	this->directXTKG_Fx_Memroy_->GarbageCollect();
+	//描画完了待ち
+	WaitDraw();
+
+}
+
+//描画終了待ち
+void GraphicsEngine::WaitDraw()
+{
+	
+	// Signal and increment the fence value.
+	const UINT64 fence = this->fence_Value_;
+	this->command_Queue_->Signal(this->fence_.Get(), fence);
+	this->fence_Value_++;
+
+	// Wait until the previous frame is finished.
+	if (this->fence_->GetCompletedValue() < fence)
+	{
+		this->fence_->SetEventOnCompletion(fence, this->fence_Event_);
+		WaitForSingleObject(this->fence_Event_, INFINITE);
+	}
 }
 
 //DXGIオブジェクトの生成

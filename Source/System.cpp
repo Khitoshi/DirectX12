@@ -28,19 +28,55 @@ System::~System()
 {
 }
 
-void System::InitGraphicSystem(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName,Camera& camera)
+/*
+void System::InitGraphicSystem(
+	HINSTANCE hInstance,
+	HINSTANCE hPrevInstance,
+	LPWSTR lpCmdLine,
+	int nCmdShow, 
+	const TCHAR* appName
+)
 {
 	InitWindow(hInstance, hPrevInstance, lpCmdLine, nCmdShow, appName);
 	
 	//std::unique_ptr<GraphicsEngine>graphics_engine;
 	//graphics_engine = std::make_unique<GraphicsEngine>(hWnd_,frame_Buffer_width_, frame_Buffer_height_);
 	//graphics_engine->Init(camera);
-
-	std::unique_ptr<tkEngine> engine;
-	engine = std::make_unique<tkEngine>();
-	engine->Init();
+	//std::unique_ptr<tkEngine> engine;
+	//engine = std::make_unique<tkEngine>();
+	//graphicsEngine = new GraphicsEngine(this->hWnd_, this->frame_Buffer_width_, this->frame_Buffer_height_);
+	//tk.Init(
+	//	this->hWnd_, 
+	//	this->frame_Buffer_width_, 
+	//	this->frame_Buffer_height_,
+	//	graphicsEngine,
+	//	camera);
 
 	return;
+}
+*/
+
+//ウィンドウメッセージをディスパッチ
+bool System::DispatchWindowMessage()
+{
+	MSG msg = { 0 };
+	while (WM_QUIT != msg.message)
+	{
+		//ウィンドウからメッセージを受け取る
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			//まだメッセージが残っている
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else
+		{
+			//ウィンドウメッセージが空になった。
+			break;
+		}
+	}
+
+	return msg.message != WM_QUIT;
 }
 
 void System::InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName)
@@ -82,7 +118,7 @@ void System::InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpC
 
 	//ウィンドウ作成
 	// ウィンドウの作成。
-	hWnd_ = CreateWindow(
+	this->hWnd_ = CreateWindow(
 		appName,				//ウィンドウクラスの名前
 		appName,				//ウィンドウの名前。ウィンドウクラスの名前と別名でもよい
 		WS_OVERLAPPEDWINDOW,	//ウィンドウスタイル。ゲームでは基本的にWS_OVERLAPPEDWINDOWでいい
@@ -97,5 +133,5 @@ void System::InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpC
 	);
 
 	//window表示
-	ShowWindow(hWnd_, nCmdShow);
+	ShowWindow(this->hWnd_, nCmdShow);
 }

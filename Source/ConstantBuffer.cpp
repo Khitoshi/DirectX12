@@ -53,6 +53,8 @@ void ConstantBuffer::Init(GraphicsEngine* graphicsEngine, int constantBufferSize
     //定数バッファの初期化
     this->constant_Buffer_Size_ = constantBufferSize;
 
+    //定数バッファは256バイトアライメントが要求されるので,256の倍率に切り上げる
+    this->alloc_Size_ = (constantBufferSize + 256) & 0xFFFFFF00;
     //バッファ番号
     int buffer_Index = 0;
     //ヒープ設定
@@ -64,7 +66,7 @@ void ConstantBuffer::Init(GraphicsEngine* graphicsEngine, int constantBufferSize
     for (auto& constant_Buffer : this->constant_Buffer_)
     {
         //生成
-        HRESULT hr = device->CreateCommittedResource(
+        HRESULT hr = device.CreateCommittedResource(
             &heap_Prop,
             D3D12_HEAP_FLAG_NONE,
             &resource_Desc,
@@ -74,6 +76,7 @@ void ConstantBuffer::Init(GraphicsEngine* graphicsEngine, int constantBufferSize
         );
 
         //生成 チェック
+        /*
         if (FAILED(hr))
         {
             //生成 失敗
@@ -81,7 +84,7 @@ void ConstantBuffer::Init(GraphicsEngine* graphicsEngine, int constantBufferSize
             MessageBox(nullptr, TEXT("ConstantBuffer::Initで生成に失敗しました"), L"エラー", MB_OK);
             //プログラムを異常終了させる。
             std::abort();
-        }
+        }*/
 
         //定数バッファをCPUからアクセス可能な仮想アドレス空間にマッピングする。
         //マップ、アンマップのオーバーヘッドを軽減するためにはこのインスタンスが生きている間は行わない。
@@ -132,7 +135,7 @@ void ConstantBuffer::RegistConstantBufferView(GraphicsEngine* graphicsEngine, D3
     D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};
     desc.BufferLocation = this->constant_Buffer_[bufferNo]->GetGPUVirtualAddress();
     desc.SizeInBytes = this->alloc_Size_;
-    device->CreateConstantBufferView(&desc, descriptorHandle);
+    device.CreateConstantBufferView(&desc, descriptorHandle);
 }
 
 //ディスクリプタヒープに定数バッファビューを登録

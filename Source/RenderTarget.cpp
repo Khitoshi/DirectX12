@@ -86,7 +86,7 @@ bool RenderTarget::Create(GraphicsEngine* graphicsEngine, int renderTargetWidth,
 //ディスクリプタヒープを作成
 void RenderTarget::CreateDescriptorHeap(GraphicsEngine& graphicsEngine)
 {
-    auto* device = graphicsEngine.GetD3DDevice();
+    auto device = graphicsEngine.GetD3DDevice();
 
     //RTV用のディスクリプタヒープ 作成
     //設定
@@ -96,7 +96,7 @@ void RenderTarget::CreateDescriptorHeap(GraphicsEngine& graphicsEngine)
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 
     //生成
-    device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->rtv_Heap_));
+    device.CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->rtv_Heap_));
 
     //生成 確認
     if (this->rtv_Heap_ == nullptr) {
@@ -107,7 +107,7 @@ void RenderTarget::CreateDescriptorHeap(GraphicsEngine& graphicsEngine)
     }
 
     //ディスクリプタのサイズを取得。
-    this->rtv_Descriptor_Size_ = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    this->rtv_Descriptor_Size_ = device.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
     //深度ステンシルテクスチャが存在する時
     if (this->depth_Stencil_Texture_) {
@@ -116,7 +116,7 @@ void RenderTarget::CreateDescriptorHeap(GraphicsEngine& graphicsEngine)
         desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 
         //生成
-        device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->dsv_Heap_));
+        device.CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->dsv_Heap_));
 
         //生成 確認
         if (this->dsv_Heap_ == nullptr) {
@@ -126,7 +126,7 @@ void RenderTarget::CreateDescriptorHeap(GraphicsEngine& graphicsEngine)
             std::abort();
         }
         //ディスクリプタのサイズを取得。
-        this->dsv_Descriptor_Size_ = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+        this->dsv_Descriptor_Size_ = device.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
     }
 }
 
@@ -142,7 +142,7 @@ void RenderTarget::CreateRenderTargetTexture(
 )
 {
     //デバイス 取得
-    auto* device = graphicsEngine.GetD3DDevice();
+    auto device = graphicsEngine.GetD3DDevice();
 
     //リソースを設定
     CD3DX12_RESOURCE_DESC desc(
@@ -175,7 +175,7 @@ void RenderTarget::CreateRenderTargetTexture(
     }
     //リソース 作成
     auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-    auto hr = device->CreateCommittedResource(
+    auto hr = device.CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,
@@ -203,7 +203,7 @@ void RenderTarget::CreateDepthStencilTexture(
     DXGI_FORMAT format)
 {
     //デバイス取得 
-    auto* device = graphicsEngine.GetD3DDevice();
+    auto device = graphicsEngine.GetD3DDevice();
 
     //深度ステンシルの値 設定
     D3D12_CLEAR_VALUE dsv_clear_value;
@@ -228,7 +228,7 @@ void RenderTarget::CreateDepthStencilTexture(
     auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
     //リソース生成
-    auto hr = device->CreateCommittedResource(
+    auto hr = device.CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,

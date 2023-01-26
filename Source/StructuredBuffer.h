@@ -36,7 +36,7 @@ public:
     /// <param name="graphicsEngine">デバイスを格納している</param>
     /// <param name="descriptorHandle">CPU ディスクリプタ　ハンドル</param>
     /// <param name="buffernumber">バッファ 番号</param>
-    void RegistShaderResourceView(GraphicsEngine* graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber)override;
+    void RegistShaderResourceView(GraphicsEngine& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber)override;
 
     /// <summary>
     /// 構造化バッファの内容更新

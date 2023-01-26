@@ -214,7 +214,7 @@ void MeshParts::CreateMeshFromTkmMesh(
     auto mesh = new SMesh;
     mesh->skinFlags.reserve(tkmMesh.materials.size());
     mesh->vertexBuffer.Init(graphicsEngine, vertex_stride * num_vertex, vertex_stride);
-    mesh->vertexBuffer.Copy((void*)&tkmMesh.vertexBuffer);
+    mesh->vertexBuffer.Copy((void*)&tkmMesh.vertexBuffer[0]);
 
     auto SetSkinFlag = [&](int index) {
         if (tkmMesh.vertexBuffer[index].skinWeights.x > 0.0f) {

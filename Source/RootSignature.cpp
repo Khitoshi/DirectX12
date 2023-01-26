@@ -74,7 +74,7 @@ bool RootSignature::Init(GraphicsEngine* graphicsEngine, D3D12_STATIC_SAMPLER_DE
 	Microsoft::WRL::ComPtr<ID3DBlob> signature;
 	Microsoft::WRL::ComPtr<ID3DBlob> error;
 	D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
-	auto hr = device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&this->root_Signature_));
+	auto hr = device.CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&this->root_Signature_));
 	if (FAILED(hr)) {
 		//TODO: MYASSERTを実装する
 		//ルートシグネチャの作成に失敗した。

@@ -41,7 +41,7 @@ void StructuredBuffer::Init(GraphicsEngine* graphicsEngine, int elementSize, int
     for (auto& buffer : this->buffers_On_GPU_)
     {
         //リソース 生成
-        HRESULT hr = device->CreateCommittedResource(
+        HRESULT hr = device.CreateCommittedResource(
             &heap_prop,
             D3D12_HEAP_FLAG_NONE,
             &resource_desc,
@@ -70,13 +70,13 @@ void StructuredBuffer::Init(GraphicsEngine* graphicsEngine, int elementSize, int
 }
 
 //SRVに登録
-void StructuredBuffer::RegistShaderResourceView(GraphicsEngine* graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber)
+void StructuredBuffer::RegistShaderResourceView(GraphicsEngine& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber)
 {
     //初期化チェック
     if (!this->is_Inited_)return;
 
     //デバイス取得
-    auto device = graphicsEngine->GetD3DDevice();
+    auto device = graphicsEngine.GetD3DDevice();
 
     D3D12_SHADER_RESOURCE_VIEW_DESC shader_recouce_view_desc;
     //メモリブロックをゼロで埋める
@@ -93,7 +93,7 @@ void StructuredBuffer::RegistShaderResourceView(GraphicsEngine* graphicsEngine, 
     shader_recouce_view_desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
     //シェーダーリソースビュー 生成
-    device->CreateShaderResourceView(
+    device.CreateShaderResourceView(
         this->buffers_On_GPU_[bufferNumber].Get(), 
         &shader_recouce_view_desc, 
         descriptorHandle

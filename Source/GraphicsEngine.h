@@ -9,6 +9,7 @@
 #include <wrl.h>
 #include <memory>
 #include "NullTextureMaps.h"
+#include <GraphicsMemory.h>
 using namespace Microsoft::WRL;
 
 class RenderContext;
@@ -54,7 +55,10 @@ public:
 	void EndRender();
 
 
+
 private:
+	void WaitDraw();
+
 #pragma region Create Method
 	/// <summary>
 	/// DXGIオブジェクトの生成
@@ -114,7 +118,7 @@ public:
 	/// デバイス取得
 	/// </summary>
 	/// <returns>this device</returns>
-	ID3D12Device5* GetD3DDevice()const { return this->device_.Get(); }
+	ID3D12Device5& GetD3DDevice()const { return *this->device_.Get(); }
 
 	/// <summary>
 	/// バックバッファの番号を取得。
@@ -136,7 +140,7 @@ public:
 
 	ID3D12CommandQueue* GetCommandQueue()const { return this->command_Queue_.Get(); }
 
-	const NullTextureMaps& GetNullTextureMaps()const { return this->null_Texture_Maps_; }
+	const NullTextureMaps& GetNullTextureMaps()const { return *this->null_Texture_Maps_; }
 
 	//フレームバッファの幅 取得
 	const UINT GetFrameBufferWidth() { return this->frame_Buffer_Width_; }
@@ -145,6 +149,12 @@ public:
 
 	//フレームバッファの数 取得
 	const static UINT GetFrameBufferCount() { return FRAME_BUFFER_COUNT; }
+
+	//レンダーコンテキスト 取得
+	RenderContext& GetRenderContext()
+	{
+		return *this->render_Conext_;
+	}
 
 #pragma endregion
 
@@ -191,7 +201,7 @@ private:
 	D3D12_RECT scissor_Rect_;
 
 	//ヌルテクスチャ
-	NullTextureMaps null_Texture_Maps_;
+	std::unique_ptr <NullTextureMaps> null_Texture_Maps_;
 
 	//現在のバックバッファの番号。
 	unsigned int current_Back_Buffer_Index_;
@@ -215,4 +225,7 @@ private:
 
 	//std::unique_ptr<Camera> camera_2d;
 	//std::unique_ptr<Camera> camera_3d;
+	//DirectXTKのグラフィックメモリシステム
+	std::unique_ptr<DirectX::GraphicsMemory> directXTKG_Fx_Memroy_;	
+
 };

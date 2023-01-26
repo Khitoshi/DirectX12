@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IShaderResource.h"
+#include "GraphicsEngine.h"
 #include <wrl.h>
 
 using namespace Microsoft::WRL;
@@ -48,7 +49,7 @@ public:
     /// SRVÇ…ìoò^ÅB
     /// </summary>
     /// <param name="descriptorHandle"></param>
-    void RegistShaderResourceView(GraphicsEngine* graphicsEngine,D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo);
+    void RegistShaderResourceView(GraphicsEngine& graphicsEngine,D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo);
 
 private:
 #pragma region Load Texture Method

@@ -143,7 +143,8 @@ void Shader::LoadRaytracing(const wchar_t* filePath)
 //シェーダーをロード
 void Shader::Load(const char* filePath, const char* entryFuncName, const char* shaderModel)
 {
-    ComPtr<ID3DBlob> error_blob;
+    //ComPtr<ID3DBlob> error_blob;
+    ID3DBlob* error_blob;
 #ifdef _DEBUG
     UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #else

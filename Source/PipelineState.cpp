@@ -18,7 +18,7 @@ void PipelineState::Init(GraphicsEngine* graphicsEngine, D3D12_GRAPHICS_PIPELINE
     auto device = graphicsEngine->GetD3DDevice();
 
     //パイプライン ステート 生成
-    HRESULT hr = device->CreateGraphicsPipelineState(
+    HRESULT hr = device.CreateGraphicsPipelineState(
         &desc,
         IID_PPV_ARGS(&this->pipeline_State_)
     );
@@ -38,7 +38,7 @@ void PipelineState::Init(GraphicsEngine* graphicsEngine, D3D12_COMPUTE_PIPELINE_
     auto device = graphicsEngine->GetD3DDevice();
 
     //パイプライン ステート 生成
-    HRESULT hr = device->CreateComputePipelineState(
+    HRESULT hr = device.CreateComputePipelineState(
         &desc,
         IID_PPV_ARGS(&this->pipeline_State_)
     );
