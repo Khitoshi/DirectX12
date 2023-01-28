@@ -28,7 +28,7 @@ public:
 	/// <param name="depthStencilFormat">深度ステンシルバッファのフォーマット。</param>
 	/// <returns>trueが返ってきたら作成成功</returns>
 	bool Create(
-		GraphicsEngine* graphicsEngine,
+		GraphicsEngine*& graphicsEngine,
 		int renderTargetWidth,
 		int renderTargetHeight,
 		int mipLevel,
@@ -41,11 +41,17 @@ public:
 private:
 #pragma region Create Method
 	/// <summary>
-	/// ディスクリプタヒープを作成
+	/// レンダーターゲットビュー用 ディスクリプタヒープ 作成
 	/// </summary>
 	/// <param name="graphicsEngine">グラフィックエンジン</param>
 	/// <returns></returns>
-	void CreateDescriptorHeap(GraphicsEngine& graphicsEngine);
+	void CreateDescriptorRTVHeap(GraphicsEngine*& graphicsEngine);
+
+	/// <summary>
+	/// 深度ステンシルバッファ用 ディスクリプタヒープ 作成
+	/// </summary>
+	/// <param name="graphicsEngine"></param>
+	void CreateDescriptorDSVHeap(GraphicsEngine*& graphicsEngine);
 
 	/// <summary>
 	/// レンダリングターゲットとなるテクスチャを作成
@@ -58,7 +64,7 @@ private:
 	/// <param name="format">テクスチャのフォーマット</param>
 	/// <returns></returns>
 	void CreateRenderTargetTexture(
-		GraphicsEngine& graphicsEngine,
+		GraphicsEngine*& graphicsEngine,
 		int textureWidth,
 		int textureHeight,
 		int mipLevel,
@@ -76,17 +82,25 @@ private:
 	/// <param name="format">テクスチャのフォーマット</param>
 	/// <returns></returns>
 	void CreateDepthStencilTexture(
-		GraphicsEngine& graphicsEngine,
+		GraphicsEngine*& graphicsEngine,
 		int textureWidth,
 		int textureHeight,
 		DXGI_FORMAT format);
 
 	/// <summary>
-	/// ディスクリプタの作成
+	/// レンダーターゲットビューのディスクリプタ 作成
 	/// </summary>
 	/// <param name="d3dDevice">D3Dデバイス</param>
 	/// <returns></returns>
-	void CreateDescriptor(ID3D12Device5*& d3dDevice);
+	void CreateDescriptorRTV(GraphicsEngine*& graphicsEngine);
+	/// <summary>
+	/// テクスチャがある場合
+	/// 深度ステンシルビューのディスクリプタ 作成
+	/// </summary>
+	/// <param name="d3dDevice">D3Dデバイス</param>
+	/// <returns></returns>
+	void CreateDescriptorDSV(GraphicsEngine*& graphicsEngine);
+
 #pragma endregion
 
 public:

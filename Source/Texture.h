@@ -86,9 +86,9 @@ public:
     /// テクスチャ取得
     /// </summary>
     /// <returns></returns>
-    ID3D12Resource* Get()
+    ID3D12Resource*& GetTexture()
     {
-        return this->texture_.Get();
+        return *this->texture_.GetAddressOf();
     }
 
     /// <summary>

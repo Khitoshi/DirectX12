@@ -54,10 +54,165 @@ public:
 	/// </remarks>
 	void EndRender();
 
+#pragma region Device Method
+
+	/// <summary>
+	/// ディスクリプタヒープ 作成
+	/// </summary>
+	/// <param name="desc"></param>
+	/// <param name="descriptorHeap"></param>
+	/// <param name="errorMessage">MessageBoxで表示する文字</param>
+	void CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& desc, ID3D12DescriptorHeap*& descriptorHeap)
+	{
+		//ディスクリプタヒープ 生成
+		HRESULT hr = this->device_->CreateDescriptorHeap(
+			&desc, 
+			IID_PPV_ARGS(&descriptorHeap)
+		);
+
+		//生成　確認
+		HRESULTCheck(hr, L"CreateDescriptorHeapで失敗");
+	}
+	void CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& desc, ID3D12DescriptorHeap*& descriptorHeap, const LPCWSTR errorMessage)
+	{
+		//ディスクリプタヒープ 生成
+		HRESULT hr = this->device_->CreateDescriptorHeap(
+			&desc, 
+			IID_PPV_ARGS(&descriptorHeap)
+		);
+
+		//生成　確認
+		HRESULTCheck(hr, errorMessage);
+	}
+
+	/// <summary>
+	/// デバイス(GPU)にリソースを作成するためのID3D12Resource 作成
+	/// </summary>
+	/// <param name="prop">heapの設定</param>
+	/// <param name="heapFlag">ヒープ オプション</param>
+	/// <param name="desc">リソースの設定</param>
+	/// <param name="state">リソースの使用方法に関するリソースの状態を指定する定数</param>
+	/// <param name="value">クリア カラーの既定値</param>
+	/// <param name="resouce">生成したID3D12Resource</param>
+	/// <param name="errorMessage">MessageBoxで表示する文字</param>
+	void CreateCommittedResource(
+		const D3D12_HEAP_PROPERTIES& prop,
+		const D3D12_HEAP_FLAGS heapFlag, 
+		const D3D12_RESOURCE_DESC& desc,
+		const D3D12_RESOURCE_STATES state, 
+		const D3D12_CLEAR_VALUE & value,
+		ID3D12Resource *& resouce)
+	{
+		//リソース作成
+		HRESULT hr = this->device_->CreateCommittedResource(
+			&prop,
+			heapFlag,
+			&desc,
+			state,
+			&value,
+			IID_PPV_ARGS(&resouce)
+		);
+
+		//生成 確認
+		HRESULTCheck(hr, L"CreateCommittedResourceに失敗");
+	}
+	void CreateCommittedResource(
+		const D3D12_HEAP_PROPERTIES& prop,
+		const D3D12_HEAP_FLAGS heapFlag,
+		const D3D12_RESOURCE_DESC& desc,
+		const D3D12_RESOURCE_STATES state,
+		const D3D12_CLEAR_VALUE& value,
+		ID3D12Resource*& resouce,
+		const LPCWSTR errorMessage
+	)
+	{
+		//リソース作成
+		HRESULT hr = this->device_->CreateCommittedResource(
+			&prop,
+			heapFlag,
+			&desc,
+			state,
+			&value,
+			IID_PPV_ARGS(&resouce)
+		);
+
+		//生成 確認
+		HRESULTCheck(hr, errorMessage);
+	}
+
+	/// <summary>
+	/// デスクリプタのバイト数 取得
+	/// </summary>
+	/// <param name="type">ディスクリプターヒープの種類</param>
+	/// <returns>デスクリプタヒープの先頭アドレス+(要素のバイト数*N)</returns>
+	const UINT GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE type)const
+	{
+		//ディスクリプターハンドルのサイズを取得
+		return this->device_->GetDescriptorHandleIncrementSize(type);
+	}
+
+
+	/// <summary>
+	/// レンダーターゲットビュー　作成
+	/// </summary>
+	/// <param name="resouce">レンダーターゲットを表すリソース</param>
+	/// <param name="desc">nullの場合，ミップ0番のサブリソースにアクセス</param>
+	/// <param name="handle">ディスクリプタヒープの開始位置のハンドル</param>
+	/// <param name=""></param>
+	void CreateRenderTargetView(
+		ID3D12Resource*& resouce,
+		const D3D12_RENDER_TARGET_VIEW_DESC* desc,
+		D3D12_CPU_DESCRIPTOR_HANDLE handle
+	)
+	{
+		this->device_->CreateRenderTargetView(
+			resouce,
+			desc,
+			handle
+		);
+	}
+
+	/// <summary>
+	/// 深度ステンシルビュー　作成
+	/// </summary>
+	/// <param name="resouce"></param>
+	/// <param name="desc"></param>
+	/// <param name="handle"></param>
+	void CreateDepthStencilView(
+		ID3D12Resource*& resouce,
+		const D3D12_DEPTH_STENCIL_VIEW_DESC* desc,
+		D3D12_CPU_DESCRIPTOR_HANDLE handle
+	)
+	{
+		this->device_->CreateDepthStencilView(
+			resouce,
+			desc,
+			handle
+		);
+	};
+
+#pragma endregion
 
 
 private:
 	void WaitDraw();
+
+	/// <summary>
+	/// HRESULTのエラー確認用 関数
+	/// 失敗した場合MessageBoxが表示される　
+	/// </summary>
+	/// <param name="hr"></param>
+	const void HRESULTCheck(const HRESULT hr,const LPCWSTR errorMessage)const
+	{
+		//成功の場合 早期リターン
+		if (SUCCEEDED(hr))return;
+
+		//RTV用のディスクリプタヒープの作成に失敗した
+		MessageBox(nullptr, errorMessage, L"エラー", MB_OK);
+
+		//異常終了
+		std::abort();
+	}
 
 #pragma region Create Method
 	/// <summary>
@@ -118,7 +273,7 @@ public:
 	/// デバイス取得
 	/// </summary>
 	/// <returns>this device</returns>
-	ID3D12Device5& GetD3DDevice()const { return *this->device_.Get(); }
+	//ID3D12Device5& GetD3DDevice()const { return *this->device_.Get(); }
 
 	/// <summary>
 	/// バックバッファの番号を取得。
