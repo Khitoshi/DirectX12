@@ -23,8 +23,8 @@ public:
 	/// èâä˙âª
 	/// </summary>
 	/// <param name="desc"></param>
-	void Init(GraphicsEngine* graphicsEngine, D3D12_GRAPHICS_PIPELINE_STATE_DESC desc);
-	void Init(GraphicsEngine* graphicsEngine, D3D12_COMPUTE_PIPELINE_STATE_DESC desc);
+	void Init(GraphicsEngine*& graphicsEngine, D3D12_GRAPHICS_PIPELINE_STATE_DESC desc);
+	void Init(GraphicsEngine*& graphicsEngine, D3D12_COMPUTE_PIPELINE_STATE_DESC desc);
 
 public:
 	/// <summary>

@@ -62,7 +62,7 @@ public:
 	/// <param name="desc"></param>
 	/// <param name="descriptorHeap"></param>
 	/// <param name="errorMessage">MessageBoxで表示する文字</param>
-	void CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& desc, ID3D12DescriptorHeap*& descriptorHeap)
+	void CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& desc, ID3D12DescriptorHeap*& descriptorHeap, const LPCWSTR errorMessage = L"CreateDescriptorHeapの作成に失敗")
 	{
 		//ディスクリプタヒープ 生成
 		HRESULT hr = this->device_->CreateDescriptorHeap(
@@ -73,7 +73,7 @@ public:
 		//生成　確認
 		HRESULTCheck(hr, L"CreateDescriptorHeapで失敗");
 	}
-	void CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& desc, ID3D12DescriptorHeap*& descriptorHeap, const LPCWSTR errorMessage)
+	void CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& desc, ComPtr<ID3D12DescriptorHeap>& descriptorHeap, const LPCWSTR errorMessage = L"CreateDescriptorHeapの作成に失敗")
 	{
 		//ディスクリプタヒープ 生成
 		HRESULT hr = this->device_->CreateDescriptorHeap(
@@ -204,27 +204,51 @@ public:
 		this->device_->CreateConstantBufferView(&desc, handle);
 	}
 
-	void CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& desc, ID3D12DescriptorHeap*& heap, const LPCWSTR errorMessage = L"CreateDescriptorHeapに失敗")
+	/// <summary>
+	/// サンプラー 作成
+	/// </summary>
+	/// <param name="desc">サンプラの設定</param>
+	/// <param name="handle">handle</param>
+	void CreateSampler(const D3D12_SAMPLER_DESC& desc, D3D12_CPU_DESCRIPTOR_HANDLE& handle)
 	{
-		HRESULT hr = this->device_->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&heap));
+		this->device_->CreateSampler(&desc, handle);
+	}
+
+
+	/// <summary>
+	/// グラフィックパイプラインステート 作成
+	/// </summary>
+	/// <param name="desc"></param>
+	/// <param name="pipelineState"></param>
+	/// <param name="errorMessage"></param>
+	void CreateGraphicsPipelineState(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, ID3D12PipelineState*& pipelineState, const LPCWSTR errorMessage = L"CreateGraphicsPipelineStateに失敗")
+	{
+		HRESULT hr = this->device_->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
 
 		HRESULTCheck(hr, errorMessage);
 	}
-	void CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& desc, ComPtr<ID3D12DescriptorHeap>& heap, const LPCWSTR errorMessage = L"CreateDescriptorHeapに失敗")
+	void CreateGraphicsPipelineState(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, ComPtr<ID3D12PipelineState>& pipelineState, const LPCWSTR errorMessage = L"CreateGraphicsPipelineStateに失敗")
 	{
-		HRESULT hr = this->device_->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&heap));
+		HRESULT hr = this->device_->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
 
 		HRESULTCheck(hr, errorMessage);
 	}
 
 	/// <summary>
-	/// 
+	/// コンピュートパイプラインステート 作成
 	/// </summary>
 	/// <param name="desc"></param>
-	/// <param name="handle"></param>
-	void CreateSampler(const D3D12_SAMPLER_DESC& desc, D3D12_CPU_DESCRIPTOR_HANDLE& handle)
+	/// <param name="pipelineState"></param>
+	void CreateComputePipelineState(const D3D12_COMPUTE_PIPELINE_STATE_DESC& desc, ID3D12PipelineState*& pipelineState, const LPCWSTR errorMessage = L"CreateComputePipelineStateに失敗")
 	{
-		this->device_->CreateSampler(&desc, handle);
+		HRESULT hr = this->device_->CreateComputePipelineState(&desc, IID_PPV_ARGS(&pipelineState));
+		HRESULTCheck(hr, errorMessage);
+	}
+	void CreateComputePipelineState(const D3D12_COMPUTE_PIPELINE_STATE_DESC& desc, ComPtr<ID3D12PipelineState>& pipelineState, const LPCWSTR errorMessage = L"CreateComputePipelineStateに失敗")
+	{
+		HRESULT hr = this->device_->CreateComputePipelineState(&desc, IID_PPV_ARGS(&pipelineState));
+
+		HRESULTCheck(hr, errorMessage);
 	}
 
 #pragma endregion
