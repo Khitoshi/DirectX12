@@ -11,7 +11,7 @@ RootSignature::~RootSignature()
 }
 
 bool RootSignature::Init(
-	GraphicsEngine* graphicsEngine,
+	GraphicsEngine*& graphicsEngine,
 	D3D12_FILTER samplerFilter, 
 	D3D12_TEXTURE_ADDRESS_MODE textureAdressModeU, 
 	D3D12_TEXTURE_ADDRESS_MODE textureAdressModeV, 
@@ -38,7 +38,16 @@ bool RootSignature::Init(
 	return Init(graphicsEngine, &sampler, 1, maxCbvDescriptor, maxSrvDescriptor, maxUavDescritor);
 }
 
-bool RootSignature::Init(GraphicsEngine* graphicsEngine, D3D12_STATIC_SAMPLER_DESC* samplerDescArray, int numSampler, UINT maxCbvDescriptor, UINT maxSrvDescriptor, UINT maxUavDescritor, UINT offsetInDescriptorsFromTableStartCB, UINT offsetInDescriptorsFromTableStartSRV, UINT offsetInDescriptorsFromTableStartUAV)
+bool RootSignature::Init(
+	GraphicsEngine*& graphicsEngine, 
+	D3D12_STATIC_SAMPLER_DESC* samplerDescArray,
+	int numSampler,
+	UINT maxCbvDescriptor,
+	UINT maxSrvDescriptor,
+	UINT maxUavDescritor,
+	UINT offsetInDescriptorsFromTableStartCB,
+	UINT offsetInDescriptorsFromTableStartSRV,
+	UINT offsetInDescriptorsFromTableStartUAV)
 {
 	enum {
 		enDescriptorHeap_CB,
@@ -46,9 +55,6 @@ bool RootSignature::Init(GraphicsEngine* graphicsEngine, D3D12_STATIC_SAMPLER_DE
 		enDescriptorHeap_UAV,
 		enNumDescriptorHeap
 	};
-
-
-	auto device = graphicsEngine->GetD3DDevice();
 
 	CD3DX12_DESCRIPTOR_RANGE1 ranges[enNumDescriptorHeap];
 	CD3DX12_ROOT_PARAMETER1 rootParameters[enNumDescriptorHeap];
@@ -74,12 +80,15 @@ bool RootSignature::Init(GraphicsEngine* graphicsEngine, D3D12_STATIC_SAMPLER_DE
 	Microsoft::WRL::ComPtr<ID3DBlob> signature;
 	Microsoft::WRL::ComPtr<ID3DBlob> error;
 	D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
-	auto hr = device.CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&this->root_Signature_));
-	if (FAILED(hr)) {
-		//TODO: MYASSERTを実装する
-		//ルートシグネチャの作成に失敗した。
-		return false;
-	}
+	//auto hr = device.CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&this->root_Signature_));
+
+	graphicsEngine->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), this->root_Signature_);
+
+	//if (FAILED(hr)) {
+	//	//TODO: MYASSERTを実装する
+	//	//ルートシグネチャの作成に失敗した。
+	//	return false;
+	//}
 	return true;
 
 }

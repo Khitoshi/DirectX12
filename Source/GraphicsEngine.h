@@ -251,6 +251,25 @@ public:
 		HRESULTCheck(hr, errorMessage);
 	}
 
+	/// <summary>
+	/// ルートシグネイチャ 作成
+	/// </summary>
+	/// <param name="nodeMask"></param>
+	/// <param name="bufferPoint"></param>
+	/// <param name="bufferSize"></param>
+	/// <param name="rootSignature"></param>
+	/// <param name="errorMessage"></param>
+	void CreateRootSignature(UINT nodeMask, const LPVOID bufferPoint, SIZE_T bufferSize, ID3D12RootSignature*& rootSignature, const LPCWSTR errorMessage = L"CreateRootSignatureに失敗")
+	{
+		HRESULT hr = this->device_->CreateRootSignature(nodeMask, bufferPoint, bufferSize, IID_PPV_ARGS(&rootSignature));
+		HRESULTCheck(hr, errorMessage);
+	}
+	void CreateRootSignature(UINT nodeMask, const LPVOID bufferPoint, SIZE_T bufferSize, ComPtr<ID3D12RootSignature>& rootSignature, const LPCWSTR errorMessage = L"CreateRootSignatureに失敗")
+	{
+		HRESULT hr = this->device_->CreateRootSignature(nodeMask, bufferPoint, bufferSize, IID_PPV_ARGS(&rootSignature));
+		HRESULTCheck(hr, errorMessage);
+	}
+
 #pragma endregion
 
 

@@ -20,7 +20,7 @@ public:
 	~RootSignature();
 
 	bool Init(
-		GraphicsEngine* graphicsEngine,
+		GraphicsEngine*& graphicsEngine,
 		D3D12_FILTER samplerFilter,
 		D3D12_TEXTURE_ADDRESS_MODE textureAdressModeU,
 		D3D12_TEXTURE_ADDRESS_MODE textureAdressModeV,
@@ -31,7 +31,7 @@ public:
 	);
 	
 	bool Init(
-		GraphicsEngine* graphicsEngine,
+		GraphicsEngine*& graphicsEngine,
 		D3D12_STATIC_SAMPLER_DESC* samplerDescArray,
 		int numSampler,
 		UINT maxCbvDescriptor = 8,
