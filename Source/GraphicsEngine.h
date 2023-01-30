@@ -97,33 +97,12 @@ public:
 	/// <param name="errorMessage">MessageBoxで表示する文字</param>
 	void CreateCommittedResource(
 		const D3D12_HEAP_PROPERTIES& prop,
-		const D3D12_HEAP_FLAGS heapFlag, 
-		const D3D12_RESOURCE_DESC& desc,
-		const D3D12_RESOURCE_STATES state, 
-		const D3D12_CLEAR_VALUE & value,
-		ID3D12Resource *& resouce)
-	{
-		//リソース作成
-		HRESULT hr = this->device_->CreateCommittedResource(
-			&prop,
-			heapFlag,
-			&desc,
-			state,
-			&value,
-			IID_PPV_ARGS(&resouce)
-		);
-
-		//生成 確認
-		HRESULTCheck(hr, L"CreateCommittedResourceに失敗");
-	}
-	void CreateCommittedResource(
-		const D3D12_HEAP_PROPERTIES& prop,
 		const D3D12_HEAP_FLAGS heapFlag,
 		const D3D12_RESOURCE_DESC& desc,
 		const D3D12_RESOURCE_STATES state,
 		const D3D12_CLEAR_VALUE& value,
 		ID3D12Resource*& resouce,
-		const LPCWSTR errorMessage
+		const LPCWSTR errorMessage = L"CreateCommittedResourceに失敗"
 	)
 	{
 		//リソース作成
@@ -199,6 +178,29 @@ public:
 	void CreateConstantBufferView(const D3D12_CONSTANT_BUFFER_VIEW_DESC& desc, D3D12_CPU_DESCRIPTOR_HANDLE& handle)
 	{
 		this->device_->CreateConstantBufferView(&desc, handle);
+	}
+
+	void CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& desc, ID3D12DescriptorHeap*& heap, const LPCWSTR errorMessage = L"CreateDescriptorHeapに失敗")
+	{
+		HRESULT hr = this->device_->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&heap));
+
+		HRESULTCheck(hr, errorMessage);
+	}
+	void CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& desc, ComPtr<ID3D12DescriptorHeap>& heap, const LPCWSTR errorMessage = L"CreateDescriptorHeapに失敗")
+	{
+		HRESULT hr = this->device_->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&heap));
+
+		HRESULTCheck(hr, errorMessage);
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="desc"></param>
+	/// <param name="handle"></param>
+	void CreateSampler(const D3D12_SAMPLER_DESC& desc, D3D12_CPU_DESCRIPTOR_HANDLE& handle)
+	{
+		this->device_->CreateSampler(&desc, handle);
 	}
 
 #pragma endregion

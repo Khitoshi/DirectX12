@@ -82,11 +82,8 @@ void DescriptorHeap::RegistSamplerDesc(int registerIndex, const D3D12_SAMPLER_DE
 }
 
 //ディスクリプタヒープへの登録を確定
-void DescriptorHeap::Commit(GraphicsEngine* graphicsEngine)
+void DescriptorHeap::Commit(GraphicsEngine*& graphicsEngine)
 {
-    //デバイスを取得
-    const auto& device = graphicsEngine->GetD3DDevice();
-
     //シェーダーリソースビューのディスクリプタヒープ デスク
     D3D12_DESCRIPTOR_HEAP_DESC srv_Heap_Desc = {};
     //シェーダーリソース数 + 定数バッファ数 + アンオーダーアクセスリソース数
@@ -99,19 +96,10 @@ void DescriptorHeap::Commit(GraphicsEngine* graphicsEngine)
     for (auto& descriptor_Heap : this->descriptor_Heap_) 
     {
         //ディスクリプタヒープ 生成
-        HRESULT hr = device.CreateDescriptorHeap(&srv_Heap_Desc, IID_PPV_ARGS(&descriptor_Heap));
+        //HRESULT hr = device.CreateDescriptorHeap(&srv_Heap_Desc, IID_PPV_ARGS(&descriptor_Heap));
+        graphicsEngine->CreateDescriptorHeap(srv_Heap_Desc, descriptor_Heap);
         //ディスクリプタ数 インクリメント
         this->num_Descriptor_Heap_++;
-
-        //生成チェック
-        if (FAILED(hr))
-        {
-            //生成失敗
-            MessageBox(nullptr, L"DescriptorHeap::Commit ディスクリプタヒープの作成に失敗しました。", L"エラー", MB_OK);
-            std::abort();
-            //強制終了
-            std::abort();
-        }
     }
 
     //定数バッファやシェーダーリソースのディスクリプタをヒープに書き込む
@@ -173,11 +161,8 @@ void DescriptorHeap::Commit(GraphicsEngine* graphicsEngine)
 }
 
 //サンプラステート用のディスクリプタヒープへの登録
-void DescriptorHeap::CommitSamplerHeap(GraphicsEngine* graphicsEngine)
+void DescriptorHeap::CommitSamplerHeap(GraphicsEngine*& graphicsEngine)
 {
-    //デバイス
-    const auto& device = graphicsEngine->GetD3DDevice();
-
     //シェーダーリソースビュー　ヒープデスク
     D3D12_DESCRIPTOR_HEAP_DESC srv_Heap_Desc = {};
     
@@ -189,15 +174,15 @@ void DescriptorHeap::CommitSamplerHeap(GraphicsEngine* graphicsEngine)
     //ディスクリプタヒープ　生成 loop
     for (auto& descriptor_Heap : this->descriptor_Heap_) {
         //生成
-        HRESULT hr = device.CreateDescriptorHeap(&srv_Heap_Desc, IID_PPV_ARGS(&descriptor_Heap));
+        graphicsEngine->CreateDescriptorHeap(srv_Heap_Desc, descriptor_Heap);
 
         //生成 チェック
-        if (FAILED(hr)) {
-            //失敗
-            MessageBox(nullptr, L"DescriptorHeap::Commit ディスクリプタヒープの作成に失敗しました。", L"エラー", MB_OK);
-            //異常終了
-            std::abort();
-        }
+        //if (FAILED(hr)) {
+        //    //失敗
+        //    MessageBox(nullptr, L"DescriptorHeap::Commit ディスクリプタヒープの作成に失敗しました。", L"エラー", MB_OK);
+        //    //異常終了
+        //    std::abort();
+        //}
     }
 
     int buffer_Index = 0;
@@ -210,7 +195,8 @@ void DescriptorHeap::CommitSamplerHeap(GraphicsEngine* graphicsEngine)
 
         for (int i = 0; i < this->num_Sampler_Desc_; i++) {
             //サンプラステートをディスクリプタヒープに登録
-            device.CreateSampler(&this->sampler_Descs_[i], cpuHandle);
+            //device->CreateSampler(&this->sampler_Descs_[i], cpuHandle);
+            graphicsEngine->CreateSampler(this->sampler_Descs_[i], cpuHandle);
             cpuHandle.ptr += graphicsEngine->GetSapmerDescriptorSize();
         }
         this->sampler_Gpu_Descriptor_Start_[buffer_Index] = gpuHandle;

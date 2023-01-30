@@ -55,13 +55,13 @@ public:
     /// ディスクリプタヒープへの登録を確定
     /// </summary>
     /// <param name="graphicsEngine">デバイスが格納されている</param>
-    void Commit(GraphicsEngine* graphicsEngine);
+    void Commit(GraphicsEngine*& graphicsEngine);
 
     /// <summary>
     /// サンプラステート用のディスクリプタヒープへの登録
     /// </summary>
     /// <param name="graphicsEngine">デバイスが格納されている</param>
-    void CommitSamplerHeap(GraphicsEngine* graphicsEngine);
+    void CommitSamplerHeap(GraphicsEngine*& graphicsEngine);
 
 private:
     /// <summary>
@@ -84,35 +84,35 @@ public://get method
     /// </summary>
     /// <param name="graphicsEngine">デバイスを格納している</param>
     /// <returns>this Descriptor Heap</returns>
-    ID3D12DescriptorHeap* GetDescriptorHeap(GraphicsEngine* graphicsEngine)const;
+    ID3D12DescriptorHeap* GetDescriptorHeap(GraphicsEngine*& graphicsEngine)const;
 
     /// <summary>
     /// 定数バッファの開始ハンドル 取得
     /// </summary>
     /// <param name="graphicsEngine">デバイスを格納している</param>
     /// <returns>this constant Buffer GPU descriptor start handle</returns>
-    D3D12_GPU_DESCRIPTOR_HANDLE GetConstantBufferGpuDescriptorStartHandle(GraphicsEngine* graphicsEngine)const;
+    D3D12_GPU_DESCRIPTOR_HANDLE GetConstantBufferGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine)const;
 
     /// <summary>
     /// シェーダーリソースのディスクリプタの開始ハンドルを取得
     /// </summary>
     /// <param name="graphicsEngine">デバイスを格納している</param>
     /// <returns>this shader resource GPU descriptor start handle</returns>
-    D3D12_GPU_DESCRIPTOR_HANDLE GetShaderResourceGpuDescriptorStartHandle(GraphicsEngine* graphicsEngine)const;
+    D3D12_GPU_DESCRIPTOR_HANDLE GetShaderResourceGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine)const;
 
     /// <summary>
     /// Unorder Access リソースのディスクリプタの開始ハンドルを取得
     /// </summary>
     /// <param name="graphicsEngine">デバイスを格納している</param>
     /// <returns>this uav resource GPU descriptor start handle</returns>
-    D3D12_GPU_DESCRIPTOR_HANDLE GetUavResourceGpuDescriptorStartHandle(GraphicsEngine* graphicsEngine) const;
+    D3D12_GPU_DESCRIPTOR_HANDLE GetUavResourceGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine) const;
 
     /// <summary>
     /// Samplerのディスクリプタの開始ハンドルを取得
     /// </summary>
     /// <param name="graphicsEngine">デバイスを格納している</param>
     /// <returns>this sampler resource GPU descriptor start handle</returns>
-    D3D12_GPU_DESCRIPTOR_HANDLE GetSamplerResourceGpuDescriptorStartHandle(GraphicsEngine* graphicsEngine) const;
+    D3D12_GPU_DESCRIPTOR_HANDLE GetSamplerResourceGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine) const;
 
     /// <summary>
     /// シェーダーリソースが一つでも登録されているか判定
