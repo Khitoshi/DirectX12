@@ -45,11 +45,8 @@ ConstantBuffer::~ConstantBuffer()
 }
 
 //初期化
-void ConstantBuffer::Init(GraphicsEngine* graphicsEngine, int constantBufferSize, void* srcData)
+void ConstantBuffer::Init(GraphicsEngine*& graphicsEngine, int constantBufferSize, void* srcData)
 {
-    //デバイス取得
-    auto device = graphicsEngine->GetD3DDevice();
-
     //定数バッファの初期化
     this->constant_Buffer_Size_ = constantBufferSize;
 
@@ -61,19 +58,28 @@ void ConstantBuffer::Init(GraphicsEngine* graphicsEngine, int constantBufferSize
     auto heap_Prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     //リソースサイズ設定
     auto resource_Desc = CD3DX12_RESOURCE_DESC::Buffer(this->alloc_Size_);
-
+    D3D12_CLEAR_VALUE* value = nullptr;
     //定数バッファ 生成
     for (auto& constant_Buffer : this->constant_Buffer_)
     {
-        //生成
-        HRESULT hr = device.CreateCommittedResource(
-            &heap_Prop,
+        graphicsEngine->CreateCommittedResource(
+            heap_Prop,
             D3D12_HEAP_FLAG_NONE,
-            &resource_Desc,
+            resource_Desc,
             D3D12_RESOURCE_STATE_GENERIC_READ,
-            nullptr,
-            IID_PPV_ARGS(&constant_Buffer)
+            *value,
+            constant_Buffer
         );
+
+        ////生成
+        //graphicsEngine->CreateCommittedResource(
+        //    heap_Prop,
+        //    D3D12_HEAP_FLAG_NONE,
+        //    resource_Desc,
+        //    D3D12_RESOURCE_STATE_GENERIC_READ,
+        //    nullptr,
+        //    constant_Buffer
+        //);
 
         //生成 チェック
         /*
@@ -103,7 +109,7 @@ void ConstantBuffer::Init(GraphicsEngine* graphicsEngine, int constantBufferSize
 }
 
 //データをVRAMにコピーする
-void ConstantBuffer::CopyToVRAM(GraphicsEngine* graphicsEngine, void* data)
+void ConstantBuffer::CopyToVRAM(GraphicsEngine*& graphicsEngine, void* data)
 {
     auto backBufferIndex = graphicsEngine->GetBackBufferIndex();
     memcpy(this->const_Buffer_CPU_[backBufferIndex], data, this->constant_Buffer_Size_);
@@ -119,7 +125,7 @@ void ConstantBuffer::CopyToVRAM(GraphicsEngine* graphicsEngine, T& data)
 */
 
 //ディスクリプタヒープに定数バッファビューを登録
-void ConstantBuffer::RegistConstantBufferView(GraphicsEngine* graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle)
+void ConstantBuffer::RegistConstantBufferView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle)
 {
     //バックバッファ数を取得
     auto back_Buffer_Index = graphicsEngine->GetBackBufferIndex();
@@ -128,18 +134,17 @@ void ConstantBuffer::RegistConstantBufferView(GraphicsEngine* graphicsEngine, D3
 }
 
 //ディスクリプタヒープに定数バッファビューを登録
-void ConstantBuffer::RegistConstantBufferView(GraphicsEngine* graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
+void ConstantBuffer::RegistConstantBufferView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
 {
-    //デバイスを取得。
-    auto device = graphicsEngine->GetD3DDevice();
     D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};
     desc.BufferLocation = this->constant_Buffer_[bufferNo]->GetGPUVirtualAddress();
     desc.SizeInBytes = this->alloc_Size_;
-    device.CreateConstantBufferView(&desc, descriptorHandle);
+    //device.CreateConstantBufferView(&desc, descriptorHandle);
+    graphicsEngine->CreateConstantBufferView(desc, descriptorHandle);
 }
 
 //ディスクリプタヒープに定数バッファビューを登録
-D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetGPUVirtualAddress(GraphicsEngine* graphicsEngine)
+D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetGPUVirtualAddress(GraphicsEngine*& graphicsEngine)
 {
     auto back_Buffer_Index = graphicsEngine->GetBackBufferIndex();
     return this->constant_Buffer_[back_Buffer_Index]->GetGPUVirtualAddress();

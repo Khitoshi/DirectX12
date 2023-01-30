@@ -191,6 +191,16 @@ public:
 		);
 	};
 
+	/// <summary>
+	/// 定数バッファービュー　作成
+	/// </summary>
+	/// <param name="desc">点数バッファビューの設定</param>
+	/// <param name="handle">CPUディスクリプタハンドル</param>
+	void CreateConstantBufferView(const D3D12_CONSTANT_BUFFER_VIEW_DESC& desc, D3D12_CPU_DESCRIPTOR_HANDLE& handle)
+	{
+		this->device_->CreateConstantBufferView(&desc, handle);
+	}
+
 #pragma endregion
 
 
