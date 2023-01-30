@@ -128,7 +128,7 @@ void DescriptorHeap::Commit(GraphicsEngine*& graphicsEngine)
         {
             if (this->shader_Resources_[i] != nullptr) 
             {
-                this->shader_Resources_[i]->RegistShaderResourceView(*graphicsEngine,cpu_Handle, buffer_Index);
+                this->shader_Resources_[i]->RegistShaderResourceView(graphicsEngine,cpu_Handle, buffer_Index);
             }
             //ŽŸ‚Éi‚ß‚éB
             cpu_Handle.ptr += graphicsEngine->GetCbrSrvDescriptorSize();

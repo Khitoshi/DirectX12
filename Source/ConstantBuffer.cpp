@@ -58,7 +58,6 @@ void ConstantBuffer::Init(GraphicsEngine*& graphicsEngine, int constantBufferSiz
     auto heap_Prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     //リソースサイズ設定
     auto resource_Desc = CD3DX12_RESOURCE_DESC::Buffer(this->alloc_Size_);
-    D3D12_CLEAR_VALUE* value = nullptr;
     //定数バッファ 生成
     for (auto& constant_Buffer : this->constant_Buffer_)
     {
@@ -67,7 +66,7 @@ void ConstantBuffer::Init(GraphicsEngine*& graphicsEngine, int constantBufferSiz
             D3D12_HEAP_FLAG_NONE,
             resource_Desc,
             D3D12_RESOURCE_STATE_GENERIC_READ,
-            *value,
+            nullptr,
             constant_Buffer
         );
 

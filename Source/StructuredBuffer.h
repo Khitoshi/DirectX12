@@ -28,7 +28,7 @@ public:
     /// <param name="elementSize">エレメントのサイズ</param>
     /// <param name="elementNumber">エレメントの数</param>
     /// <param name="initData">初期化データ</param>
-    void Init(GraphicsEngine* graphicsEngine, int elementSize, int elementNumber, void* initData);
+    void Init(GraphicsEngine*& graphicsEngine, int elementSize, int elementNumber, void* initData);
 
     /// <summary>
     /// SRVに登録。
@@ -36,14 +36,14 @@ public:
     /// <param name="graphicsEngine">デバイスを格納している</param>
     /// <param name="descriptorHandle">CPU ディスクリプタ　ハンドル</param>
     /// <param name="buffernumber">バッファ 番号</param>
-    void RegistShaderResourceView(GraphicsEngine& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber)override;
+    void RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber)override;
 
     /// <summary>
     /// 構造化バッファの内容更新
     /// </summary>
     /// <param name="graphicsEngine">デバイスを格納している</param>
     /// <param name="data"></param>
-    void Update(GraphicsEngine* graphicsEngine,void* data);
+    void Update(GraphicsEngine*& graphicsEngine,void* data);
 
     
 private:
@@ -58,7 +58,7 @@ public:
     bool IsInited() const { return this->is_Inited_; }
 
     //GPUからアクセスできるバッファーの取得
-    ID3D12Resource* GetResouce(GraphicsEngine* graphicsEngine);
+    ID3D12Resource* GetResouce(GraphicsEngine*& graphicsEngine);
 
 #pragma endregion
 

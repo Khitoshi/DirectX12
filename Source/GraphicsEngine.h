@@ -270,6 +270,21 @@ public:
 		HRESULTCheck(hr, errorMessage);
 	}
 
+	/// <summary>
+	/// シェーダーリソースビュー 作成
+	/// </summary>
+	/// <param name="resouce">シェーダーリソース</param>
+	/// <param name="desc">シェーダーリソースの設定</param>
+	/// <param name="handle">ハンドル</param>
+	void CreateShaderResourceView(ID3D12Resource*& resouce, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc, D3D12_CPU_DESCRIPTOR_HANDLE& handle)
+	{
+		this->device_->CreateShaderResourceView(resouce, &desc, handle);
+	}
+	void CreateShaderResourceView(ComPtr<ID3D12Resource>& resouce, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc, D3D12_CPU_DESCRIPTOR_HANDLE& handle)
+	{
+		this->device_->CreateShaderResourceView(resouce.Get(), &desc, handle);
+	}
+
 #pragma endregion
 
 

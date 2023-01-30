@@ -21,16 +21,14 @@ StructuredBuffer::~StructuredBuffer()
 }
 
 //初期化
-void StructuredBuffer::Init(GraphicsEngine* graphicsEngine, int elementSize, int elementNumber, void* initData)
+void StructuredBuffer::Init(GraphicsEngine*& graphicsEngine, int elementSize, int elementNumber, void* initData)
 {
     
     //エレメントサイズ 取得
     this->element_Size_ = elementSize;
     //エレメント要素数 取得
     this->element_Number_ = elementNumber;
-    //デバイス 取得
-    auto device = graphicsEngine->GetD3DDevice();
-    
+
     //バッファ番号
     int buffer_number = 0;
     //ヒープ情報
@@ -41,21 +39,21 @@ void StructuredBuffer::Init(GraphicsEngine* graphicsEngine, int elementSize, int
     for (auto& buffer : this->buffers_On_GPU_)
     {
         //リソース 生成
-        HRESULT hr = device.CreateCommittedResource(
-            &heap_prop,
+        graphicsEngine->CreateCommittedResource(
+            heap_prop,
             D3D12_HEAP_FLAG_NONE,
-            &resource_desc,
+            resource_desc,
             D3D12_RESOURCE_STATE_GENERIC_READ,
             nullptr,
-            IID_PPV_ARGS(&buffer)
+            buffer
         );
 
-        //生成　チェック
-        if (FAILED(hr))
-        {
-            MessageBox(nullptr, TEXT("GraphicsEngine::CreateSynchronizationWithGPUObjectの生成に失敗"), TEXT("エラー"), MB_OK);
-            std::abort();
-        }
+        ////生成　チェック
+        //if (FAILED(hr))
+        //{
+        //    MessageBox(nullptr, TEXT("GraphicsEngine::CreateSynchronizationWithGPUObjectの生成に失敗"), TEXT("エラー"), MB_OK);
+        //    std::abort();
+        //}
 
         CD3DX12_RANGE read_range(0, 0);
         buffer->Map(0, &read_range, reinterpret_cast<void**>(this->buffers_On_CPU_[buffer_number]));
@@ -70,13 +68,10 @@ void StructuredBuffer::Init(GraphicsEngine* graphicsEngine, int elementSize, int
 }
 
 //SRVに登録
-void StructuredBuffer::RegistShaderResourceView(GraphicsEngine& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber)
+void StructuredBuffer::RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber)
 {
     //初期化チェック
     if (!this->is_Inited_)return;
-
-    //デバイス取得
-    auto device = graphicsEngine.GetD3DDevice();
 
     D3D12_SHADER_RESOURCE_VIEW_DESC shader_recouce_view_desc;
     //メモリブロックをゼロで埋める
@@ -93,21 +88,24 @@ void StructuredBuffer::RegistShaderResourceView(GraphicsEngine& graphicsEngine, 
     shader_recouce_view_desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
     //シェーダーリソースビュー 生成
-    device.CreateShaderResourceView(
-        this->buffers_On_GPU_[bufferNumber].Get(), 
-        &shader_recouce_view_desc, 
-        descriptorHandle
-    );
+    //device.CreateShaderResourceView(
+    //    this->buffers_On_GPU_[bufferNumber].Get(), 
+    //    &shader_recouce_view_desc, 
+    //    descriptorHandle
+    //);
+
+    graphicsEngine->CreateShaderResourceView(this->buffers_On_GPU_[bufferNumber], shader_recouce_view_desc, descriptorHandle);
+
 }
 
 //構造化バッファの内容更新
-void StructuredBuffer::Update(GraphicsEngine* graphicsEngine, void* data)
+void StructuredBuffer::Update(GraphicsEngine*& graphicsEngine, void* data)
 {
     auto back_baffer_index = graphicsEngine->GetBackBufferIndex();
     memcpy(this->buffers_On_CPU_[back_baffer_index], data, this->element_Number_ * this->element_Size_);
 }
 
-ID3D12Resource* StructuredBuffer::GetResouce(GraphicsEngine* graphicsEngine)
+ID3D12Resource* StructuredBuffer::GetResouce(GraphicsEngine*& graphicsEngine)
 {
 
     auto buck_buffer_index = graphicsEngine->GetBackBufferIndex();
