@@ -16,7 +16,7 @@ IndexBuffer::~IndexBuffer()
 }
 
 //初期化
-void IndexBuffer::Init(GraphicsEngine* graphicsEngine,int size, int stride)
+void IndexBuffer::Init(GraphicsEngine*& graphicsEngine,int size, int stride)
 {
     //サイズを設定
     if (stride == 2)
@@ -27,30 +27,28 @@ void IndexBuffer::Init(GraphicsEngine* graphicsEngine,int size, int stride)
     {
         this->size_In_Bytes_ = size;
     }
-
-    //デバイス取得
-    auto device = graphicsEngine->GetD3DDevice();
     //ヒープの設定 取得
     auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     //リソースのサイズ 取得
     auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(this->size_In_Bytes_);
+    
 
     //RESOURCE 生成
-    HRESULT hr = device.CreateCommittedResource(
-        &heapProp,
+    graphicsEngine->CreateCommittedResource(
+        heapProp,
         D3D12_HEAP_FLAG_NONE,
-        &resourceDesc,
+        resourceDesc,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS(&this->index_Buffer_)
+        this->index_Buffer_
     );
 
     //生成チェック
-    if (FAILED(hr))
-    {
-        //TODO :MYASSERTを実装する
-        std::abort();
-    }
+    //if (FAILED(hr))
+    //{
+    //    //TODO :MYASSERTを実装する
+    //    std::abort();
+    //}
 
     //インデックスバッファのビュー 生成
     this->index_Buffer_View_.BufferLocation = this->index_Buffer_->GetGPUVirtualAddress();

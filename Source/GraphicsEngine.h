@@ -100,7 +100,7 @@ public:
 		const D3D12_HEAP_FLAGS heapFlag,
 		const D3D12_RESOURCE_DESC& desc,
 		const D3D12_RESOURCE_STATES state,
-		const D3D12_CLEAR_VALUE& value,
+		const D3D12_CLEAR_VALUE* value,
 		ID3D12Resource*& resouce,
 		const LPCWSTR errorMessage = L"CreateCommittedResourceに失敗"
 	)
@@ -111,13 +111,37 @@ public:
 			heapFlag,
 			&desc,
 			state,
-			&value,
+			value,
 			IID_PPV_ARGS(&resouce)
 		);
 
 		//生成 確認
 		HRESULTCheck(hr, errorMessage);
 	}
+	void CreateCommittedResource(
+		const D3D12_HEAP_PROPERTIES& prop,
+		const D3D12_HEAP_FLAGS heapFlag,
+		const D3D12_RESOURCE_DESC& desc,
+		const D3D12_RESOURCE_STATES state,
+		const D3D12_CLEAR_VALUE* value,
+		ComPtr<ID3D12Resource>& resouce,
+		const LPCWSTR errorMessage = L"CreateCommittedResourceに失敗"
+	)
+	{
+		//リソース作成
+		HRESULT hr = this->device_->CreateCommittedResource(
+			&prop,
+			heapFlag,
+			&desc,
+			state,
+			value,
+			IID_PPV_ARGS(&resouce)
+		);
+
+		//生成 確認
+		HRESULTCheck(hr, errorMessage);
+	}
+
 
 	/// <summary>
 	/// デスクリプタのバイト数 取得

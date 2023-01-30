@@ -28,7 +28,7 @@ public:
     /// <param name="graphicsEngine">使用しているデバイスを格納しているクラス</param>
     /// <param name="size">インデックスバッファのサイズ</param>
     /// <param name="stride">ストライド</param>
-    void Init(GraphicsEngine* graphicsEngine,int size, int stride);
+    void Init(GraphicsEngine*& graphicsEngine,int size, int stride);
 
     /// <summary>
     /// インデックスデータをインデックスバッファにコピー
