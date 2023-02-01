@@ -173,7 +173,7 @@ void RenderTarget::CreateRenderTargetTexture(
         D3D12_HEAP_FLAG_NONE,
         desc,
         D3D12_RESOURCE_STATE_COMMON,
-        clear_value,
+        &clear_value,
         this->render_Target_Texture_Dx12_
     );
 
@@ -215,7 +215,7 @@ void RenderTarget::CreateDepthStencilTexture(
         D3D12_HEAP_FLAG_NONE,
         desc,
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
-        dsv_clear_value,
+        &dsv_clear_value,
         this->depth_Stencil_Texture_
     );
 }

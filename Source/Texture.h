@@ -19,7 +19,7 @@ public:
     /// 明示的 コンストラクタ
     /// </summary>
     /// <param name = "filePath">ロードするテクスチャのファイルパス</param>
-    explicit Texture(GraphicsEngine* graphicsEngine,const wchar_t* filePath);
+    explicit Texture(GraphicsEngine*& graphicsEngine,const wchar_t* filePath);
 
     /// <summary>
     /// デストラクタ
@@ -30,26 +30,26 @@ public:
     /// DDSファイルからテクスチャを初期化する。
     /// </summary>
     /// <param name="filePath">ロードするテクスチャのファイルパス。</param>
-    void InitFromDDSFile(GraphicsEngine* graphicsEngine,const wchar_t* filePath);
+    void InitFromDDSFile(GraphicsEngine*& graphicsEngine,const wchar_t* filePath);
 
     /// <summary>
     /// メモリからテクスチャを初期化する。
     /// </summary>
     /// <param name="memory">テクスチャデータが格納されているメモリの先頭アドレス</param>
     /// <param name="size">テクスチャのサイズ。</param>
-    void InitFromMemory(GraphicsEngine* graphicsEngine,const char* memory, unsigned int size);
+    void InitFromMemory(GraphicsEngine*& graphicsEngine,const char* memory, unsigned int size);
     
     /// <summary>
     /// D3Dリソースからテクスチャを初期化する。
     /// </summary>
     /// <param name="resrouce">D3Dリソース。</param>
-    void InitFromD3DResource(ID3D12Resource* texture);
+    void InitFromD3DResource(ID3D12Resource*& texture);
     
     /// <summary>
     /// SRVに登録。
     /// </summary>
     /// <param name="descriptorHandle"></param>
-    void RegistShaderResourceView(GraphicsEngine& graphicsEngine,D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo);
+    void RegistShaderResourceView(GraphicsEngine*& graphicsEngine,D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo);
 
 private:
 #pragma region Load Texture Method
@@ -57,7 +57,7 @@ private:
     /// DDSファイルからテクスチャをロード。
     /// </summary>
     /// <param name="filePath">ファイルパス。</param>
-    void LoadTextureFromDDSFile(GraphicsEngine* graphicsEngine,const wchar_t* filePath);
+    void LoadTextureFromDDSFile(GraphicsEngine*& graphicsEngine,const wchar_t* filePath);
 
     /// <summary>
     /// メモリからテクスチャをロード。
@@ -66,7 +66,7 @@ private:
     /// <param name="size">テクスチャのサイズ。</param>
     /// <param name="ge12">Dx12版のグラフィックスエンジン</param>
     /// <param name="device">D3Dデバイス</param>
-    void LoadTextureFromMemory(GraphicsEngine* graphicsEngine,const char* memory, unsigned int size);
+    void LoadTextureFromMemory(GraphicsEngine*& graphicsEngine,const char* memory, unsigned int size);
 
 #pragma endregion
 
@@ -88,7 +88,7 @@ public:
     /// <returns></returns>
     ID3D12Resource*& GetTexture()
     {
-        return *this->texture_.GetAddressOf();
+        return this->texture_;
     }
 
     /// <summary>
@@ -122,7 +122,8 @@ public:
 
 private:
     //テクスチャ。
-    ComPtr<ID3D12Resource> texture_ = nullptr;	
+    //ComPtr<ID3D12Resource> texture_ = nullptr;	
+    ID3D12Resource* texture_;
     //テクスチャ情報
     D3D12_RESOURCE_DESC texture_Desc_;	
 };

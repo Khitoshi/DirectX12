@@ -10,6 +10,7 @@
 #include <memory>
 #include "NullTextureMaps.h"
 #include <GraphicsMemory.h>
+//#include <ResourceUploadBatch.h>
 using namespace Microsoft::WRL;
 
 class RenderContext;
@@ -282,8 +283,24 @@ public:
 	}
 	void CreateShaderResourceView(ComPtr<ID3D12Resource>& resouce, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc, D3D12_CPU_DESCRIPTOR_HANDLE& handle)
 	{
-		this->device_->CreateShaderResourceView(resouce.Get(), &desc, handle);
+		this->device_->CreateShaderResourceView(*resouce.GetAddressOf(), &desc, handle);
 	}
+	
+	///// <summary>
+	///// 現在使用しているDeviceでResourceUploadBatch 取得
+	///// </summary>
+	///// <returns></returns>
+	//ResourceUploadBatch GetResourceUploadBatch()
+	//{
+	//	ResourceUploadBatch batch(device_.Get());
+	//	return batch;
+	//}
+
+	/// <summary>
+	/// デバイス取得
+	/// </summary>
+	/// <returns></returns>
+	ID3D12Device5* GetDevice() { return this->device_.Get(); }
 
 #pragma endregion
 

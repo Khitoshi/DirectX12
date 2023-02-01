@@ -113,6 +113,7 @@ void DescriptorHeap::Commit(GraphicsEngine*& graphicsEngine)
 
 
         //定数バッファを登録
+        /*
         for (auto& constant_buffer:this->constant_Buffers_)
         {
             if (constant_buffer != nullptr)
@@ -122,6 +123,16 @@ void DescriptorHeap::Commit(GraphicsEngine*& graphicsEngine)
             //次に進める。
             cpu_Handle.ptr += graphicsEngine->GetCbrSrvDescriptorSize();
         }
+        */
+        for (int i = 0; i < this->num_Constant_Buffer_; i++) {
+            //@todo bug
+            if (this->constant_Buffers_[i] != nullptr) {
+                this->constant_Buffers_[i]->RegistConstantBufferView(graphicsEngine,cpu_Handle, buffer_Index);
+            }
+            //次に進める。
+            cpu_Handle.ptr += graphicsEngine->GetCbrSrvDescriptorSize();
+        }
+
 
         //続いてシェーダーリソース。
         for (int i = 0; i < this->num_Shader_Resource_; i++) 

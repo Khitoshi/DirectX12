@@ -13,29 +13,29 @@ VertexBuffer::~VertexBuffer()
 //初期化
 void VertexBuffer::Init(GraphicsEngine* graphicsEngine, int size, int stride)
 {
-    //デバイス 取得
-    auto device = graphicsEngine->GetD3DDevice();
     //ヒープの設定 取得
     auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     //リソースのサイズ 取得
     auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
 
-    //RESOURCE 生成
-    HRESULT hr = device.CreateCommittedResource(
-        &heapProp,
+    ////RESOURCE 生成
+    //HRESULT hr = device.CreateCommittedResource(
+    //    &heapProp,
+    //    D3D12_HEAP_FLAG_NONE,
+    //    &resourceDesc,
+    //    D3D12_RESOURCE_STATE_GENERIC_READ,
+    //    nullptr,
+    //    IID_PPV_ARGS(&vertex_Buffer_)
+    //);
+    
+    graphicsEngine->CreateCommittedResource(
+        heapProp,
         D3D12_HEAP_FLAG_NONE,
-        &resourceDesc,
+        resourceDesc,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS(&vertex_Buffer_)
+        vertex_Buffer_
     );
-    
-    //生成 チェック
-    if (FAILED(hr))
-    {
-        //TODO:MYASSERTを実装する
-        std::abort();
-    }
 
     //頂点バッファの名前 セット
     vertex_Buffer_->SetName(L"VertexBuffer");

@@ -150,7 +150,7 @@ public:
     }
     void WaitUntilFinishDrawingToRenderTarget(RenderTarget& renderTarget)
     {
-        WaitUntilFinishDrawingToRenderTarget(renderTarget.GetRenderTargetTexture().Get());
+        WaitUntilFinishDrawingToRenderTarget(renderTarget.GetRenderTargetTexture().GetTexture());
     }
     void WaitUntilFinishDrawingToRenderTarget(ID3D12Resource* renderTarget)
     {
@@ -176,7 +176,7 @@ public:
     }
     void WaitUntilToPossibleSetRenderTarget(RenderTarget& renderTarget)
     {
-        WaitUntilToPossibleSetRenderTarget(renderTarget.GetRenderTargetTexture().Get());
+        WaitUntilToPossibleSetRenderTarget(renderTarget.GetRenderTargetTexture().GetTexture());
     }
     void WaitUntilToPossibleSetRenderTarget(ID3D12Resource* renderTarget)
     {
