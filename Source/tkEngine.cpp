@@ -1,48 +1,35 @@
+ï»¿#include "stdafx.h"
 #include "tkEngine.h"
 #include "GraphicsEngine.h"
-//ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-tkEngine::tkEngine():
-    graphics_Engine_(nullptr),
-    tkm_File_Bank_(),
-    shader_Bank_(),
-    texture_Bank_(),
-    pad_()
+
+TkEngine* g_engine = nullptr;
+
+TkEngine::~TkEngine()
 {
+	if (m_graphicsEngine) {
+		delete m_graphicsEngine;
+	}
 }
-
-//ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-tkEngine::~tkEngine()
+void TkEngine::Init(HWND hwnd, UINT frameBufferWidth, UINT frameBufferHeight)
 {
-    delete graphics_Engine_;
+	//ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¨ãƒ³ã‚¸ãƒ³ã®åˆæœŸåŒ–ã€‚
+	m_graphicsEngine = new GraphicsEngine();
+	m_graphicsEngine->Init(hwnd, frameBufferWidth, frameBufferHeight);
+	//ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã®åˆæœŸåŒ–ã€‚
+	for (int i = 0; i < GamePad::CONNECT_PAD_MAX; i++) {
+		g_pad[i] = &m_pad[i];
+	}
 }
-
-//ƒtƒŒ[ƒ€‚ÌŠJn‚ÉŒÄ‚Î‚ê‚éˆ—
-void tkEngine::BeginFrame(GraphicsEngine*& graphicsEngine, Camera& camera)
+void TkEngine::BeginFrame()
 {
-    graphicsEngine->BeginRender(camera);
+	m_graphicsEngine->BeginRender();
+	for (auto& pad : m_pad) {
+		pad.BeginFrame();
+		pad.Update();
+	}
+	
 }
-
-//ƒtƒŒ[ƒ€‚ÌI—¹‚ÉŒÄ‚Î‚ê‚éˆ—
-void tkEngine::EndFrame()
+void TkEngine::EndFrame()
 {
-    graphics_Engine_->EndRender();
-}
-
-//ƒQ[ƒ€ƒGƒ“ƒWƒ“‚Ì‰Šú‰»
-void tkEngine::Init(
-    HWND hwnd, 
-    UINT frameBufferWidth, 
-    UINT frameBufferHeight, 
-    Camera& camera
-)
-{
-    //this->graphics_Engine_.reset(&graphicsEngine);
-
-    graphics_Engine_ = new GraphicsEngine(hwnd, frameBufferWidth, frameBufferHeight);
-
-    graphics_Engine_->Init(camera);
-    //ƒQ[ƒ€ƒpƒbƒh‚Ì‰Šú‰»B
-    //for (int i = 0; i < GamePad::CONNECT_PAD_MAX; i++) {
-    //    g_pad[i] = &m_pad[i];
-    //}
+	m_graphicsEngine->EndRender();
 }

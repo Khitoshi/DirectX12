@@ -1,101 +1,60 @@
+ï»¿#include "stdafx.h"
 #include "IndexBuffer.h"
 
-//ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-IndexBuffer::IndexBuffer():
-    index_Buffer_(),
-    index_Buffer_View_(),
-    index_Count_(0),
-    stride_In_Bytes_(0),
-    size_In_Bytes_(0)
-{
-}
 
-//ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
+
+
 IndexBuffer::~IndexBuffer()
 {
+	if (m_indexBuffer) {
+		m_indexBuffer->Release();
+	}
 }
-
-//‰Šú‰»
-void IndexBuffer::Init(GraphicsEngine*& graphicsEngine,int size, int stride)
+void IndexBuffer::Init(int size, int stride)
 {
-    //ƒTƒCƒY‚ðÝ’è
-    if (stride == 2)
-    {
-        this->size_In_Bytes_ = size * 2;
-    }
-    else
-    {
-        this->size_In_Bytes_ = size;
-    }
-    //ƒq[ƒv‚ÌÝ’è Žæ“¾
-    auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    //ƒŠƒ\[ƒX‚ÌƒTƒCƒY Žæ“¾
-    auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(this->size_In_Bytes_);
-    
-
-    //RESOURCE ¶¬
-    graphicsEngine->CreateCommittedResource(
-        heapProp,
-        D3D12_HEAP_FLAG_NONE,
-        resourceDesc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        this->index_Buffer_
-    );
-
-    //¶¬ƒ`ƒFƒbƒN
-    //if (FAILED(hr))
-    //{
-    //    //TODO :MYASSERT‚ðŽÀ‘•‚·‚é
-    //    std::abort();
-    //}
-
-    //ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚Ìƒrƒ…[ ¶¬
-    this->index_Buffer_View_.BufferLocation = this->index_Buffer_->GetGPUVirtualAddress();
-
-    //ƒXƒgƒ‰ƒCƒh‚Î4byteŒÅ’è
-    this->stride_In_Bytes_ = 4;
-    this->index_Buffer_View_.Format = DXGI_FORMAT_R32_UINT;
-    this->index_Buffer_View_.SizeInBytes = this->size_In_Bytes_;
-
-    //ƒCƒ“ƒfƒbƒNƒX”‚ðÝ’è
-    this->index_Count_ = this->size_In_Bytes_ / this->stride_In_Bytes_;
+	if (stride == 2) {
+		m_sizeInBytes = size * 2;
+	}
+	else {
+		m_sizeInBytes = size;
+	}
+	auto d3dDevice = g_graphicsEngine->GetD3DDevice();
+	auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	auto rDesc = CD3DX12_RESOURCE_DESC::Buffer(m_sizeInBytes);
+	auto hr = d3dDevice->CreateCommittedResource(
+		&heapProp,
+		D3D12_HEAP_FLAG_NONE,
+		&rDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&m_indexBuffer));
+	
+	//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã®ãƒ“ãƒ¥ãƒ¼ã‚’ä½œæˆã€‚
+	m_indexBufferView.BufferLocation = m_indexBuffer->GetGPUVirtualAddress();
+	
+	
+	//ã‚¹ãƒˆãƒ©ã‚¤ãƒ‰ã¯ï¼”ãƒã‚¤ãƒˆå›ºå®šã€‚
+	m_strideInBytes = 4;
+	m_indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+	m_indexBufferView.SizeInBytes = m_sizeInBytes;
+	
+	m_count = m_sizeInBytes / m_strideInBytes;
 }
-
-//ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^‚ðƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ÉƒRƒs[
 void IndexBuffer::Copy(uint16_t* srcIndecies)
 {
-
-    uint32_t* data = nullptr;
-
-    //ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ÉƒRƒs[(map)‚·‚é
-    this->index_Buffer_->Map(0, nullptr, reinterpret_cast<void**>(&data));
-    for (int i = 0; i < this->index_Count_; i++)
-    {
-        data[i] = srcIndecies[i];
-    }
-
-    //map‚ð‰ðœ
-    this->index_Buffer_->Unmap(0, nullptr);
+	uint32_t* pData;
+	m_indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData));
+	for (int i = 0; i < m_count; i++) {
+		pData[i] = srcIndecies[i];
+	}
+	m_indexBuffer->Unmap(0, nullptr);
 }
-
-//ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^‚ðƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ÉƒRƒs[
 void IndexBuffer::Copy(uint32_t* srcIndecies)
 {
-    uint32_t* data = nullptr;
-
-    //ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ÉƒRƒs[(map)‚·‚é
-    this->index_Buffer_->Map(0, nullptr, reinterpret_cast<void**>(&data));
-    for (int i = 0; i < this->index_Count_; i++)
-    {
-        data[i] = srcIndecies[i];
-    }
-
-    //map‚ð‰ðœ
-    this->index_Buffer_->Unmap(0, nullptr);
-
+	uint32_t* pData;
+	m_indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData));
+	for (int i = 0; i < m_count; i++) {
+		pData[i] = srcIndecies[i];
+	}
+	m_indexBuffer->Unmap(0, nullptr);
 }
-
-
-
-

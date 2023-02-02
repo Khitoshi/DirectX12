@@ -1,446 +1,362 @@
+ï»¿/*!
+* @brief	ã‚«ãƒ¡ãƒ©
+*/
+
 #pragma once
-#include <DirectXMath.h>
-#include "Vector2.h"
-#include "Vector3.h"
-#include "Matrix.h"
-#include "GraphicsEngine.h"
-using namespace DirectX;
 
-class Quaternion;
-class Camera
-{
-private:
-	/// <summary>
-	/// Ë‰es—ñ‚ÌXV•û–@B
-	/// </summary>
-	enum class EnUpdateProjMatrixFunc {
-		enUpdateProjMatrixFunc_Perspective,		//“§‹Ë‰es—ñB‰“‹ß–@‚ªŒø‚¢‚½ŠG‚ğì‚è‚½‚¢‚È‚ç‚±‚Á‚¿B
-		enUpdateProjMatrixFunc_Ortho,			//•½s“Š‰eB‚Q‚c“I‚È•\Œ»‚ª‚µ‚½‚¢‚È‚ç‚±‚Á‚¿B
-	};
-
+/// <summary>
+/// ã‚«ãƒ¡ãƒ©ã‚¯ãƒ©ã‚¹ã€‚
+/// </summary>
+class Camera  {
 public:
 	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	/// å°„å½±è¡Œåˆ—ã®æ›´æ–°æ–¹æ³•ã€‚
 	/// </summary>
-	Camera();
-
+	enum EnUpdateProjMatrixFunc {
+		enUpdateProjMatrixFunc_Perspective,		//é€è¦–å°„å½±è¡Œåˆ—ã€‚é è¿‘æ³•ãŒåŠ¹ã„ãŸçµµã‚’ä½œã‚ŠãŸã„ãªã‚‰ã“ã£ã¡ã€‚
+		enUpdateProjMatrixFunc_Ortho,			//å¹³è¡ŒæŠ•å½±ã€‚ï¼’ï¼¤çš„ãªè¡¨ç¾ãŒã—ãŸã„ãªã‚‰ã“ã£ã¡ã€‚
+	};
 	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
+	/// ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã€ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã‚’æ›´æ–°ã™ã‚‹ã€‚
 	/// </summary>
-	~Camera();
-
+	void Update();
 	/// <summary>
-	/// ƒrƒ…[s—ñAƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚ğXV‚·‚é
+	/// æ³¨è¦–ç‚¹ã‚’åŸç‚¹ã¨ã—ã¦ã‚«ãƒ¡ãƒ©ã‚’å›è»¢ã•ã›ã‚‹ã€‚
 	/// </summary>
-	void Update(const GraphicsEngine* graphicsEngine);
-
+	/// <param name="qRot">å›è»¢ã•ã›ã‚‹ã‚¯ã‚©ãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³</param>
+	void RotateOriginTarget( const Quaternion& qRot);
+	
 	/// <summary>
-	/// ’‹“_‚ğŒ´“_‚Æ‚µ‚ÄƒJƒƒ‰‚ğ‰ñ“]‚³‚¹‚é
+	/// ã‚«ãƒ¡ãƒ©ã‚’å‹•ã‹ã™ã€‚
 	/// </summary>
-	/// <param name="qRot">‰ñ“]‚³‚¹‚éƒNƒH[ƒ^ƒjƒIƒ“</param>
-	void RotateOriginTarget(const Quaternion& qRot);
-
-#pragma region Move Method
-	/// <summary>
-	/// ƒJƒƒ‰‚ğ“®‚©‚·
-	/// </summary>
-	/// <param name="move">“®‚©‚·—Ê</param>
+	/// <param name="move">å‹•ã‹ã™é‡</param>
 	void Move(const Vector3& move)
 	{
-		this->position_ += move;
-		this->target_ += move;
-		this->is_dirty_ = true;
+		m_position += move;
+		m_target += move;
+		m_isDirty = true;
 	}
-
 	/// <summary>
-	/// ’‹“_‚ğ“®‚©‚·
+	/// æ³¨è¦–ç‚¹ã‚’å‹•ã‹ã™ã€‚
 	/// </summary>
-	/// <param name="move">ˆÚ“®—Ê</param>
+	/// <param name="move">ç§»å‹•é‡</param>
 	void MoveTarget(const Vector3& move)
 	{
-		this->target_ += move;
-		this->is_dirty_ = true;
+		m_target += move;
+		m_isDirty = true;
 	}
-
 	/// <summary>
-	/// ‹“_‚ğ“®‚©‚·
+	/// è¦–ç‚¹ã‚’å‹•ã‹ã™ã€‚
 	/// </summary>
 	/// <param name="move"></param>
 	void MovePosition(const Vector3& move)
 	{
-		this->position_ += move;
-		this->is_dirty_ = true;
+		m_position += move;
+		m_isDirty = true;
 	}
-
 	/// <summary>
-	/// ƒJƒƒ‰‚Ì‘O•û•ûŒü‚ÉˆÚ“®
+	/// ã‚«ãƒ¡ãƒ©ã®å‰æ–¹æ–¹å‘ã«ç§»å‹•ã€‚
 	/// </summary>
 	/// <param name="moveForward"></param>
 	void MoveForward(float moveForward)
 	{
-		Move(this->forward_ * moveForward);
+		Move(m_forward * moveForward);
 	}
-
 	/// <summary>
-	/// ƒJƒƒ‰‚Ì‰E•ûŒü‚ÉˆÚ“®
+	/// ã‚«ãƒ¡ãƒ©ã®å³æ–¹å‘ã«ç§»å‹•ã€‚
 	/// </summary>
 	/// <param name="moveRight"></param>
 	void MoveRight(float moveRight)
 	{
-		Move(this->right_ * moveRight);
+		Move(m_right * moveRight);
 	}
-
 	/// <summary>
-	/// ƒJƒƒ‰‚Ìã•ûŒü‚ÉˆÚ“®
+	/// ã‚«ãƒ¡ãƒ©ã®ä¸Šæ–¹å‘ã«ç§»å‹•ã€‚
 	/// </summary>
 	/// <param name="moveUp"></param>
 	void MoveUp(float moveUp)
 	{
-		Move(this->up_ * moveUp);
+		Move(m_up * moveUp);
 	}
-
-#pragma endregion
-
-
 	/// <summary>
-	/// ƒJƒƒ‰‚ÌƒRƒs[‚ğì¬
+	/// ã‚«ãƒ¡ãƒ©ã®åº§æ¨™ã‚’è¨­å®šã™ã‚‹ã€‚
 	/// </summary>
-	/// <param name="dst"></param>
-	void CopyTo(Camera& dst)
+	void SetPosition( const Vector3& pos ) 
 	{
-		memcpy(&dst, this, sizeof(dst));
-		this->is_dirty_ = true;
+		m_position = pos;
+		m_isDirty = true;
 	}
-
+	void SetPosition(float x, float y, float z)
+	{
+		SetPosition({ x, y, z });
+	}
 	/// <summary>
-	/// ƒ[ƒ‹ƒhÀ•W‚©‚çƒXƒNƒŠ[ƒ“À•W‚ğŒvZ‚·‚é
+	/// ã‚«ãƒ¡ãƒ©ã®åº§æ¨™ã‚’å–å¾—ã€‚
 	/// </summary>
-	/// <remarks>
-	/// ŒvZ‚³‚ê‚éƒXƒNƒŠ[ƒ“À•W‚Í‰æ–Ê‚Ì’†S‚ğ{0,0}A¶ã‚ğ{‰æ–Ê‚Ì•*-0.5,‰æ–Ê‚Ì‚‚³*-0.5}
-	/// ‰E‰º‚ğ{ ‰æ–Ê‚Ì• * 0.5,‰æ–Ê‚Ì‚‚³ * 0.5 }‚Æ‚·‚éÀ•WŒn‚Å‚·
-	/// </remarks>
-	/// <param name="screenPos">ƒXƒNƒŠ[ƒ“À•W‚ÌŠi”[æ</param>
-	/// <param name="worldPos">ƒ[ƒ‹ƒhÀ•W</param>
-	void CalcScreenPositionFromWorldPosition(GraphicsEngine*& graphicsEngine, Vector2& screenPos, const Vector3& worldPos) const;
-
-public:
-#pragma region Get Method
+	const Vector3& GetPosition() const
+	{
+		return m_position;
+	}
 	/// <summary>
-	/// ˆÊ’u æ“¾
+	/// æ³¨è¦–ç‚¹ã‚’è¨­å®šã€‚
 	/// </summary>
-	/// <returns>Vector3 position</returns>
-	Vector3& GetPosition() { return position_; }
-
+	void SetTarget(float x, float y, float z)
+	{
+		SetTarget({x, y, z});
+	}
+	void SetTarget( const Vector3& target )
+	{
+		m_target = target;
+		m_isDirty = true;
+	}
 	/// <summary>
-	/// ƒ^[ƒQƒbƒg æ“¾	
-	/// </summary>
-	/// <returns>Vector target</returns>
-	Vector3& GetTarget() { return target_; }
-
-	/// <summary>
-	/// ’‹“_ æ“¾
+	/// æ³¨è¦–ç‚¹ã‚’å–å¾—ã€‚
 	/// </summary>
 	const Vector3& GetTarget() const
 	{
-		return this->target_;
+		return m_target;
 	}
-
 	/// <summary>
-	/// ƒJƒƒ‰‚Ìã•ûŒü æ“¾
+	/// ã‚«ãƒ¡ãƒ©ã®ä¸Šæ–¹å‘ã‚’è¨­å®šã€‚
+	/// </summary>
+	void SetUp( const Vector3& up )
+	{
+		m_up = up;
+		m_up.Normalize();
+	}
+	void SetUp(float x, float y, float z)
+	{
+		SetUp({ x, y, z });
+	}
+	/// <summary>
+	/// ã‚«ãƒ¡ãƒ©ã®ä¸Šæ–¹å‘ã‚’å–å¾—ã€‚
 	/// </summary>
 	const Vector3& GetUp() const
 	{
-		return this->up_;
+		return m_up;
 	}
 
 	/// <summary>
-	/// ƒrƒ…[s—ñ‚Ì‹ts—ñ æ“¾
+	/// ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã®é€†è¡Œåˆ—ã‚’å–å¾—ã€‚
 	/// </summary>
-	const Matrix& GetViewMatrixInv(GraphicsEngine*& graphicEngine)
+	const Matrix& GetViewMatrixInv() 
 	{
-		if (this->is_dirty_) {
-			//XV‚·‚é•K—v‚ª‚ ‚éB
-			Update(graphicEngine);
+		if (m_isDirty) {
+			//æ›´æ–°ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
+			Update();
 		}
-		return this->view_matrix_inv;
+		return m_viewMatrixInv;
 	}
-
 	/// <summary>
-	/// ƒrƒ…[s—ñ æ“¾
+	/// ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã‚’å–å¾—ã€‚
 	/// </summary>
-	const Matrix& GetViewMatrix(GraphicsEngine*& graphicEngine)
+	const Matrix& GetViewMatrix() 
 	{
-		if (this->is_dirty_) {
-			//XV‚·‚é•K—v‚ª‚ ‚éB
-			Update(graphicEngine);
+		if (m_isDirty) {
+			//æ›´æ–°ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
+			Update();
 		}
-		return this->view_matrix_;
+		return m_viewMatrix;
 	}
-
 	/// <summary>
-	/// ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ æ“¾
+	/// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã‚’å–å¾—ã€‚
 	/// </summary>
-	const Matrix& GetProjectionMatrix(GraphicsEngine*& graphicEngine)
+	const Matrix& GetProjectionMatrix() 
 	{
-		if (this->is_dirty_) {
-			//XV‚·‚é•K—v‚ª‚ ‚éB
-			Update(graphicEngine);
+		if (m_isDirty) {
+			//æ›´æ–°ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
+			Update();
 		}
-		return this->projection_matrix_;
+		return m_projectionMatrix;
 	}
-
 	/// <summary>
-	/// ƒrƒ…[~ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ æ“¾
+	/// ãƒ“ãƒ¥ãƒ¼Ã—ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã‚’å–å¾—ã€‚
 	/// </summary>
-	const Matrix& GetViewProjectionMatrix(GraphicsEngine*& graphicEngine)
+	const Matrix& GetViewProjectionMatrix() 
 	{
-		if (this->is_dirty_) {
-			//XV‚·‚é•K—v‚ª‚ ‚éB
-			Update(graphicEngine);
+		if (m_isDirty) {
+			//æ›´æ–°ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
+			Update();
 		}
-		return this->view_projection_matrix;
+		return m_viewProjectionMatrix;
 	}
-
 	/// <summary>
-	/// ƒJƒƒ‰‚Ì‰ñ“]s—ñ æ“¾
+	/// ã‚«ãƒ¡ãƒ©ã®å›è»¢è¡Œåˆ—ã‚’å–å¾—ã€‚
 	/// </summary>
-	const Matrix& GetCameraRotation(GraphicsEngine*& graphicEngine)
+	const Matrix& GetCameraRotation() 
 	{
-		if (this->is_dirty_) {
-			//XV‚·‚é•K—v‚ª‚ ‚é
-			Update(graphicEngine);
+		if (m_isDirty) {
+			//æ›´æ–°ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
+			Update();
 		}
-		return this->camera_rotation_;
+		return m_cameraRotation;
 	}
-
 	/// <summary>
-	/// ‰“•½–Ê‚Ü‚Å‚Ì‹——£ æ“¾
+	/// é å¹³é¢ã¾ã§ã®è·é›¢ã‚’è¨­å®šã€‚
+	/// </summary>
+	void SetFar( float fFar )
+	{
+		m_far = fFar;
+		m_isDirty = true;
+	}
+	/// <summary>
+	/// è¿‘å¹³é¢ã¾ã§ã®è·é›¢ã‚’è¨­å®šã€‚
+	/// </summary>
+	void SetNear( float fNear )
+	{
+		m_near = fNear;
+		m_isDirty = true;
+	}
+	/// <summary>
+	/// é å¹³é¢ã¾ã§ã®è·é›¢ã‚’å–å¾—ã€‚
 	/// </summary>
 	float GetFar() const
 	{
-		return this->far_;
+		return m_far;
 	}
-
 	/// <summary>
-	/// ‹ß•½–Ê‚Ü‚Å‚Ì‹——£ æ“¾
+	/// è¿‘å¹³é¢ã¾ã§ã®è·é›¢ã‚’å–å¾—ã€‚
 	/// </summary>
 	float GetNear() const
 	{
-		return this->near_;
+		return m_near;
 	}
-
 	/// <summary>
-	/// •½s“Š‰e‚Ì• æ“¾
+	/// å¹³è¡ŒæŠ•å½±ã®å¹…ã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <remarks>
+	/// SetUpdateProjMatrixFuncã§enUpdateProjMatrixFunc_OrthoãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹ã¨ãã«ä½¿ç”¨ã•ã‚Œã‚‹ã€‚
+	/// </remarks>
+	void SetWidth(float w)
+	{
+		m_width = w;
+		m_isDirty = true;
+	}
+	/// <summary>
+	/// å¹³è¡ŒæŠ•å½±ã®é«˜ã•ã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <remarks>
+	/// SetUpdateProjMatrixFuncã§enUpdateProjMatrixFunc_OrthoãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹ã¨ãã«ä½¿ç”¨ã•ã‚Œã‚‹ã€‚
+	/// </remarks>
+	void SetHeight(float h)
+	{
+		m_height = h;
+		m_isDirty = true;
+	}
+	/// <summary>
+	/// å¹³è¡ŒæŠ•å½±ã®å¹…ã‚’å–å¾—ã€‚
 	/// </summary>
 	float GetWidth() const
 	{
-		return this->width_;
+		return m_width;
 	}
-
 	/// <summary>
-	/// •½s“Š‰e‚Ì‚‚³ æ“¾
+	/// å¹³è¡ŒæŠ•å½±ã®é«˜ã•ã‚’å–å¾—ã€‚
 	/// </summary>
 	float GetHeight() const
 	{
-		return this->height_;
+		return m_height;
 	}
-
 	/// <summary>
-	/// ‰æŠp‚ğæ“¾
+	/// å¹³è¡ŒæŠ•å½±ã®é«˜ã•ã‚’è¨­å®šã€‚
 	/// </summary>
-	/// <returns>‰æŠp (’PˆÊ:ƒ‰ƒWƒAƒ“)</returns>
+	/// <remarks>
+	/// SetUpdateProjMatrixFuncã§enUpdateProjMatrixFunc_OrthoãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹ã¨ãã«ä½¿ç”¨ã•ã‚Œã‚‹ã€‚
+	/// </remarks>
+	void SetUpdateProjMatrixFunc(EnUpdateProjMatrixFunc func)
+	{
+		m_updateProjMatrixFunc = func;
+		m_isDirty = true;
+	}
+	/// <summary>
+	/// ç”»è§’ã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <remarks>
+	/// SetUpdateProjMatrixFuncã§enUpdateProjMatrixFunc_PerspectiveãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹ã¨ãã«ä½¿ç”¨ã•ã‚Œã‚‹ã€‚
+	/// </remarks>
+	/// <param name="viewAngle">ç”»è§’ã€‚å˜ä½ãƒ©ã‚¸ã‚¢ãƒ³</param>
+	void SetViewAngle(float viewAngle)
+	{
+		m_viewAngle = viewAngle;
+		m_isDirty = true;
+	}
+	/// <summary>
+	/// ç”»è§’ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns>ç”»è§’ã€‚å˜ä½ãƒ©ã‚¸ã‚¢ãƒ³</returns>
 	float GetViewAngle() const
 	{
-		return this->view_angle_;
+		return m_viewAngle;
 	}
-
 	/// <summary>
-	/// ’‹“_‚Æ‹“_‚Ì‹——£ æ“¾
+	/// æ³¨è¦–ç‚¹ã¨è¦–ç‚¹ã®è·é›¢ã‚’å–å¾—ã€‚
 	/// </summary>
 	/// <returns></returns>
 	float GetTargetToPositionLength() const
 	{
-		return this->target_to_position_len_;
+		return m_targetToPositionLen;
 	}
-
 	/// <summary>
-	/// ƒJƒƒ‰‚Ì‘O•ûŒü æ“¾
+	/// ã‚«ãƒ¡ãƒ©ã®å‰æ–¹å‘ã‚’å–å¾—ã€‚
 	/// </summary>
 	const Vector3& GetForward() const
 	{
-		return this->forward_;
+		return m_forward;
 	}
-
 	/// <summary>
-	/// ƒJƒƒ‰‚Ì‰E•ûŒü æ“¾
+	/// ã‚«ãƒ¡ãƒ©ã®å³æ–¹å‘ã‚’å–å¾—ã€‚
 	/// </summary>
+
 	const Vector3& GetRight() const
 	{
-		return this->right_;
+		return m_right;
 	}
-
 	/// <summary>
-	/// ƒAƒXƒyƒNƒg”ä æ“¾
+	/// ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‚’å–å¾—ã€‚
 	/// </summary>
 	float GetAspect() const
 	{
-		return this->aspect_;
+		return m_aspect;
 	}
-
-#pragma endregion
-
-#pragma region Set Method
 	/// <summary>
-	/// ƒJƒƒ‰‚ÌÀ•W İ’è
+	/// ã‚«ãƒ¡ãƒ©ã®ã‚³ãƒ”ãƒ¼ã‚’ä½œæˆã€‚
 	/// </summary>
-	void SetPosition(const Vector3& pos)
+	/// <param name="dst"></param>
+	void CopyTo(Camera& dst) 
 	{
-		this->position_ = pos;
-		this->is_dirty_ = true;
+		memcpy(&dst, this, sizeof(dst));
+		m_isDirty = true;
 	}
-	void SetPosition(float x, float y, float z)
-	{
-		SetPosition(Vector3(x, y, z));
-	}
-
 	/// <summary>
-	/// ’‹“_ İ’è
-	/// </summary>
-	void SetTarget(float x, float y, float z)
-	{
-		SetTarget(Vector3(x, y, z));
-	}
-	void SetTarget(const Vector3& target)
-	{
-		this->target_ = target;
-		this->is_dirty_ = true;
-	}
-
-	/// <summary>
-	/// ƒJƒƒ‰‚Ìã•ûŒü İ’è
-	/// </summary>
-	void SetUp(const Vector3& up)
-	{
-		this->up_ = up;
-		this->up_.Normalize();
-	}
-	void SetUp(float x, float y, float z)
-	{
-		SetUp(Vector3(x, y, z));
-	}
-
-	/// <summary>
-	/// ‰“•½–Ê‚Ü‚Å‚Ì‹——£ İ’è
-	/// </summary>
-	void SetFar(float fFar)
-	{
-		this->far_ = fFar;
-		this->is_dirty_ = true;
-	}
-
-	/// <summary>
-	/// ‹ß•½–Ê‚Ü‚Å‚Ì‹——£ İ’è
-	/// </summary>
-	void SetNear(float fNear)
-	{
-		this->near_ = fNear;
-		this->is_dirty_ = true;
-	}
-
-	/// <summary>
-	/// •½s“Š‰e‚Ì• İ’è
+	/// ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‹ã‚‰ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã‚’è¨ˆç®—ã™ã‚‹ã€‚
 	/// </summary>
 	/// <remarks>
-	/// SetUpdateProjMatrixFunc‚ÅenUpdateProjMatrixFunc_Ortho‚ªİ’è‚³‚ê‚Ä‚¢‚é‚Æ‚«‚Ég—p‚³‚ê‚é
+	/// è¨ˆç®—ã•ã‚Œã‚‹ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã¯ç”»é¢ã®ä¸­å¿ƒã‚’{0,0}ã€å·¦ä¸Šã‚’{ç”»é¢ã®å¹…*-0.5,ç”»é¢ã®é«˜ã•*-0.5}
+	/// å³ä¸‹ã‚’{ ç”»é¢ã®å¹… * 0.5,ç”»é¢ã®é«˜ã• * 0.5 }ã¨ã™ã‚‹åº§æ¨™ç³»ã§ã™ã€‚
 	/// </remarks>
-	void SetWidth(float w)
-	{
-		this->width_ = w;
-		this->is_dirty_ = true;
-	}
+	/// <param name="screenPos">ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã®æ ¼ç´å…ˆ</param>
+	/// <param name="worldPos">ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™</param>
+	void CalcScreenPositionFromWorldPosition(Vector2& screenPos, const Vector3& worldPos) const;
 
-	/// <summary>
-	/// •½s“Š‰e‚Ì‚‚³ İ’è
-	/// </summary>
-	/// <remarks>
-	/// SetUpdateProjMatrixFunc‚ÅenUpdateProjMatrixFunc_Ortho‚ªİ’è‚³‚ê‚Ä‚¢‚é‚Æ‚«‚Ég—p‚³‚ê‚é
-	/// </remarks>
-	void SetHeight(float h)
-	{
-		this->height_ = h;
-		this->is_dirty_ = true;
-	}
-
-	/// <summary>
-	/// •½s“Š‰e‚Ì‚‚³‚ğİ’è
-	/// </summary>
-	/// <remarks>
-	/// SetUpdateProjMatrixFunc‚ÅenUpdateProjMatrixFunc_Ortho‚ªİ’è‚³‚ê‚Ä‚¢‚é‚Æ‚«‚Ég—p‚³‚ê‚é
-	/// </remarks>
-	void SetUpdateProjMatrixFunc(EnUpdateProjMatrixFunc func)
-	{
-		this->update_Projection_matrix_func = func;
-		this->is_dirty_ = true;
-	}
-
-	/// <summary>
-	/// ‰æŠp‚ğİ’è
-	/// </summary>
-	/// <remarks>
-	/// SetUpdateProjMatrixFunc‚ÅenUpdateProjMatrixFunc_Perspective‚ªİ’è‚³‚ê‚Ä‚¢‚é‚Æ‚«‚Ég—p‚³‚ê‚é
-	/// </remarks>
-	/// <param name="viewAngle">‰æŠpB’PˆÊƒ‰ƒWƒAƒ“</param>
-	void SetViewAngle(float viewAngle)
-	{
-		this->view_angle_ = viewAngle;
-		this->is_dirty_ = true;
-	}
-
-#pragma endregion
-
-private:
-	//ƒJƒƒ‰ˆÊ’uB
-	Vector3		position_;
-	//ƒJƒƒ‰‚Ìã•ûŒüB
-	Vector3		up_;
-	//ƒJƒƒ‰‚Ì’†~“_B
-	Vector3		target_;
-	//ƒJƒƒ‰‚Ì‘O•ûB
-	Vector3		forward_;
-	//ƒJƒƒ‰‚Ì‰EB
-	Vector3		right_ ;
-
-	//ƒrƒ…[s—ñB
-	Matrix		view_matrix_;
-	//ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñB
-	Matrix		projection_matrix_;
-	//ƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñB
-	Matrix		view_projection_matrix;
-	//ƒrƒ…[s—ñ‚Ì‹ts—ñB
-	Matrix		view_matrix_inv;
-	//ƒJƒƒ‰‚Ì‰ñ“]s—ñB
-	Matrix		camera_rotation_;
-
-	//’‹“_‚Æ‹“_‚Ü‚Å‹——£B
-	float		target_to_position_len_;
-	//‹ß•½–ÊB
-	float		near_;
-	//‰“•½–ÊB
-	float		far_;
-	//‰æŠp(ƒ‰ƒWƒAƒ“)B
-	float		view_angle_;
-	//ƒAƒXƒyƒNƒg”äB
-	float		aspect_;
-	//•½s“Š‰es—ñ‚ğì¬‚·‚é‚Æ‚«‚Ég—p‚³‚ê‚é•B
-	float		width_ ;
-	//•½s“Š‰es—ñ‚ğì¬‚·‚é‚Æ‚«‚Ég—p‚³‚ê‚é‚‚³B
-	float		height_;
-
-	//ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚ÌXV‚Ìd•ûB
-	EnUpdateProjMatrixFunc update_Projection_matrix_func;
-
-	bool		is_Need_Update_Projection_matrix;
-
-	//ƒ_[ƒeƒBƒtƒ‰ƒOB
-	bool		is_dirty_;
+protected:
+	float		m_targetToPositionLen = 1.0f;			//æ³¨è¦–ç‚¹ã¨è¦–ç‚¹ã¾ã§è·é›¢ã€‚
+	Vector3		m_position = {0.0f, 0.0f, 1.0f};		//ã‚«ãƒ¡ãƒ©ä½ç½®ã€‚
+	Vector3		m_up = g_vec3Up;						//ã‚«ãƒ¡ãƒ©ã®ä¸Šæ–¹å‘ã€‚
+	Vector3		m_target;								//ã‚«ãƒ¡ãƒ©ã®ä¸­æ­¢ç‚¹ã€‚
+	Matrix		m_viewMatrix;							//ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã€‚
+	Matrix		m_projectionMatrix;						//ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã€‚
+	Matrix		m_viewProjectionMatrix;					//ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã€‚
+	Matrix		m_viewMatrixInv;						//ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã®é€†è¡Œåˆ—ã€‚
+	Matrix		m_cameraRotation;						//ã‚«ãƒ¡ãƒ©ã®å›è»¢è¡Œåˆ—ã€‚
+	Vector3		m_forward = g_vec3Front;				//ã‚«ãƒ¡ãƒ©ã®å‰æ–¹ã€‚
+	Vector3		m_right = g_vec3Right;					//ã‚«ãƒ¡ãƒ©ã®å³ã€‚
+	float		m_near = 1.0f;							//è¿‘å¹³é¢ã€‚
+	float		m_far = 5000.0f;						//é å¹³é¢ã€‚
+	float		m_viewAngle = Math::DegToRad(60.0f);	//ç”»è§’(ãƒ©ã‚¸ã‚¢ãƒ³)ã€‚
+	float		m_aspect = 1.0f;						//ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã€‚
+	float		m_width = 1280.0f;						//å¹³è¡ŒæŠ•å½±è¡Œåˆ—ã‚’ä½œæˆã™ã‚‹ã¨ãã«ä½¿ç”¨ã•ã‚Œã‚‹å¹…ã€‚
+	float		m_height = 720.0f;						//å¹³è¡ŒæŠ•å½±è¡Œåˆ—ã‚’ä½œæˆã™ã‚‹ã¨ãã«ä½¿ç”¨ã•ã‚Œã‚‹é«˜ã•ã€‚
+	EnUpdateProjMatrixFunc m_updateProjMatrixFunc = enUpdateProjMatrixFunc_Perspective;	//ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã®æ›´æ–°ã®ä»•æ–¹ã€‚
+	bool		m_isNeedUpdateProjectionMatrix = true;
+	bool		m_isDirty = false;						//ãƒ€ãƒ¼ãƒ†ã‚£ãƒ•ãƒ©ã‚°ã€‚
 };

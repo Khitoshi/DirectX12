@@ -1,81 +1,47 @@
-#pragma once
+ï»¿#pragma once
 
-#include "IShaderResource.h"
-#include <wrl.h>
-#include <d3dx12.h>
 
-using namespace Microsoft::WRL;
 
-class GraphicsEngine;
-
-class StructuredBuffer :public IShaderResource
-{
+/// <summary>
+/// æ§‹é€ åŒ–ãƒãƒƒãƒ•ã‚¡
+/// </summary>
+class StructuredBuffer : public IShaderResource {
 public:
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^ 
-    /// </summary>
-    StructuredBuffer();
-
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^ 
-    /// </summary>
-    ~StructuredBuffer()override;
-
-    /// <summary>
-    /// ‰Šú‰»
-    /// </summary>
-    /// <param name="graphicsEngine">ƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚é</param>
-    /// <param name="elementSize">ƒGƒŒƒƒ“ƒg‚ÌƒTƒCƒY</param>
-    /// <param name="elementNumber">ƒGƒŒƒƒ“ƒg‚Ì”</param>
-    /// <param name="initData">‰Šú‰»ƒf[ƒ^</param>
-    void Init(GraphicsEngine*& graphicsEngine, int elementSize, int elementNumber, void* initData);
-
-    /// <summary>
-    /// SRV‚É“o˜^B
-    /// </summary>
-    /// <param name="graphicsEngine">ƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚é</param>
-    /// <param name="descriptorHandle">CPU ƒfƒBƒXƒNƒŠƒvƒ^@ƒnƒ“ƒhƒ‹</param>
-    /// <param name="buffernumber">ƒoƒbƒtƒ@ ”Ô†</param>
-    void RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber)override;
-
-    /// <summary>
-    /// \‘¢‰»ƒoƒbƒtƒ@‚Ì“à—eXV
-    /// </summary>
-    /// <param name="graphicsEngine">ƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚é</param>
-    /// <param name="data"></param>
-    void Update(GraphicsEngine*& graphicsEngine,void* data);
-
-    
+	/// <summary>
+	/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
+	/// </summary>
+	~StructuredBuffer();
+	/// <summary>
+	/// æ§‹é€ åŒ–ãƒãƒƒãƒ•ã‚¡ã‚’åˆæœŸåŒ–ã€‚
+	/// </summary>
+	/// <param name="sizeOfElement">ã‚¨ãƒ¬ãƒ¡ãƒ³ãƒˆã®ã‚µã‚¤ã‚ºã€‚</param>
+	/// <param name="numElement">ã‚¨ãƒ¬ãƒ¡ãƒ³ãƒˆã®æ•°ã€‚</param>
+	/// <param name="initData">åˆæœŸãƒ‡ãƒ¼ã‚¿ã€‚</param>
+	void Init(int sizeOfElement, int numElement, void* initData);
+	
+	/// <summary>
+	/// SRVã«ç™»éŒ²ã€‚
+	/// </summary>
+	/// <param name="descriptorHandle"></param>
+	void RegistShaderResourceView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo) override;
+	/// <summary>
+	/// æ§‹é€ åŒ–ãƒãƒƒãƒ•ã‚¡ã®å†…å®¹ã‚’æ›´æ–°ã€‚
+	/// </summary>
+	/// <param name="data"></param>
+	void Update(void* data);
+	/// <summary>
+	/// åˆæœŸåŒ–ã•ã‚Œã¦ã„ã‚‹ã‹åˆ¤å®šã€‚
+	/// </summary>
+	/// <returns></returns>
+	bool IsInited() const
+	{
+		return m_isInited;
+	}
+	ID3D12Resource* GetD3DResoruce() ;
 private:
-
-public:
-#pragma region Get method
-
-    /// <summary>
-    /// ‰Šú‰»”»•Ê—pƒtƒ‰ƒOæ“¾
-    /// </summary>
-    /// <returns>true = ‰Šú‰»Ï‚İ</returns>
-    bool IsInited() const { return this->is_Inited_; }
-
-    //GPU‚©‚çƒAƒNƒZƒX‚Å‚«‚éƒoƒbƒtƒ@[‚Ìæ“¾
-    ID3D12Resource* GetResouce(GraphicsEngine*& graphicsEngine);
-
-#pragma endregion
-
-
-private:
-    //GPU‚©‚çƒAƒNƒZƒX‚Å‚«‚éƒoƒbƒtƒ@[
-    ComPtr<ID3D12Resource> buffers_On_GPU_[2];
-    //CPU‚©‚çƒAƒNƒZƒX‚Å‚«‚éƒoƒbƒtƒ@[
-    void* buffers_On_CPU_[2];
-
-    //ƒGƒŒƒƒ“ƒg —v‘f”
-    int element_Number_;
-    //ƒGƒŒƒƒ“ƒgƒTƒCƒY
-    int element_Size_;
-
-    //‰Šú‰»Ï‚İ ”»’f ƒtƒ‰ƒO
-    bool is_Inited_;
-
+	ID3D12Resource* m_buffersOnGPU[2] = {nullptr};
+	void* m_buffersOnCPU[2] = { nullptr };		//CPUå´ã‹ã‚‰ã‚¢ã‚¯ã‚»ã‚¹ã§ãã‚‹ã™ã‚‹ã‚¹ãƒˆãƒ©ã‚¯ãƒãƒ£ãƒãƒƒãƒ•ã‚¡ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã€‚
+	int m_numElement = 0;				//è¦ç´ æ•°ã€‚
+	int m_sizeOfElement = 0;			//ã‚¨ãƒ¬ãƒ¡ãƒ³ãƒˆã®ã‚µã‚¤ã‚ºã€‚
+	bool m_isInited = false;			//åˆæœŸåŒ–æ¸ˆã¿ï¼Ÿ
 };
-

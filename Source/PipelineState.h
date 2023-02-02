@@ -1,40 +1,30 @@
-#pragma once
-#include "d3dx12.h"
-#include <wrl.h>
+ï»¿#pragma once
 
-using namespace Microsoft::WRL;
 
-class GraphicsEngine;
-
-class PipelineState
-{
+/// <summary>
+/// ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã€‚
+/// </summary>
+class PipelineState {
 public:
 	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 	/// </summary>
-	PipelineState();
-
+	~PipelineState()
+	{
+		if (m_pipelineState) {
+			m_pipelineState->Release();
+		}
+	}
 	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
-	/// </summary>
-	~PipelineState();
-
-	/// <summary>
-	/// ‰Šú‰»
+	/// åˆæœŸåŒ–ã€‚
 	/// </summary>
 	/// <param name="desc"></param>
-	void Init(GraphicsEngine*& graphicsEngine, D3D12_GRAPHICS_PIPELINE_STATE_DESC desc);
-	void Init(GraphicsEngine*& graphicsEngine, D3D12_COMPUTE_PIPELINE_STATE_DESC desc);
-
-public:
-	/// <summary>
-	/// ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚ğæ“¾
-	/// </summary>
-	/// <returns>this Pipeline State</returns>
-	ID3D12PipelineState* GetPipelineState() { return this->pipeline_State_.Get(); }
-
+	void Init(D3D12_GRAPHICS_PIPELINE_STATE_DESC desc);
+	void Init(D3D12_COMPUTE_PIPELINE_STATE_DESC desc);
+	ID3D12PipelineState* Get()
+	{
+		return m_pipelineState;
+	}
 private:
-	//ƒpƒCƒvƒ‰ƒCƒ“ ƒXƒe[ƒg
-	ComPtr<ID3D12PipelineState> pipeline_State_;
-
+	ID3D12PipelineState* m_pipelineState = nullptr;	//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã€‚
 };

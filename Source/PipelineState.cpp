@@ -1,56 +1,21 @@
+ï»¿#include "stdafx.h"
 #include "PipelineState.h"
 
-#include "GraphicsEngine.h"
-
-PipelineState::PipelineState():
-    pipeline_State_()
+void PipelineState::Init(D3D12_GRAPHICS_PIPELINE_STATE_DESC desc)
 {
+	auto d3dDevice = g_graphicsEngine->GetD3DDevice();
+	auto hr = d3dDevice->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&m_pipelineState));
+	if (FAILED(hr)) {
+		MessageBoxA(nullptr, "ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚\n", "ã‚¨ãƒ©ãƒ¼", MB_OK);
+		std::abort();
+	}
 }
-
-PipelineState::~PipelineState()
+void PipelineState::Init(D3D12_COMPUTE_PIPELINE_STATE_DESC desc)
 {
-}
-
-//‰Šú‰»
-void PipelineState::Init(GraphicsEngine*& graphicsEngine, D3D12_GRAPHICS_PIPELINE_STATE_DESC desc)
-{
-    //ƒpƒCƒvƒ‰ƒCƒ“ ƒXƒe[ƒg ¶¬
-    //HRESULT hr = device.CreateGraphicsPipelineState(
-    //    &desc,
-    //    IID_PPV_ARGS(&this->pipeline_State_)
-    //);
-
-    graphicsEngine->CreateGraphicsPipelineState(
-        desc,
-        this->pipeline_State_
-    );
-
-    //if (FAILED(hr))
-    //{
-    //    MessageBoxA(nullptr, "ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B\n", "ƒGƒ‰[", MB_OK);
-    //    std::abort();
-    //    std::abort();
-    //}
-}
-
-//‰Šú‰»
-void PipelineState::Init(GraphicsEngine*& graphicsEngine, D3D12_COMPUTE_PIPELINE_STATE_DESC desc)
-{
-    //ƒpƒCƒvƒ‰ƒCƒ“ ƒXƒe[ƒg ¶¬
-    //HRESULT hr = device.CreateComputePipelineState(
-    //    &desc,
-    //    IID_PPV_ARGS(&this->pipeline_State_)
-    //);
-
-    graphicsEngine->CreateComputePipelineState(
-        desc, 
-        this->pipeline_State_
-    );
-
-    //if (FAILED(hr))
-    //{
-    //    MessageBoxA(nullptr, "ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B\n", "ƒGƒ‰[", MB_OK);
-    //    std::abort();
-    //    std::abort();
-    //}
+	auto d3dDevice = g_graphicsEngine->GetD3DDevice();
+	auto hr = d3dDevice->CreateComputePipelineState(&desc, IID_PPV_ARGS(&m_pipelineState));
+	if (FAILED(hr)) {
+		MessageBoxA(nullptr, "ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚\n", "ã‚¨ãƒ©ãƒ¼", MB_OK);
+		std::abort();
+	}
 }

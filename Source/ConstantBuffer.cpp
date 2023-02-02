@@ -1,129 +1,75 @@
+ï»¿#include "stdafx.h"
 #include "ConstantBuffer.h"
-#include "GraphicsEngine.h"
-#include <Windows.h>
 
-
-//ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-ConstantBuffer::ConstantBuffer() :
-    constant_Buffer_(),
-    const_Buffer_CPU_(),
-    constant_Buffer_Size_(0),
-    alloc_Size_(0),
-    is_Valid_(false)
-{
-}
-
-//ƒ€[ƒuƒRƒ“ƒXƒgƒ‰ƒNƒ^
-ConstantBuffer::ConstantBuffer(ConstantBuffer&& cb)
-{
-    //cb ‚©‚ç this‚É÷“n
-    //cb ‚©‚ç this‚É’è”ƒoƒbƒtƒ@‚Ì÷“n
-    this->constant_Buffer_[0] = cb.constant_Buffer_[0];
-    this->constant_Buffer_[1] = cb.constant_Buffer_[1];
-    //cb ‚©‚ç this‚ÉCPU‚©‚çƒAƒNƒZƒX‚Å‚«‚é’è”ƒoƒbƒtƒ@‚Ì÷“n
-    this->const_Buffer_CPU_[0] = cb.const_Buffer_CPU_[0];
-    this->const_Buffer_CPU_[1] = cb.const_Buffer_CPU_[1];
-    //cb ‚©‚ç ’è”ƒoƒbƒtƒ@‚ÌƒTƒCƒY‚ğ÷“n
-    this->constant_Buffer_Size_ = cb.constant_Buffer_Size_;
-    //cb ‚©‚ç alloc‚ÌƒTƒCƒY‚ğ÷“n
-    this->alloc_Size_ = cb.alloc_Size_;
-    //cb ‚©‚ç@is_Valid_‚ğ÷“n
-    this->is_Valid_ = cb.is_Valid_;
-
-    //ƒRƒs[Œ³‚Ìíœ
-    //’è”ƒoƒbƒtƒ@ íœ
-    cb.constant_Buffer_[0] = nullptr;
-    cb.constant_Buffer_[1] = nullptr;
-    //CPU‚©‚çƒAƒNƒZƒX‚Å‚«‚é’è”ƒoƒbƒtƒ@ íœ
-    cb.const_Buffer_CPU_[0] = nullptr;
-    cb.const_Buffer_CPU_[1] = nullptr;
-}
-
-//ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
 ConstantBuffer::~ConstantBuffer()
 {
+	//ã‚¢ãƒ³ãƒãƒ¼ãƒƒãƒ—
+	CD3DX12_RANGE readRange(0, 0);
+	for (auto& cb : m_constantBuffer) {
+		if (cb != nullptr) {
+			cb->Unmap(0, &readRange);
+			cb->Release();
+		}
+	}
 }
-
-//‰Šú‰»
-void ConstantBuffer::Init(GraphicsEngine*& graphicsEngine, int constantBufferSize, void* srcData)
+void ConstantBuffer::Init(int size, void* srcData)
 {
-    //’è”ƒoƒbƒtƒ@‚Ì‰Šú‰»
-    this->constant_Buffer_Size_ = constantBufferSize;
+	m_size = size;
 
-    //’è”ƒoƒbƒtƒ@‚Í256ƒoƒCƒgƒAƒ‰ƒCƒƒ“ƒg‚ª—v‹‚³‚ê‚é‚Ì‚Å,256‚Ì”{—¦‚ÉØ‚èã‚°‚é
-    this->alloc_Size_ = (constantBufferSize + 256) & 0xFFFFFF00;
-    //ƒoƒbƒtƒ@”Ô†
-    int buffer_Index = 0;
-    //ƒq[ƒvİ’è
-    auto heap_Prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    //ƒŠƒ\[ƒXƒTƒCƒYİ’è
-    auto resource_Desc = CD3DX12_RESOURCE_DESC::Buffer(this->alloc_Size_);
-    //’è”ƒoƒbƒtƒ@ ¶¬
-    for (auto& constant_Buffer : this->constant_Buffer_)
-    {
-        graphicsEngine->CreateCommittedResource(
-            heap_Prop,
-            D3D12_HEAP_FLAG_NONE,
-            resource_Desc,
-            D3D12_RESOURCE_STATE_GENERIC_READ,
-            nullptr,
-            constant_Buffer
-        );
+	//D3Dãƒ‡ãƒã‚¤ã‚¹ã‚’å–å¾—ã€‚
+	auto device = g_graphicsEngine->GetD3DDevice();
 
-        //’è”ƒoƒbƒtƒ@‚ğCPU‚©‚çƒAƒNƒZƒX‰Â”\‚È‰¼‘zƒAƒhƒŒƒX‹óŠÔ‚Éƒ}ƒbƒsƒ“ƒO‚·‚éB
-        //ƒ}ƒbƒvAƒAƒ“ƒ}ƒbƒv‚ÌƒI[ƒo[ƒwƒbƒh‚ğŒyŒ¸‚·‚é‚½‚ß‚É‚Í‚±‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ª¶‚«‚Ä‚¢‚éŠÔ‚Ís‚í‚È‚¢B
-        {
-            CD3DX12_RANGE read_Range(0, 0);
-            constant_Buffer->Map(0, &read_Range, reinterpret_cast<void**>(&this->const_Buffer_CPU_[buffer_Index]));
-        }
-        if (srcData != nullptr) {
-            memcpy(this->const_Buffer_CPU_[buffer_Index], srcData, this->constant_Buffer_Size_);
-        }
-        //Œ»İ‚Ì”Ô†‚Ì¶¬‚ªI—¹‚µ‚½‚Ì‚ÅƒCƒ“ƒNƒŠƒƒ“ƒg‚·‚é
-        buffer_Index++;
-    }
-    //—˜—p‚ğ‰Â”\‚É‚·‚é
-    this->is_Valid_ = true;
+
+	//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã¯256ãƒã‚¤ãƒˆã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆãŒè¦æ±‚ã•ã‚Œã‚‹ã®ã§ã€256ã®å€æ•°ã«åˆ‡ã‚Šä¸Šã’ã‚‹ã€‚
+	m_allocSize = (size + 256) & 0xFFFFFF00;
+	//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ä½œæˆã€‚
+	int bufferNo = 0;
+	auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	auto rDesc = CD3DX12_RESOURCE_DESC::Buffer(m_allocSize);
+	for( auto& cb : m_constantBuffer ){
+		device->CreateCommittedResource(
+			&heapProp,
+			D3D12_HEAP_FLAG_NONE,
+			&rDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&cb)
+		);
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’CPUã‹ã‚‰ã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½ãªä»®æƒ³ã‚¢ãƒ‰ãƒ¬ã‚¹ç©ºé–“ã«ãƒãƒƒãƒ”ãƒ³ã‚°ã™ã‚‹ã€‚
+		//ãƒãƒƒãƒ—ã€ã‚¢ãƒ³ãƒãƒƒãƒ—ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ˜ãƒƒãƒ‰ã‚’è»½æ¸›ã™ã‚‹ãŸã‚ã«ã¯ã“ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒç”Ÿãã¦ã„ã‚‹é–“ã¯è¡Œã‚ãªã„ã€‚
+		{
+			CD3DX12_RANGE readRange(0, 0);        //     intend to read from this resource on the CPU.
+			cb->Map(0, &readRange, reinterpret_cast<void**>(&m_constBufferCPU[bufferNo]));
+		}
+		if (srcData != nullptr) {
+			memcpy(m_constBufferCPU[bufferNo], srcData, m_size);
+		}
+		bufferNo++;
+	}
+	//åˆ©ç”¨å¯èƒ½ã«ã™ã‚‹ã€‚
+	m_isValid = true;
 }
-
-//ƒf[ƒ^‚ğVRAM‚ÉƒRƒs[‚·‚é
-void ConstantBuffer::CopyToVRAM(GraphicsEngine*& graphicsEngine, void* data)
+void ConstantBuffer::RegistConstantBufferView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
 {
-    auto backBufferIndex = graphicsEngine->GetBackBufferIndex();
-    memcpy(this->const_Buffer_CPU_[backBufferIndex], data, this->constant_Buffer_Size_);
+	//D3Dãƒ‡ãƒã‚¤ã‚¹ã‚’å–å¾—ã€‚
+	auto device = g_graphicsEngine->GetD3DDevice();
+	D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};
+	desc.BufferLocation = m_constantBuffer[bufferNo]->GetGPUVirtualAddress();
+	desc.SizeInBytes = m_allocSize;
+	device->CreateConstantBufferView(&desc, descriptorHandle);
 }
-
-//ƒf[ƒ^‚ğVRAM‚ÉƒRƒs[‚·‚é
-/*
-template<class T>
-void ConstantBuffer::CopyToVRAM(GraphicsEngine* graphicsEngine, T& data)
+void ConstantBuffer::RegistConstantBufferView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle)
 {
-    CopyToVRAM(graphicsEngine, &data);
+	auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+	RegistConstantBufferView(descriptorHandle, backBufferIndex);
 }
-*/
-
-//ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É’è”ƒoƒbƒtƒ@ƒrƒ…[‚ğ“o˜^
-void ConstantBuffer::RegistConstantBufferView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle)
+void ConstantBuffer::CopyToVRAM(void* data)
 {
-    //ƒoƒbƒNƒoƒbƒtƒ@”‚ğæ“¾
-    auto back_Buffer_Index = graphicsEngine->GetBackBufferIndex();
-    //ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É’è”ƒoƒbƒtƒ@ƒrƒ…[‚ğ“o˜^
-    RegistConstantBufferView(graphicsEngine, descriptorHandle, back_Buffer_Index);
+	auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+	memcpy(m_constBufferCPU[backBufferIndex], data, m_size);
 }
-
-//ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É’è”ƒoƒbƒtƒ@ƒrƒ…[‚ğ“o˜^
-void ConstantBuffer::RegistConstantBufferView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
+D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetGPUVirtualAddress()
 {
-    D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};
-    desc.BufferLocation = this->constant_Buffer_[bufferNo]->GetGPUVirtualAddress();
-    desc.SizeInBytes = this->alloc_Size_;
-    //device.CreateConstantBufferView(&desc, descriptorHandle);
-    graphicsEngine->CreateConstantBufferView(desc, descriptorHandle);
-}
-
-//ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É’è”ƒoƒbƒtƒ@ƒrƒ…[‚ğ“o˜^
-D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetGPUVirtualAddress(GraphicsEngine*& graphicsEngine)
-{
-    auto back_Buffer_Index = graphicsEngine->GetBackBufferIndex();
-    return this->constant_Buffer_[back_Buffer_Index]->GetGPUVirtualAddress();
+	auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+	return m_constantBuffer[backBufferIndex]->GetGPUVirtualAddress();
 }

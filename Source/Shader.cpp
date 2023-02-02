@@ -1,212 +1,139 @@
+ï»¿#include "stdafx.h"
 #include "Shader.h"
-#include <d3dcompiler.h>
 #include <stierr.h>
-#include <fstream>
 #include <sstream>
-#include <atlcomcli.h>
+#include <fstream>
+#include <atlbase.h>
 
-#pragma warning(disable : 4996)
-//ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^ 
-Shader::Shader():
-    blob_(nullptr),
-    dxc_Blob_(nullptr),
 
-    is_Inited_(false)
-{
+namespace {
+	const char* g_vsShaderModelName = "vs_5_0";	//é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ¢ãƒ‡ãƒ«åã€‚
+	const char* g_psShaderModelName = "ps_5_0";	//ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¢ãƒ‡ãƒ«åã€‚
+	const char* g_csShaderModelName = "cs_5_0";	//ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ¢ãƒ‡ãƒ«åã€‚
 }
-
-//ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
-Shader::~Shader()
-{
-}
-
-//ƒsƒNƒZƒ‹ƒVƒF[ƒ_[‚ğƒ[ƒh
-void Shader::LoadPS(const char* filePath, const char* entryFuncName)
-{
-    Load(filePath, entryFuncName, this->GetPixelShaderModelName().c_str());
-}
-//’¸“_ƒVƒF[ƒ_[‚ğƒ[ƒh
-void Shader::LoadVS(const char* filePath, const char* entryFuncName)
-{
-    Load(filePath, entryFuncName, this->GetVertexShaderModelName().c_str());
-}
-
-//ƒRƒ“ƒsƒ…[ƒgƒVƒF[ƒ_[‚ğƒ[ƒh
-void Shader::LoadCS(const char* filePath, const char* entryFuncName)
-{
-    Load(filePath, entryFuncName, this->GetComputeShaderModelName().c_str());
-}
-
-//ƒŒƒCƒgƒŒ[ƒVƒ“ƒO—p‚ÌƒVƒF[ƒ_[‚ğƒ[ƒh
-/*
-void Shader::LoadRaytracing(const wchar_t* filePath)
-{
-    //ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
-    std::ifstream shader_file(filePath);
-    if (!shader_file.good())
-    {
-        std::wstring error_message = L"ƒVƒF[ƒ_[ƒtƒ@ƒCƒ‹‚ÌƒI[ƒvƒ“‚É¸”s‚µ‚Ü‚µ‚½\n";
-        error_message += filePath;
-        MessageBoxW(nullptr, error_message.c_str(), L"ƒGƒ‰[", MB_OK);
-        std::abort();
-    }
-
-    std::stringstream str_stream;
-    str_stream << shader_file.rdbuf();
-    std::string shader = str_stream.str();
-
-    //¶¬@Œ‹‰ÊŠm”F—pƒtƒ‰ƒO
-    HRESULT hr;
-
-    //ƒVƒF[ƒ_[‚ÌƒeƒLƒXƒgƒtƒ@ƒCƒ‹‚©‚çABLOB‚ğì¬‚·‚éB
-    CComPtr<IDxcLibrary> dxc_lib;
-    hr = DxcCreateInstance(CLSID_DxcLibrary, IID_PPV_ARGS(&dxc_lib));
-    //¶¬ Šm”F
-    if (FAILED(hr))
-    {
-        //¸”s‚µ‚½‚Ì‚ÅMessageBox‚ğì‚èˆÙíI—¹‚·‚é
-        MessageBox(nullptr, L"DXCLIB‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B", L"ƒGƒ‰[", MB_OK);
-        std::abort();
-    }
-
-    //ƒCƒ“ƒNƒ‹[ƒhƒnƒ“ƒhƒ‹ ¶¬
-    CComPtr<IDxcIncludeHandler> includer_handler;
-    hr = dxc_lib->CreateIncludeHandler(&includer_handler);
-    CreateCheck(hr, L"CreateIncludeHandler‚Ì¶¬‚É¸”s");
-
-    //dxcƒRƒ“ƒpƒCƒ‰ ¶¬
-    CComPtr<IDxcCompiler> dxc_compiler;
-    hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxc_compiler));
-    CreateCheck(hr, L"DxcƒRƒ“ƒpƒCƒ‰‚Ì¶¬‚É¸”s");
-
-    //ƒ\[ƒXƒR[ƒh‚ÌBLOB‚ğì¬‚·‚éB
-    uint32_t code_page = CP_UTF8;
-    CComPtr<IDxcBlobEncoding> source_blob;
-    hr = dxc_lib->CreateBlobFromFile(filePath, &code_page, &source_blob);
-    CreateCheck(hr, L"ƒVƒF[ƒ_[ƒ\[ƒX‚ÌBlob‚Ì¶¬‚É¸”s");
-
-    // dxcƒCƒ“ƒNƒ‹[ƒhƒnƒ“ƒhƒ‹ ¶¬
-    CComPtr<IDxcIncludeHandler> dxcIncludeHandler;
-    hr = dxc_lib->CreateIncludeHandler(&dxcIncludeHandler);
-    CreateCheck(hr, L"Dxc CreateIncludeHandler‚Ì¶¬‚É¸”s");
-
-    const wchar_t* args[] = {
-        L"-I Assets\\shader",
-    };
-
-
-    //ƒRƒ“ƒpƒCƒ‹
-    CComPtr<IDxcOperationResult> result;
-    hr = dxc_compiler->Compile(
-        source_blob, // pSource
-        filePath, // pSourceName
-        L"",		// pEntryPoint
-        L"lib_6_3", // pTargetProfile
-        args, 1, // pArguments, argCount
-        nullptr, 0, // pDefines, defineCount
-        dxcIncludeHandler, // pIncludeHandler
-        &result); // ppResult
-    //¬Œ÷
-    if (SUCCEEDED(hr))
-    {
-        result->GetStatus(&hr);
-    }
-        
-    //¸”s
-    if (FAILED(hr))
-    {
-        if (result)
-        {
-            CComPtr<IDxcBlobEncoding> errors_blob;
-            hr = result->GetErrorBuffer(&errors_blob);
-            if (SUCCEEDED(hr) && errors_blob)
-            {
-                std::string error_message = "Compilation failed with errors:\n%hs\n";
-                error_message += (const char*)errors_blob->GetBufferPointer();
-                MessageBoxA(nullptr, error_message.c_str(), "ƒGƒ‰[", MB_OK);
-                std::abort();
-            }
-        }
-        else
-        {
-            MessageBox(nullptr, TEXT("ƒRƒ“ƒpƒCƒ‹‚É¸”s"), L"ƒGƒ‰[", MB_OK);
-            std::abort();
-        }
-    }
-    else
-    {
-        result->GetResult(&this->dxc_Blob_);
-    }
-
-}*/
-
-//ƒVƒF[ƒ_[‚ğƒ[ƒh
 void Shader::Load(const char* filePath, const char* entryFuncName, const char* shaderModel)
 {
-    //ComPtr<ID3DBlob> error_blob;
-    ID3DBlob* error_blob;
+	ID3DBlob* errorBlob;
 #ifdef _DEBUG
-    UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+	// Enable better shader debugging with the graphics debugging tools.
+	UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #else
-    UINT compileFlags = 0;
-#endif // _DEBUG
-    //ƒƒCƒh•¶š‚Ö•ÏŠ·
-    wchar_t wfx_file_path[256] = { L"" };
-    mbstowcs(wfx_file_path, filePath, 256);
-
-    //HLSLƒR[ƒh‚ğƒRƒ“ƒpƒCƒ‹
-    HRESULT hr = D3DCompileFromFile(
-        wfx_file_path,
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        entryFuncName,
-        shaderModel,
-        compileFlags,
-        0,
-        &this->blob_,
-        &error_blob
-    );
-
-    //ƒRƒ“ƒpƒCƒ‹ƒ`ƒFƒbƒN
-    if (FAILED(hr))
-    {
-        //¸”s‚µ‚½‚Ì‚ÅƒGƒ‰[Œ´ˆö‚ğ•\¦
-        if (hr == STIERR_OBJECTNOTFOUND) {
-            std::wstring errorMessage;
-            errorMessage = L"w’è‚³‚ê‚½fxƒtƒ@ƒCƒ‹‚ªŠJ‚¯‚Ü‚¹‚ñ‚Å‚µ‚½B";
-            errorMessage += wfx_file_path;
-            MessageBoxW(nullptr, errorMessage.c_str(), L"ƒGƒ‰[", MB_OK);
-
-            //ˆÙíI—¹
-            std::abort();
-        }
-        if (error_blob) {
-            static char errorMessage[10 * 1024];
-            sprintf_s(errorMessage, "filePath : %ws, %s", wfx_file_path, (char*)error_blob->GetBufferPointer());
-            MessageBoxA(NULL, errorMessage, "ƒVƒF[ƒ_[ƒRƒ“ƒpƒCƒ‹ƒGƒ‰[", MB_OK);
-            //ˆÙíI—¹
-            std::abort();
-        }
-        else
-        {
-            MessageBox(nullptr, TEXT("Shader::Load‚É¸”s‚µ‚Ü‚µ‚½"), L"ƒGƒ‰[", MB_OK);
-            //ˆÙíI—¹
-            std::abort();
-        }
-    }
-
-    //‰Šú‰»Š®—¹‚µ‚½‚Ì‚Å‰Šú‰»Ï‚İƒtƒ‰ƒO‚ğŒš‚Ä‚é
-    this->is_Inited_ = true;
+	UINT compileFlags = 0;
+#endif
+	wchar_t wfxFilePath[256] = { L"" };
+	mbstowcs(wfxFilePath, filePath, 256);
+	
+	auto hr = D3DCompileFromFile(wfxFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryFuncName, shaderModel, compileFlags, 0, &m_blob, &errorBlob);
+	
+	if (FAILED(hr)) {
+		if (hr == STIERR_OBJECTNOTFOUND) {
+			std::wstring errorMessage;
+			errorMessage = L"æŒ‡å®šã•ã‚ŒãŸfxãƒ•ã‚¡ã‚¤ãƒ«ãŒé–‹ã‘ã¾ã›ã‚“ã§ã—ãŸã€‚";
+			errorMessage += wfxFilePath;
+			MessageBoxW(nullptr, errorMessage.c_str(), L"ã‚¨ãƒ©ãƒ¼", MB_OK);
+		}
+		if (errorBlob) {
+			static char errorMessage[10 * 1024];
+			sprintf_s(errorMessage, "filePath : %ws, %s", wfxFilePath, (char*)errorBlob->GetBufferPointer());
+			MessageBoxA(NULL, errorMessage, "ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã‚¨ãƒ©ãƒ¼", MB_OK);
+			return;
+		}
+	}
+	m_isInited = true;
 }
-
-void Shader::CreateCheck(HRESULT hr, std::wstring message)const
+void Shader::LoadPS(const char* filePath, const char* entryFuncName)
 {
-    //Šm”F
-    if (FAILED(hr))
-    {
-        //¸”s‚µ‚½‚Ì‚ÅƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ğ•\¦
-        MessageBoxW(nullptr, message.c_str(), L"ƒGƒ‰[", MB_OK);
-        //ˆÙíI—¹‚·‚é
-        std::abort();
-    }
+	Load(filePath, entryFuncName, g_psShaderModelName);
 }
+void Shader::LoadVS(const char* filePath, const char* entryFuncName)
+{
+	Load(filePath, entryFuncName, g_vsShaderModelName);
+}
+void Shader::LoadCS(const char* filePath, const char* entryFuncName)
+{
+	Load(filePath, entryFuncName, g_csShaderModelName);
+}
+void Shader::LoadRaytracing(const wchar_t* filePath)
+{
+	std::ifstream shaderFile(filePath);
+	if (shaderFile.good() == false){
+		std::wstring errormessage = L"ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ªãƒ¼ãƒ—ãƒ³ã«å¤±æ•—ã—ã¾ã—ãŸã€‚\n";
+		errormessage += filePath;
+		MessageBoxW( nullptr, errormessage.c_str(), L"ã‚¨ãƒ©ãƒ¼", MB_OK);
+		std::abort();
+	}
+
+	std::stringstream strStream;
+	strStream << shaderFile.rdbuf();
+	std::string shader = strStream.str();
+	//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ãƒ†ã‚­ã‚¹ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã€BLOBã‚’ä½œæˆã™ã‚‹ã€‚
+	CComPtr<IDxcLibrary> dxclib;
+	auto hr = DxcCreateInstance(CLSID_DxcLibrary, IID_PPV_ARGS(&dxclib));
+	if (FAILED(hr)) {
+		MessageBox(nullptr, L"DXCLIBã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚", L"ã‚¨ãƒ©ãƒ¼", MB_OK);
+		std::abort();
+	}
+	CComPtr< IDxcIncludeHandler> includerHandler;
+	hr = dxclib->CreateIncludeHandler(&includerHandler);
+	if (FAILED(hr)) {
+		MessageBox(nullptr, L"CreateIncludeHandlerã«å¤±æ•—ã—ã¾ã—ãŸã€‚", L"ã‚¨ãƒ©ãƒ¼", MB_OK);
+		std::abort();
+	}
+	
+	//dxcã‚³ãƒ³ãƒ‘ã‚¤ãƒ©ã®ä½œæˆã€‚
+	CComPtr<IDxcCompiler> dxcCompiler;
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
+	if (FAILED(hr)) {
+		MessageBox(nullptr, L"dxcã‚³ãƒ³ãƒ‘ã‚¤ãƒ©ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚", L"ã‚¨ãƒ©ãƒ¼", MB_OK);
+		std::abort();
+	}
+	//ã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰ã®BLOBã‚’ä½œæˆã™ã‚‹ã€‚
+	uint32_t codePage = CP_UTF8;
+	CComPtr< IDxcBlobEncoding> sourceBlob;
+	hr = dxclib->CreateBlobFromFile(filePath, &codePage, &sourceBlob);
+	if (FAILED(hr)) {
+		MessageBox(nullptr, L"ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚½ãƒ¼ã‚¹ã®Blobã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚", L"ã‚¨ãƒ©ãƒ¼", MB_OK);
+		std::abort();
+	}
+	
+	CComPtr<IDxcIncludeHandler> dxcIncludeHandler;
+	dxclib->CreateIncludeHandler(&dxcIncludeHandler);
+	const wchar_t* args[] = {
+		L"-I Assets\\shader",
+	};
+	//ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã€‚
+	CComPtr<IDxcOperationResult> result;
+	hr = dxcCompiler->Compile(
+		sourceBlob, // pSource
+		filePath, // pSourceName
+		L"",		// pEntryPoint
+		L"lib_6_3", // pTargetProfile
+		args, 1, // pArguments, argCount
+		nullptr, 0, // pDefines, defineCount
+		dxcIncludeHandler, // pIncludeHandler
+		&result); // ppResult
+	if (SUCCEEDED(hr)) {
+		result->GetStatus(&hr);
+	}
+
+	if (FAILED(hr))
+	{
+		if (result)
+		{
+			CComPtr<IDxcBlobEncoding> errorsBlob;
+			hr = result->GetErrorBuffer(&errorsBlob);
+			if (SUCCEEDED(hr) && errorsBlob)
+			{
+				std::string errormessage = "Compilation failed with errors:\n%hs\n";
+				errormessage += (const char*)errorsBlob->GetBufferPointer();
+				MessageBoxA(nullptr, errormessage.c_str(), "ã‚¨ãƒ©ãƒ¼", MB_OK);
+
+			}
+		}
+		// Handle compilation error...
+	}
+	else {
+		result->GetResult(&m_dxcBlob);
+	}
+}
+

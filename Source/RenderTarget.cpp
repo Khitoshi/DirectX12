@@ -1,257 +1,195 @@
+Ôªø#include "stdafx.h"
 #include "RenderTarget.h"
 #include "GraphicsEngine.h"
 
-//ÉfÉtÉHÉãÉg ÉRÉìÉXÉgÉâÉNÉ^
-RenderTarget::RenderTarget() :
-    render_Target_Texture_(),
-    render_Target_Texture_Dx12_(nullptr),
-    depth_Stencil_Texture_(nullptr),
-
-    rtv_Heap_(nullptr),
-    dsv_Heap_(nullptr),
-
-    rtv_Descriptor_Size_(0),
-    dsv_Descriptor_Size_(0),
-
-    width_(0),
-    height_(0),
-
-    rtv_Clear_Color_(),
-    dsv_Clear_Value_(1.0f)
-{
-}
-
-//ÉfÉtÉHÉãÉg ÉfÉXÉgÉâÉNÉ^
 RenderTarget::~RenderTarget()
 {
-    if (render_Target_Texture_Dx12_ != nullptr)
-    {
-        render_Target_Texture_Dx12_->Release();
-    }
-
-    if (depth_Stencil_Texture_ != nullptr)
-    {
-        depth_Stencil_Texture_->Release();
-    }
-
-    if (rtv_Heap_ != nullptr)
-    {
-        rtv_Heap_->Release();
-    }
-
-    if (dsv_Heap_ != nullptr)
-    {
-        dsv_Heap_->Release();
-    }
+	if (m_renderTargetTextureDx12) {
+		m_renderTargetTextureDx12->Release();
+	}
+	if (m_depthStencilTexture) {
+		m_depthStencilTexture->Release();
+	}
+	if (m_rtvHeap) {
+		m_rtvHeap->Release();
+	}
+	if (m_dsvHeap) {
+		m_dsvHeap->Release();
+	}
 }
-
-// ÉåÉìÉ_ÉäÉìÉOÉ^Å[ÉQÉbÉgÇÃçÏê¨
-bool RenderTarget::Create(GraphicsEngine*& graphicsEngine, int renderTargetWidth, int renderTargetHeight, int mipLevel, int arraySize, DXGI_FORMAT colorFormat, DXGI_FORMAT depthStencilFormat, float clearColor[4])
-{
-    //ÉåÉìÉ_Å[É^Å[ÉQÉbÉgÇÃïùÅEçÇÇ≥ ê›íË
-    this->width_ = renderTargetWidth;
-    this->height_ = renderTargetHeight;
-    
-    //ÉåÉìÉ_ÉäÉìÉOÉ^Å[ÉQÉbÉgÇ∆Ç»ÇÈÉeÉNÉXÉ`ÉÉ çÏê¨
-    CreateRenderTargetTexture(
-        graphicsEngine,
-        renderTargetWidth,
-        renderTargetHeight,
-        mipLevel,
-        arraySize,
-        colorFormat,
-        clearColor);
-
-    //ê[ìxÉXÉeÉìÉVÉãÉoÉbÉtÉ@Ç∆Ç»ÇÈÉeÉNÉXÉ`ÉÉ çÏê¨
-    if (depthStencilFormat != DXGI_FORMAT_UNKNOWN) {
-        CreateDepthStencilTexture(graphicsEngine, renderTargetWidth, renderTargetHeight, depthStencilFormat);
-    }
-
-    //RTV ÉfÉBÉXÉNÉäÉvÉ^ÉqÅ[ÉvçÏê¨
-    CreateDescriptorRTVHeap(graphicsEngine);
-    //DSV ÉfÉBÉXÉNÉäÉvÉ^ÉqÅ[ÉvçÏê¨
-    CreateDescriptorDSVHeap(graphicsEngine);
-
-    //ÉåÉìÉ_Å[É^Å[ÉQÉbÉgÅ@ÉfÉBÉXÉNÉäÉvÉ^Å@çÏê¨
-    CreateDescriptorRTV(graphicsEngine);
-    //ê[ìxÉXÉeÉìÉVÉãÅ@ÉfÉBÉXÉNÉäÉvÉ^Å@çÏê¨
-    CreateDescriptorDSV(graphicsEngine);
-
-    //ÉNÉäÉAÉJÉâÅ[Ç™ë∂ç›Ç∑ÇÈèÍçáÉÅÉÇÉäÇÃÉRÉsÅ[ÇçsÇ§
-    if (clearColor) {
-        memcpy(this->rtv_Clear_Color_, clearColor, sizeof(this->rtv_Clear_Color_));
-    }
-
-    return true;
-}
-
-//ÉåÉìÉ_Å[É^Å[ÉQÉbÉgÉrÉÖÅ[óp ÉfÉBÉXÉNÉäÉvÉ^ÉqÅ[Év çÏê¨
-void RenderTarget::CreateDescriptorRTVHeap(GraphicsEngine*& graphicsEngine)
-{
-    //RTVópÇÃÉfÉBÉXÉNÉäÉvÉ^ÉqÅ[Év çÏê¨
-    //ê›íË
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.NumDescriptors = GraphicsEngine::GetFrameBufferCount();
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    //ê∂ê¨
-    graphicsEngine->CreateDescriptorHeap(desc, this->rtv_Heap_);
-
-    //ÉfÉBÉXÉNÉäÉvÉ^ÇÃÉTÉCÉYÇê›íË
-    this->rtv_Descriptor_Size_ = graphicsEngine->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-}
-
-//ê[ìxÉXÉeÉìÉVÉãÉoÉbÉtÉ@óp ÉfÉBÉXÉNÉäÉvÉ^ÉqÅ[Év
-void RenderTarget::CreateDescriptorDSVHeap(GraphicsEngine*& graphicsEngine)
-{
-    //ê[ìxÉXÉeÉìÉVÉãÉeÉNÉXÉ`ÉÉÇ™ë∂ç›ÇµÇ»Ç¢èÍçá ëÅä˙ÉäÉ^Å[Éì
-    if (!this->depth_Stencil_Texture_) return;
-
-    //DSVópÇÃÉfÉBÉXÉNÉäÉvÉ^ÉqÅ[ÉvÇçÏê¨
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.NumDescriptors = 1;
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-
-
-    //ê∂ê¨
-    //device.CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->dsv_Heap_));
-    graphicsEngine->CreateDescriptorHeap(desc, this->dsv_Heap_);
-
-    //ÉfÉBÉXÉNÉäÉvÉ^ÇÃÉTÉCÉYÇê›íË
-    this->dsv_Descriptor_Size_ = graphicsEngine->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-    
-}
-
-//ÉåÉìÉ_ÉäÉìÉOÉ^Å[ÉQÉbÉgÇ∆Ç»ÇÈÉeÉNÉXÉ`ÉÉÇçÏê¨
-void RenderTarget::CreateRenderTargetTexture(
-    GraphicsEngine*& graphicsEngine, 
-    int textureWidth, 
-    int textureHeight, 
-    int mipLevel, 
-    int arraySize, 
-    DXGI_FORMAT format, 
-    float clearColor[4]
+bool RenderTarget::Create(
+	int w,
+	int h,
+	int mipLevel,
+	int arraySize,
+	DXGI_FORMAT colorFormat,
+	DXGI_FORMAT depthStencilFormat,
+	float clearColor[4]
 )
 {
-    //ÉäÉ\Å[ÉXÇê›íË
-    CD3DX12_RESOURCE_DESC desc(
-        D3D12_RESOURCE_DIMENSION_TEXTURE2D,
-        0,
-        static_cast<UINT>(textureWidth),
-        static_cast<UINT>(textureHeight),
-        arraySize,
-        mipLevel,
-        format,
-        1,
-        0,
-        D3D12_TEXTURE_LAYOUT_UNKNOWN,
-        D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET
-    );
-
-    D3D12_CLEAR_VALUE clear_value;
-    clear_value.Format = format;
-    if (clearColor != nullptr) {
-        clear_value.Color[0] = clearColor[0];
-        clear_value.Color[1] = clearColor[1];
-        clear_value.Color[2] = clearColor[2];
-        clear_value.Color[3] = clearColor[3];
-    }
-    else {
-        clear_value.Color[0] = 0.0f;
-        clear_value.Color[1] = 0.0f;
-        clear_value.Color[2] = 0.0f;
-        clear_value.Color[3] = 1.0f;
-    }
-
-    //ÉqÅ[ÉvÇÃê›íË
-    auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-
-    //ÉäÉ\Å[ÉX çÏê¨
-    graphicsEngine->CreateCommittedResource(
-        prop,
-        D3D12_HEAP_FLAG_NONE,
-        desc,
-        D3D12_RESOURCE_STATE_COMMON,
-        &clear_value,
-        this->render_Target_Texture_Dx12_
-    );
-
-    this->render_Target_Texture_.InitFromD3DResource(this->render_Target_Texture_Dx12_);
+	auto d3dDevice = g_graphicsEngine->GetD3DDevice();
+	m_width = w;
+	m_height = h;
+	//„É¨„É≥„ÉÄ„É™„É≥„Ç∞„Çø„Éº„Ç≤„ÉÉ„Éà„Å®„Å™„Çã„ÉÜ„ÇØ„Çπ„ÉÅ„É£„Çí‰ΩúÊàê„Åô„Çã„ÄÇ
+	if (!CreateRenderTargetTexture(*g_graphicsEngine, d3dDevice, w, h, mipLevel, arraySize, colorFormat, clearColor)) {
+	//	TK_ASSERT(false, "„É¨„É≥„ÉÄ„É™„É≥„Ç∞„Çø„Éº„Ç≤„ÉÉ„Éà„Å®„Å™„Çã„ÉÜ„ÇØ„Çπ„ÉÅ„É£„ÅÆ‰ΩúÊàê„Å´Â§±Êïó„Åó„Åæ„Åó„Åü„ÄÇ");
+		MessageBoxA(nullptr, "„É¨„É≥„ÉÄ„É™„É≥„Ç∞„Çø„Éº„Ç≤„ÉÉ„Éà„Å®„Å™„Çã„ÉÜ„ÇØ„Çπ„ÉÅ„É£„ÅÆ‰ΩúÊàê„Å´Â§±Êïó„Åó„Åæ„Åó„Åü„ÄÇ", "„Ç®„É©„Éº", MB_OK);
+		return false;
+	}
+	//Ê∑±Â∫¶„Çπ„ÉÜ„É≥„Ç∑„É´„Éê„ÉÉ„Éï„Ç°„Å®„Å™„Çã„ÉÜ„ÇØ„Çπ„ÉÅ„É£„Çí‰ΩúÊàê„Åô„Çã„ÄÇ
+	if (depthStencilFormat != DXGI_FORMAT_UNKNOWN) {
+		if (!CreateDepthStencilTexture(*g_graphicsEngine, d3dDevice, w, h, depthStencilFormat)) {
+			MessageBoxA(nullptr, "„É¨„É≥„ÉÄ„É™„É≥„Ç∞„Çø„Éº„Ç≤„ÉÉ„Éà„Å®„Å™„Çã„ÉÜ„ÇØ„Çπ„ÉÅ„É£„ÅÆ‰ΩúÊàê„Å´Â§±Êïó„Åó„Åæ„Åó„Åü„ÄÇ", "„Ç®„É©„Éº", MB_OK);
+			return false;
+		}
+	}
+	if (!CreateDescriptorHeap(*g_graphicsEngine, d3dDevice)) {
+		//„Éá„Ç£„Çπ„ÇØ„É™„Éó„Çø„Éí„Éº„Éó„ÅÆ‰ΩúÊàê„Å´Â§±Êïó„Åó„Åü„ÄÇ
+		MessageBoxA(nullptr, "„É¨„É≥„ÉÄ„É™„É≥„Ç∞„Çø„Éº„Ç≤„ÉÉ„Éà„Å®„Å™„Çã„ÉÜ„ÇØ„Çπ„ÉÅ„É£„ÅÆ‰ΩúÊàê„Å´Â§±Êïó„Åó„Åæ„Åó„Åü„ÄÇ", "„Ç®„É©„Éº", MB_OK);
+		return false;
+	}
+	//„Éá„Ç£„Çπ„ÇØ„É™„Éó„Çø„Çí‰ΩúÊàê„Åô„Çã„ÄÇ
+	CreateDescriptor(d3dDevice);
+	if (clearColor) {
+		memcpy(m_rtvClearColor, clearColor, sizeof(m_rtvClearColor));
+	}
+	return true;
 }
-
-//ê[ìxÉXÉeÉìÉVÉãÉoÉbÉtÉ@Ç∆Ç»ÇÈÉeÉNÉXÉ`ÉÉÇçÏê¨
-void RenderTarget::CreateDepthStencilTexture(
-    GraphicsEngine*& graphicsEngine,
-    int textureWidth, 
-    int textureHeight, 
-    DXGI_FORMAT format)
+bool RenderTarget::CreateDescriptorHeap(GraphicsEngine& ge, ID3D12Device5*& d3dDevice)
 {
-    //ê[ìxÉXÉeÉìÉVÉãÇÃíl ê›íË
-    D3D12_CLEAR_VALUE dsv_clear_value;
-    dsv_clear_value.Format = format;
-    dsv_clear_value.DepthStencil.Depth = 1.0f;
-    dsv_clear_value.DepthStencil.Stencil = 0;
+		
+	//RTVÁî®„ÅÆ„Éá„Ç£„Çπ„ÇØ„É™„Éó„Çø„Éí„Éº„Éó„Çí‰ΩúÊàê„Åô„Çã„ÄÇ
+	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+	desc.NumDescriptors = GraphicsEngine::FRAME_BUFFER_COUNT;
+	desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	d3dDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_rtvHeap));
+	if (m_rtvHeap == nullptr) {
+		//RTVÁî®„ÅÆ„Éá„Ç£„Çπ„ÇØ„É™„Éó„Çø„Éí„Éº„Éó„ÅÆ‰ΩúÊàê„Å´Â§±Êïó„Åó„Åü„ÄÇ
+		return false;
+	}
+	//„Éá„Ç£„Çπ„ÇØ„É™„Éó„Çø„ÅÆ„Çµ„Ç§„Ç∫„ÇíÂèñÂæó„ÄÇ
+	m_rtvDescriptorSize = d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-    //ÉäÉ\Å[ÉXÇÃê›íË
-    CD3DX12_RESOURCE_DESC desc(
-        D3D12_RESOURCE_DIMENSION_TEXTURE2D,
-        0,
-        static_cast<UINT>(textureWidth),
-        static_cast<UINT>(textureHeight),
-        1,
-        1,
-        format,
-        1,
-        0,
-        D3D12_TEXTURE_LAYOUT_UNKNOWN,
-        D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
-
-    auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-
-    //ÉäÉ\Å[ÉXê∂ê¨
-    graphicsEngine->CreateCommittedResource(
-        prop,
-        D3D12_HEAP_FLAG_NONE,
-        desc,
-        D3D12_RESOURCE_STATE_DEPTH_WRITE,
-        &dsv_clear_value,
-        this->depth_Stencil_Texture_
-    );
+	if (m_depthStencilTexture) {
+		//DSVÁî®„ÅÆ„Éá„Ç£„Çπ„ÇØ„É™„Éó„Çø„Éí„Éº„Éó„Çí‰ΩúÊàê„Åô„Çã„ÄÇ
+		desc.NumDescriptors = 1;
+		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+		d3dDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_dsvHeap));
+		if (m_dsvHeap == nullptr) {
+			//DSVÁî®„ÅÆ„Éá„Ç£„Çπ„ÇØ„É™„Éó„Çø„Éí„Éº„Éó„ÅÆ‰ΩúÊàê„Å´Â§±Êïó„Åó„Åü„ÄÇ
+			return false;
+		}
+		//„Éá„Ç£„Çπ„ÇØ„É™„Éó„Çø„ÅÆ„Çµ„Ç§„Ç∫„ÇíÂèñÂæó„ÄÇ
+		m_dsvDescriptorSize = d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	}
+	return true;
 }
-
-//ÉåÉìÉ_Å[É^Å[ÉQÉbÉgÉrÉÖÅ[ÇÃÉfÉBÉXÉNÉäÉvÉ^ çÏê¨
-void RenderTarget::CreateDescriptorRTV(GraphicsEngine*& graphicsEngine)
+bool RenderTarget::CreateRenderTargetTexture(
+	GraphicsEngine& ge,
+	ID3D12Device5*& d3dDevice,
+	int w,
+	int h,
+	int mipLevel,
+	int arraySize,
+	DXGI_FORMAT format,
+	float clearColor[4]
+)
 {
-    //ÉJÉâÅ[ÉeÉNÉXÉ`ÉÉÇÃÉfÉBÉXÉNÉäÉvÉ^ÇçÏê¨ÅB
-    auto rtv_handle = this->rtv_Heap_->GetCPUDescriptorHandleForHeapStart();
-    graphicsEngine->CreateRenderTargetView(
-        this->render_Target_Texture_.GetTexture(),
-        nullptr, 
-        rtv_handle
-    );
+	CD3DX12_RESOURCE_DESC desc(
+		D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+		0,
+		static_cast<UINT>(w),
+		static_cast<UINT>(h),
+		arraySize,
+		mipLevel,
+		format,
+		1,
+		0,
+		D3D12_TEXTURE_LAYOUT_UNKNOWN,
+		D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET
+	);
 
-    //ID3D12Device* device = nullptr;
-    //device->CreateRenderTargetView(
-    //    this->render_Target_Texture_.GetTexture(),
-    //    nullptr,
-    //    rtv_handle)
+	D3D12_CLEAR_VALUE clearValue;
+	clearValue.Format = format;
+	if (clearColor != nullptr) {
+		clearValue.Color[0] = clearColor[0];
+		clearValue.Color[1] = clearColor[1];
+		clearValue.Color[2] = clearColor[2];
+		clearValue.Color[3] = clearColor[3];
+	}
+	else {
+		clearValue.Color[0] = 0.0f;
+		clearValue.Color[1] = 0.0f;
+		clearValue.Color[2] = 0.0f;
+		clearValue.Color[3] = 1.0f;
+	}
+	//„É™„ÇΩ„Éº„Çπ„Çí‰ΩúÊàê„ÄÇ
+	auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+	auto hr = d3dDevice->CreateCommittedResource(
+		&prop,
+		D3D12_HEAP_FLAG_NONE,
+		&desc,
+		D3D12_RESOURCE_STATE_COMMON,
+		&clearValue,
+		IID_PPV_ARGS(&m_renderTargetTextureDx12)
+	);
 
+	if (FAILED(hr)) {
+		//‰ΩúÊàê„Å´Â§±Êïó„ÄÇ
+		return false;
+	}
+	m_renderTargetTexture.InitFromD3DResource(m_renderTargetTextureDx12);
+	return true;
 }
-
-// ÉeÉNÉXÉ`ÉÉÇ™Ç†ÇÈèÍçá
-// ê[ìxÉXÉeÉìÉVÉãÉrÉÖÅ[ÇÃÉfÉBÉXÉNÉäÉvÉ^ çÏê¨
-void RenderTarget::CreateDescriptorDSV(GraphicsEngine*& graphicsEngine)
+bool RenderTarget::CreateDepthStencilTexture(
+	GraphicsEngine& ge,
+	ID3D12Device5*& d3dDevice,
+	int w,
+	int h,
+	DXGI_FORMAT format)
 {
-    //ê[ìxÉXÉeÉìÉVÉãÉeÉNÉXÉ`ÉÉÇ™ë∂ç›ÇµÇ»Ç¢èÍçáÅ@ëÅä˙ÉäÉ^Å[Éì
-    if (this->depth_Stencil_Texture_ == nullptr)return;
-    
-    //ê[ìxÉeÉNÉXÉ`ÉÉÇÃÉfÉBÉXÉNÉäÉvÉ^ÇçÏê¨
-    auto dsvHandle = this->dsv_Heap_->GetCPUDescriptorHandleForHeapStart();
-    graphicsEngine->CreateDepthStencilView(
-        this->depth_Stencil_Texture_,
-        nullptr,
-        dsvHandle
-    );
-    
+	D3D12_CLEAR_VALUE dsvClearValue;
+	dsvClearValue.Format = format;
+	dsvClearValue.DepthStencil.Depth = 1.0f;
+	dsvClearValue.DepthStencil.Stencil = 0;
+
+	CD3DX12_RESOURCE_DESC desc(
+		D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+		0,
+		static_cast<UINT>(w),
+		static_cast<UINT>(h),
+		1,
+		1,
+		format,
+		1,
+		0,
+		D3D12_TEXTURE_LAYOUT_UNKNOWN,
+		D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
+
+	auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+	auto hr = d3dDevice->CreateCommittedResource(
+		&prop,
+		D3D12_HEAP_FLAG_NONE,
+		&desc,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		&dsvClearValue,
+		IID_PPV_ARGS(&m_depthStencilTexture)
+	);
+	if (FAILED(hr)) {
+		//Ê∑±Â∫¶„Çπ„ÉÜ„É≥„Ç∑„É´„Éê„ÉÉ„Éï„Ç°„ÅÆ‰ΩúÊàê„Å´Â§±Êïó„ÄÇ
+		return false;
+	}
+	return true;
+}
+void RenderTarget::CreateDescriptor(ID3D12Device5*& d3dDevice)
+{
+	//„Ç´„É©„Éº„ÉÜ„ÇØ„Çπ„ÉÅ„É£„ÅÆ„Éá„Ç£„Çπ„ÇØ„É™„Éó„Çø„Çí‰ΩúÊàê„ÄÇ
+	auto rtvHandle = m_rtvHeap->GetCPUDescriptorHandleForHeapStart();
+	d3dDevice->CreateRenderTargetView(m_renderTargetTexture.Get(), nullptr, rtvHandle);
+	if (m_depthStencilTexture) {
+		//Ê∑±Â∫¶„ÉÜ„ÇØ„Çπ„ÉÅ„É£„ÅÆ„Éá„Ç£„Çπ„ÇØ„É™„Éó„Çø„Çí‰ΩúÊàê
+		auto dsvHandle = m_dsvHeap->GetCPUDescriptorHandleForHeapStart();
+		d3dDevice->CreateDepthStencilView(m_depthStencilTexture, nullptr, dsvHandle);
+	}
 }

@@ -1,362 +1,445 @@
-#pragma once
+ï»¿#pragma once
 
-#include <d3dx12.h>
-#include <wrl.h>
-#include "RenderTarget.h"
-#include "DescriptorHeap_inline.h"
-#include "ConstantBuffer.h"
-#include "Texture.h"
-using namespace Microsoft::WRL;
-
-class GraphicsEngine;
-class VertexBuffer;
-class IndexBuffer;
-class RootSignature;
-class PipelineState;
+class ConstantBuffer;
+class Texture;
+class DescriptorHeap;
 class RenderTarget;
-//class DescriptorHeap;
 
-
-class RenderContext
-{
-private:
+namespace raytracing{
+	class PSO;
+}
+/// <summary>
+/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã€‚
+/// </summary>
+class RenderContext {
 public:
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    RenderContext();
+	/// <summary>
+	/// åˆæœŸåŒ–ã€‚
+	/// </summary>
+	/// <param name="commandList">ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã€‚</param>
+	void Init(ID3D12GraphicsCommandList4* commandList)
+	{
+		m_commandList = commandList;
+	}
 
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    ~RenderContext();
+	/// <summary>
+	/// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <param name="vb">é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã€‚</param>
+	void SetVertexBuffer(VertexBuffer& vb)
+	{
+		m_commandList->IASetVertexBuffers(0, 1, &vb.GetView());
+	}
+	/// <summary>
+	/// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <param name="ib"></param>
+	void SetIndexBuffer(IndexBuffer& ib)
+	{
+		m_commandList->IASetIndexBuffer(&ib.GetView());
+	}
+	/// <summary>
+	/// ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ã®ãƒˆãƒãƒ­ã‚¸ãƒ¼ã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <remarks>
+	/// ID3D12GraphicsCommandList::ã®IASetPrimitiveTopologyã®ãƒ©ãƒƒãƒ‘ãƒ¼é–¢æ•°ã€‚
+	/// è©³ç´°ã¯Microsoftã®ãƒ˜ãƒ«ãƒ—ã‚’å‚ç…§ã€‚
+	/// </remarks>
+	void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology)
+	{
+		m_commandList->IASetPrimitiveTopology(topology);
+	}
+	/// <summary>
+	/// ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <param name="commandList">ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã€‚</param>
+	void SetCommandList(ID3D12GraphicsCommandList4* commandList)
+	{
+		m_commandList = commandList;
+	}
+	/// <summary>
+	/// ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã¨ã‚·ã‚¶ãƒªãƒ³ã‚°çŸ©å½¢ã‚’ã‚»ãƒƒãƒˆã§è¨­å®š
+	/// </summary>
+	/// <param name="viewport">ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆ</param>
+	void SetViewportAndScissor(D3D12_VIEWPORT& viewport)
+	{
+		//ã‚·ã‚¶ãƒªãƒ³ã‚°çŸ©å½¢ã‚‚è¨­å®šã™ã‚‹ã€‚
+		D3D12_RECT scissorRect;
+		scissorRect.bottom = static_cast<LONG>(viewport.Height);
+		scissorRect.top = 0;
+		scissorRect.left = 0;
+		scissorRect.right = static_cast<LONG>(viewport.Width);
+		SetScissorRect(scissorRect);
 
-    /// <summary>
-    /// ‰Šú‰»
-    /// </summary>
-    /// <param name="commandList">ƒRƒ}ƒ“ƒhƒŠƒXƒg</param>
-    void Init(ID3D12GraphicsCommandList4* commandList);
+		m_commandList->RSSetViewports(1, &viewport);
+		m_currentViewport = viewport;
+	}
+	/// <summary>
+	/// ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	D3D12_VIEWPORT GetViewport() const
+	{
+		return m_currentViewport;
+	}
+	/// <summary>
+	/// ã‚·ã‚¶ãƒªãƒ³ã‚°çŸ©å½¢ã‚’è¨­å®š
+	/// </summary>
+	/// <param name="rect"></param>
+	void SetScissorRect(D3D12_RECT& rect)
+	{
+		m_commandList->RSSetScissorRects(1, &rect);
+	}
 
-    /// <summary>
-    /// ƒCƒ“ƒXƒ^ƒ“ƒVƒ“ƒO•`‰æ
-    /// </summary>
-    /// <param name="indexCount">ƒCƒ“ƒfƒbƒNƒX”</param>
-    void DrawIndexed(UINT indexCount)
-    {
-        this->command_List_->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
-    }
+	/// <summary>
+	/// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã‚’è¨­å®šã€‚
+	/// </summary>
+	void SetRootSignature(ID3D12RootSignature* rootSignature)
+	{
+		m_commandList->SetGraphicsRootSignature(rootSignature);
+	}
+	void SetRootSignature(RootSignature& rootSignature)
+	{
+		m_commandList->SetGraphicsRootSignature(rootSignature.Get());
+	}
+	void SetComputeRootSignature(ID3D12RootSignature* rootSignature)
+	{
+		m_commandList->SetComputeRootSignature(rootSignature);
+	}
+	void SetComputeRootSignature(RootSignature& rootSignature)
+	{
+		m_commandList->SetComputeRootSignature(rootSignature.Get());
+	}
+	/// <summary>
+	/// ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã‚’è¨­å®šã€‚
+	/// </summary>
+	void SetPipelineState(ID3D12PipelineState* pipelineState)
+	{
+		m_commandList->SetPipelineState(pipelineState);
+	}
+	void SetPipelineState(PipelineState& pipelineState)
+	{
+		m_commandList->SetPipelineState(pipelineState.Get());
+	}
+	/// <summary>
+	/// ãƒ¬ã‚¤ãƒˆãƒ¬ç”¨ã®ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <param name="pso"></param>
+	void SetPipelineState(raytracing::PSO& pso);
 
-    /// <summary>
-    /// ƒCƒ“ƒXƒ^ƒ“ƒVƒ“ƒO•`‰æ
-    /// </summary>
-    /// <param name="indexCount">ƒCƒ“ƒfƒbƒNƒX”</param>
-    /// <param name="numInstance">ƒCƒ“ƒXƒ^ƒ“ƒX”</param>
-    void DrawIndexedInstanced(UINT indexCount, UINT numInstance)
-    {
-        this->command_List_->DrawIndexedInstanced(indexCount, numInstance, 0, 0, 0);
-    }
+	/// <summary>
+	/// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’è¨­å®šã€‚
+	/// </summary>
+	void SetDescriptorHeap(ID3D12DescriptorHeap* descHeap)
+	{
+		m_descriptorHeaps[0] = descHeap;
+		m_commandList->SetDescriptorHeaps(1, m_descriptorHeaps);
+	}
+	
+	void SetDescriptorHeap(DescriptorHeap& descHeap);
+	void SetComputeDescriptorHeap(DescriptorHeap& descHeap);
+	/// <summary>
+	/// è¤‡æ•°ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’ç™»éŒ²ã€‚
+	/// </summary>
+	/// <param name="numDescriptorHeap">ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®æ•°ã€‚</param>
+	/// <param name="descHeaps">ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é…åˆ—</param>
+	void SetDescriptorHeaps(int numDescriptorHeap, const DescriptorHeap* descHeaps[])
+	{
+		for (int i = 0; i < numDescriptorHeap; i++) {
+			m_descriptorHeaps[i] = descHeaps[i]->Get();
+		}
+		m_commandList->SetDescriptorHeaps(numDescriptorHeap, m_descriptorHeaps);
+	}
+	/// <summary>
+	/// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <param name="registerNo">è¨­å®šã™ã‚‹ãƒ¬ã‚¸ã‚¹ã‚¿ã®ç•ªå·ã€‚</param>
+	/// <param name="cb">å®šæ•°ãƒãƒƒãƒ•ã‚¡ã€‚</param>
+	void SetConstantBuffer(int registerNo, ConstantBuffer& cb)
+	{
+		if (registerNo < MAX_CONSTANT_BUFFER) {
+			m_constantBuffers[registerNo] = &cb;
+		}
+		else {
+			//ç¯„å›²å¤–ã‚¢ã‚¯ã‚»ã‚¹ã€‚
+			std::abort();
+		}
+	}
+	/// <summary>
+	/// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <param name="registerNo">è¨­å®šã™ã‚‹ãƒ¬ã‚¸ã‚¹ã‚¿ã®ç•ªå·ã€‚</param>
+	/// <param name="texture">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚</param>
+	void SetShaderResource(int registerNo, Texture& texture)
+	{
+		if (registerNo < MAX_SHADER_RESOURCE) {
+			m_shaderResources[registerNo] = &texture;
+		}
+		else {
+			//ç¯„å›²å¤–ã‚¢ã‚¯ã‚»ã‚¹ã€‚
+			std::abort();
+		}
+	}
+	/// <summary>
+	/// è¤‡æ•°æšã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’è¨­å®šã™ã‚‹ã€‚
+	/// </summary>
+	/// <remarks>
+	/// MRTã‚’åˆ©ç”¨ã—ãŸãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚’è¡Œã„ãŸã„å ´åˆã«åˆ©ç”¨ã—ã¦ãã ã•ã„ã€‚
+	/// </remarks>
+	/// <param name="numRT">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æ•°</param>
+	/// <param name="renderTarget">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é…åˆ—ã€‚</param>
+	void SetRenderTargets(UINT numRT, RenderTarget* renderTargets[]);
+	/// <summary>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’è¨­å®šã™ã‚‹ã€‚
+	/// </summary>
+	/// <param name="renderTarget"></param>
+	void SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle)
+	{
+		m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+	}
+	
+	/// <summary>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’ã‚¹ãƒ­ãƒƒãƒˆ0ã«è¨­å®šã™ã‚‹ã€‚
+	/// </summary>
+	/// <remarks>
+	/// æœ¬é–¢æ•°ã¯ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã®è¨­å®šã‚’è¡Œã„ã¾ã›ã‚“ã€‚
+	/// ãƒ¦ãƒ¼ã‚¶ãƒ¼å´ã§é©åˆ‡ãªãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã‚’æŒ‡å®šã™ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚
+	/// </remarks>
+	/// <param name="renderTarget">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ</param>
+	void SetRenderTarget(RenderTarget& renderTarget) 
+	{
+		RenderTarget* rtArray[] = { &renderTarget };
+		SetRenderTargets(1, rtArray);
+	}
 
-    void Reset(ID3D12CommandAllocator* commandAllocator, ID3D12PipelineState* pipelineState)
-    {
-        this->command_List_->Reset(commandAllocator, pipelineState);
-        //ƒXƒNƒ‰ƒbƒ`ƒŠƒ\[ƒX‚ğƒNƒŠƒA
-        this->scratch_Resource_List_.clear();
-    }
-
-    /// <summary>
-    /// ƒRƒ}ƒ“ƒhƒŠƒXƒg‚ğ•Â‚¶‚é
-    /// </summary>
-    void Close()
-    {
-        this->command_List_->Close();
-    }
-
-#pragma region Clear Method
-
-    /// <summary>
-    /// •¡”–‡‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ğƒNƒŠƒAB
-    /// </summary>
-    /// <remarks>
-    /// ƒNƒŠƒAƒJƒ‰[‚ÍƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì‰Šú‰»‚Éw’è‚µ‚½ƒJƒ‰[‚Å‚·B
-    /// </remarks>
-    /// <param name="numRt">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì”</param>
-    /// <param name="renderTargets">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì”</param>
-    inline void ClearRenderTargetViews(
-        int numRt,
-        RenderTarget* renderTargets[]
-    )
-    {
-        if (renderTargets[0]->IsExsitDepthStencilBuffer()) {
-            //[“xƒoƒbƒtƒ@‚ª‚ ‚éB
-            ClearDepthStencilView(renderTargets[0]->GetDSVCpuDescriptorHandle(), renderTargets[0]->GetDSVClearValue());
-        }
-        for (int i = 0; i < numRt; i++) {
-            ClearRenderTargetView(renderTargets[i]->GetRTVCpuDescriptorHandle(), renderTargets[i]->GetRTVClearColor());
-        }
-    }
-
-    /// <summary>
-    /// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ÌƒNƒŠƒAB
-    /// </summary>
-    /// <param name="rtvHandle">CPU‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒgƒrƒ…[‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒnƒ“ƒhƒ‹</param>
-    /// <param name="clearColor">ƒNƒŠƒAƒJƒ‰[</param>
-    void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, const float* clearColor)
-    {
-        this->command_List_->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-    }
-
-    /// <summary>
-    /// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ÌƒNƒŠƒAB
-    /// </summary>
-    /// <param name="renderTarget"></param>
-    void ClearRenderTargetView(RenderTarget& renderTarget)
-    {
-        RenderTarget* rtArray[] = { &renderTarget };
-        ClearRenderTargetViews(1, rtArray);
-    }
-
-    /// <summary>
-    /// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ğƒNƒŠƒA
-    /// </summary>
-    /// <param name="renderTarget">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg</param>
-    /// <param name="clearValue">ƒNƒŠƒA’l</param>
-    void ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, float clearValue)
-    {
-        this->command_List_->ClearDepthStencilView(
-            dsvHandle,
-            D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
-            clearValue,
-            0,
-            0,
-            nullptr);
-    }
-
-#pragma endregion
-
-#pragma region Wait Until Method
-    /// <summary>
-    /// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ö‚Ì•`‚«‚İ‘Ò‚¿
-    /// </summary>
-    /// <remarks>
-    /// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Æ‚µ‚Äg‚í‚ê‚Ä‚¢‚éƒeƒNƒXƒ`ƒƒ‚ğƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[‚Æ‚µ‚Ä
-    /// g—p‚µ‚½‚¢ê‡‚ÍA‚±‚ÌŠÖ”‚ğg‚Á‚Ä•`‚«‚İŠ®—¹‘Ò‚¿‚ğs‚¤•K—v‚ª‚ ‚è‚Ü‚·
-    /// </remarks>
-    /// <param name="renderTarget">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg</param>
-    void WaitUntilFinishDrawingToRenderTargets(int numRt, RenderTarget* renderTargets[])
-    {
-        for (int i = 0; i < numRt; i++) {
-            WaitUntilFinishDrawingToRenderTarget(*renderTargets[i]);
-        }
-    }
-    void WaitUntilFinishDrawingToRenderTarget(RenderTarget& renderTarget)
-    {
-        WaitUntilFinishDrawingToRenderTarget(renderTarget.GetRenderTargetTexture().GetTexture());
-    }
-    void WaitUntilFinishDrawingToRenderTarget(ID3D12Resource* renderTarget)
-    {
-        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-            renderTarget,
-            D3D12_RESOURCE_STATE_RENDER_TARGET,
-            D3D12_RESOURCE_STATE_PRESENT);
-        this->command_List_->ResourceBarrier(1, &barrier);
-    }
-    
-    /// <summary>
-    /// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Æ‚µ‚Äg—p‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‹@
-    /// </summary>
-    /// <remarks>
-    /// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Æ‚µ‚Äİ’è‚µ‚½‚¢ê‡‚Í
-    /// –{ŠÖ”‚ğg‚Á‚Äg—p‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‹@‚·‚é•K—v
-    /// </remarks>
-    void WaitUntilToPossibleSetRenderTargets(int numRt, RenderTarget* renderTargets[])
-    {
-        for (int i = 0; i < numRt; i++) {
-            WaitUntilToPossibleSetRenderTarget(*renderTargets[i]);
-        }
-    }
-    void WaitUntilToPossibleSetRenderTarget(RenderTarget& renderTarget)
-    {
-        WaitUntilToPossibleSetRenderTarget(renderTarget.GetRenderTargetTexture().GetTexture());
-    }
-    void WaitUntilToPossibleSetRenderTarget(ID3D12Resource* renderTarget)
-    {
-        auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(renderTarget, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-        this->command_List_->ResourceBarrier(1, &barrier);
-    }
-#pragma endregion
-
-#pragma region Set Method
-    /// <summary>
-    /// ’¸“_ƒoƒbƒtƒ@ İ’è
-    /// </summary>
-    /// <param name="vertexBuffer">’¸“_ƒoƒbƒtƒ@</param>
-    void SetVertexBuffer(VertexBuffer& vertexBuffer);
-
-    /// <summary>
-    /// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@ İ’è
-    /// </summary>
-    /// <param name="indexbuffer">ƒCƒ“ƒfƒbƒNƒX ƒoƒbƒtƒ@</param>
-    void SetIndexBuffer(IndexBuffer& indexbuffer);
-
-    /// <summary>
-    /// ƒvƒŠƒ~ƒeƒBƒuƒgƒ|ƒƒW[ İ’è
-    /// </summary>
-    /// <param name="topology">ƒvƒŠƒ~ƒeƒBƒu ƒgƒ|ƒƒW[</param>
-    void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology);
-
-    /// <summary>
-    /// ƒRƒ}ƒ“ƒhƒŠƒXƒg İ’è
-    /// </summary>
-    /// <param name="commandList">ƒRƒ}ƒ“ƒh ƒŠƒXƒg</param>
-    void SetCommandList(ID3D12GraphicsCommandList5* commandList);
-
-    /// <summary>
-    /// ƒrƒ…[ƒ|[ƒg‚ÆƒVƒUƒŠƒ“ƒO‹éŒ`‚ğƒZƒbƒg‚Åİ’è
-    /// </summary>
-    /// <param name="viewport">ƒrƒ…[ƒ|[ƒg</param>
-    void SetViewportAndScissor(D3D12_VIEWPORT& viewport);
-
-    /// <summary>
-    /// ƒVƒUƒŠƒ“ƒO‹éŒ` İ’è
-    /// </summary>
-    /// <param name="rect"></param>
-    void SetScissorRect(D3D12_RECT& rect);
-
-
-    /// <summary>
-    /// ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚ğİ’èB
-    /// </summary>
-    void SetRootSignature(ID3D12RootSignature* rootSignature);
-    void SetRootSignature(RootSignature& rootSignature);
-    void SetComputeRootSignature(ID3D12RootSignature* rootSignature);
-    void SetComputeRootSignature(RootSignature& rootSignature);
-    
-    /// <summary>
-    /// ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg İ’è
-    /// </summary>
-    /// <param name="pipelineState">ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg</param>
-    void SetPipelineState(ID3D12PipelineState* pipelineState);
-    void SetPipelineState(PipelineState& pipelineState);
-    
-    /// <summary>
-    /// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğİ’èB
-    /// </summary>
-    void SetDescriptorHeap(ID3D12DescriptorHeap* descHeap)
-    {
-        this->descriptor_Heap_[0] = descHeap;
-        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
-    }
-    void SetDescriptorHeap(GraphicsEngine*& graphicsEngine,DescriptorHeap& descriptorHeap)
-    {
-        this->descriptor_Heap_[0] = descriptorHeap.GetDescriptorHeap(graphicsEngine);
-        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
-
-        //ƒfƒBƒXƒNƒŠƒvƒ^ƒe[ƒuƒ‹‚É“o˜^‚·‚éB
-        if (descriptorHeap.IsRegistConstantBuffer()) {
-            SetGraphicsRootDescriptorTable(0, descriptorHeap.GetConstantBufferGpuDescriptorStartHandle(graphicsEngine));
-        }
-        if (descriptorHeap.IsRegistShaderResource()) {
-            SetGraphicsRootDescriptorTable(1, descriptorHeap.GetShaderResourceGpuDescriptorStartHandle(graphicsEngine));
-        }
-        if (descriptorHeap.IsRegistUavResource()) {
-            SetGraphicsRootDescriptorTable(2, descriptorHeap.GetUavResourceGpuDescriptorStartHandle(graphicsEngine));
-        }
-    }
-    void SetComputeDescriptorHeap(GraphicsEngine*& graphicsEngine, DescriptorHeap& descriptorHeap)
-    {
-        this->descriptor_Heap_[0] = descriptorHeap.GetDescriptorHeap(graphicsEngine);
-        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
-
-        //ƒfƒBƒXƒNƒŠƒvƒ^ƒe[ƒuƒ‹‚É“o˜^‚·‚éB
-        if (descriptorHeap.IsRegistConstantBuffer()) {
-            SetComputeRootDescriptorTable(0, descriptorHeap.GetConstantBufferGpuDescriptorStartHandle(graphicsEngine));
-        }
-        if (descriptorHeap.IsRegistShaderResource()) {
-            SetComputeRootDescriptorTable(1, descriptorHeap.GetShaderResourceGpuDescriptorStartHandle(graphicsEngine));
-        }
-        if (descriptorHeap.IsRegistUavResource()) {
-            SetComputeRootDescriptorTable(2, descriptorHeap.GetUavResourceGpuDescriptorStartHandle(graphicsEngine));
-        }
-    }
-    /// <summary>
-    /// ƒfƒBƒXƒNƒŠƒvƒ^ƒe[ƒuƒ‹‚ğİ’èB
-    /// </summary>
-    /// <param name="RootParameterIndex"></param>
-    /// <param name="BaseDescriptor"></param>
-    void SetComputeRootDescriptorTable(UINT RootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor);
-
-
-    /// <summary>
-    /// •¡”–‡‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ğİ’è‚·‚éB
-    /// </summary>
-    /// <remarks>
-    /// MRT‚ğ—˜—p‚µ‚½ƒŒƒ“ƒ_ƒŠƒ“ƒO‚ğs‚¢‚½‚¢ê‡‚É—˜—p‚µ‚Ä‚­‚¾‚³‚¢B
-    /// </remarks>
-    /// <param name="numRT">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì”</param>
-    /// <param name="renderTarget">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì”z—ñB</param>
-    void SetRenderTargets(UINT numRT, RenderTarget* renderTargets[])
-    {
-        D3D12_CPU_DESCRIPTOR_HANDLE rtDSHandleTbl[32];
-        int rtNo = 0;
-        for (UINT rtNo = 0; rtNo < numRT; rtNo++) {
-            rtDSHandleTbl[rtNo] = renderTargets[rtNo]->GetRTVCpuDescriptorHandle();
-        }
-        if (renderTargets[0]->IsExsitDepthStencilBuffer()) {
-            //[“xƒoƒbƒtƒ@‚ª‚ ‚éB
-            D3D12_CPU_DESCRIPTOR_HANDLE dsDS = renderTargets[0]->GetDSVCpuDescriptorHandle();
-            this->command_List_->OMSetRenderTargets(numRT, rtDSHandleTbl, FALSE, &dsDS);
-        }
-        else {
-            //[“xƒoƒbƒtƒ@‚ª‚È‚¢B
-            this->command_List_->OMSetRenderTargets(numRT, rtDSHandleTbl, FALSE, nullptr);
-        }
-    }
-    /// <summary>
-    /// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg İ’è
-    /// </summary>
-    /// <param name="renderTarget"></param>
-    void SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle)
-    {
-        this->command_List_->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
-    }
-
-#pragma endregion
-
-public://get method
-    D3D12_VIEWPORT GetViewport()const { return this->current_Viewport_; }
-
+	/// <summary>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã‚’åŒæ™‚ã«è¨­å®šã™ã‚‹ã€‚
+	/// </summary>
+	/// <remarks>
+	/// ã“ã®é–¢æ•°ã‚’åˆ©ç”¨ã™ã‚‹ã¨ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨åŒã˜å¹…ã¨é«˜ã•ã®ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆãŒè¨­å®šã•ã‚Œã¾ã™ã€‚
+	/// </remarks>
+	/// <param name="renderTarget">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ</param>
+	void SetRenderTargetAndViewport(RenderTarget& renderTarget);
+	/// <summary>
+	/// è¤‡æ•°æšã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã‚’åŒæ™‚ã«è¨­å®šã™ã‚‹ã€‚
+	/// </summary>
+	/// /// <remarks>
+	/// ã“ã®é–¢æ•°ã‚’åˆ©ç”¨ã™ã‚‹ã¨ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨åŒã˜å¹…ã¨é«˜ã•ã®ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆãŒè¨­å®šã•ã‚Œã¾ã™ã€‚
+	/// </remarks>
+	/// <param name="numRT">è¨­å®šã™ã‚‹ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æšæ•°</param>
+	/// <param name="renderTargets">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é…åˆ—ã€‚</param>
+	void SetRenderTargetsAndViewport(UINT numRT, RenderTarget* renderTargets[]);
+	
+	/// <summary>
+	/// è¤‡æ•°æšã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’ã‚¯ãƒªã‚¢ã€‚
+	/// </summary>
+	/// <remarks>
+	/// ã‚¯ãƒªã‚¢ã‚«ãƒ©ãƒ¼ã¯ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®åˆæœŸåŒ–æ™‚ã«æŒ‡å®šã—ãŸã‚«ãƒ©ãƒ¼ã§ã™ã€‚
+	/// </remarks>
+	/// <param name="numRt">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æ•°</param>
+	/// <param name="renderTargets">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æ•°</param>
+	void ClearRenderTargetViews(
+		int numRt, 
+		RenderTarget* renderTargets[]
+	);
+	/// <summary>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ã‚¯ãƒªã‚¢ã€‚
+	/// </summary>
+	/// <param name="rtvHandle">CPUã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒ“ãƒ¥ãƒ¼ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒãƒ³ãƒ‰ãƒ«</param>
+	/// <param name="clearColor">ã‚¯ãƒªã‚¢ã‚«ãƒ©ãƒ¼</param>
+	void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, const float* clearColor)
+	{
+		m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+	}
+	/// <summary>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ã‚¯ãƒªã‚¢ã€‚
+	/// </summary>
+	/// <param name="renderTarget"></param>
+	void ClearRenderTargetView(RenderTarget& renderTarget)
+	{
+		RenderTarget* rtArray[] = { &renderTarget };
+		ClearRenderTargetViews(1, rtArray);
+	}
+	/// <summary>
+	/// ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã‚’ã‚¯ãƒªã‚¢
+	/// </summary>
+	/// <param name="renderTarget">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ</param>
+	/// <param name="clearValue">ã‚¯ãƒªã‚¢å€¤</param>
+	void ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, float clearValue)
+	{
+		m_commandList->ClearDepthStencilView(
+			dsvHandle,
+			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+			clearValue,
+			0,
+			0,
+			nullptr);
+	}
+	/// <summary>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¸ã®æãè¾¼ã¿å¾…ã¡ã€‚
+	/// </summary>
+	/// <remarks>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã—ã¦ä½¿ã‚ã‚Œã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ã¨ã—ã¦
+	/// ä½¿ç”¨ã—ãŸã„å ´åˆã¯ã€ã“ã®é–¢æ•°ã‚’ä½¿ã£ã¦æãè¾¼ã¿å®Œäº†å¾…ã¡ã‚’è¡Œã†å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚
+	/// </remarks>
+	/// <param name="renderTarget">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ</param>
+	void WaitUntilFinishDrawingToRenderTargets(int numRt, RenderTarget* renderTargets[]);
+	void WaitUntilFinishDrawingToRenderTarget(RenderTarget& renderTarget);
+	void WaitUntilFinishDrawingToRenderTarget( ID3D12Resource* renderTarget )
+	{
+		CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+			renderTarget,
+			D3D12_RESOURCE_STATE_RENDER_TARGET,
+			D3D12_RESOURCE_STATE_PRESENT);
+		m_commandList->ResourceBarrier(1,&barrier);
+	}
+	/// <summary>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã—ã¦ä½¿ç”¨å¯èƒ½ã«ãªã‚‹ã¾ã§å¾…ã¤ã€‚
+	/// </summary>
+	/// <remarks>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã—ã¦è¨­å®šã—ãŸã„å ´åˆã¯ã€
+	/// æœ¬é–¢æ•°ã‚’ä½¿ã£ã¦ä½¿ç”¨å¯èƒ½ã«ãªã‚‹ã¾ã§å¾…æ©Ÿã™ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚
+	/// </remarks>
+	void WaitUntilToPossibleSetRenderTargets(int numRt, RenderTarget* renderTargets[]);
+	void WaitUntilToPossibleSetRenderTarget(RenderTarget& renderTarget);
+	void WaitUntilToPossibleSetRenderTarget( ID3D12Resource* renderTarget)
+	{
+		auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(renderTarget, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		m_commandList->ResourceBarrier(1,&barrier);
+	}
+	/// <summary>
+	/// ãƒªã‚½ãƒ¼ã‚¹ãƒãƒªã‚¢ã€‚
+	/// </summary>
+	/// <param name="barrier"></param>
+	void ResourceBarrier(D3D12_RESOURCE_BARRIER& barrier)
+	{
+		m_commandList->ResourceBarrier(1, &barrier);
+	}
+	/// <summary>
+	/// ãƒªã‚½ãƒ¼ã‚¹ã‚¹ãƒ†ãƒ¼ãƒˆã‚’é·ç§»ã™ã‚‹ã€‚
+	/// </summary>
+	/// <param name="resrouce"></param>
+	/// <param name="beforeState"></param>
+	/// <param name="afterState"></param>
+	void TransitionResourceState(ID3D12Resource* resrouce , D3D12_RESOURCE_STATES beforeState, D3D12_RESOURCE_STATES afterState)
+	{
+		auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(resrouce, beforeState, afterState);
+		m_commandList->ResourceBarrier(1,&barrier);
+	}
+	/// <summary>
+	/// ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚’é–‰ã˜ã‚‹
+	/// </summary>
+	void Close()
+	{
+		m_commandList->Close();
+	}
+	/// <summary>
+	/// ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚’ãƒªã‚»ãƒƒãƒˆã€‚
+	/// </summary>
+	/// <param name="commandAllocator"></param>
+	/// <param name="pipelineState"></param>
+	void Reset( ID3D12CommandAllocator* commandAllocator, ID3D12PipelineState* pipelineState)
+	{
+		m_commandList->Reset(commandAllocator, pipelineState);
+		//ã‚¹ã‚¯ãƒ©ãƒƒãƒãƒªã‚½ãƒ¼ã‚¹ã‚’ã‚¯ãƒªã‚¢ã€‚
+		m_scratchResourceList.clear();
+	}
+	/// <summary>
+	/// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¤ããƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ã‚’æç”»ã€‚
+	/// </summary>
+	/// <param name="indexCount">ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®æ•°ã€‚</param>
+	void DrawIndexed(UINT indexCount)
+	{
+		m_commandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+	}
+	/// <summary>
+	/// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚·ãƒ³ã‚°æç”»
+	/// </summary>
+	/// <param name="indexCount">ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹æ•°</param>
+	/// <param name="numInstance">ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹æ•°</param>
+	void DrawIndexedInstanced(UINT indexCount, UINT numInstance)
+	{
+		m_commandList->DrawIndexedInstanced(indexCount, numInstance, 0, 0, 0);
+	}
+	/// <summary>
+	/// ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ãƒ‡ã‚£ã‚¹ãƒ‘ãƒƒãƒã€‚
+	/// </summary>
+	/// <param name="ThreadGroupCountX"></param>
+	/// <param name="ThreadGroupCountY"></param>
+	/// <param name="ThreadGroupCountZ"></param>
+	void Dispatch( 
+		UINT ThreadGroupCountX,
+		UINT ThreadGroupCountY,
+		UINT ThreadGroupCountZ )
+	{
+		m_commandList->Dispatch(ThreadGroupCountX, ThreadGroupCountY, ThreadGroupCountZ);
+	}
+	/// <summary>
+	/// GPUã§ãƒ¬ã‚¤ãƒˆãƒ¬ãƒ¼ã‚·ãƒ³ã‚°ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³æ§‹é€ ã®ãƒ“ãƒ«ãƒ‰ã‚’è¡Œã„ã¾ã™ã€‚
+	/// </summary>
+	void BuildRaytracingAccelerationStructure(D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC desc)
+	{
+		m_commandList->BuildRaytracingAccelerationStructure(&desc, 0, nullptr);
+	}
+	/// <summary>
+	/// ãƒ¬ã‚¤ã‚’ãƒ‡ã‚£ã‚¹ãƒ‘ãƒƒãƒ
+	/// </summary>
+	/// <param name="rayDesc"></param>
+	void DispatchRays(D3D12_DISPATCH_RAYS_DESC& rayDesc)
+	{
+		m_commandList->DispatchRays(&rayDesc);
+	}
+	/// <summary>
+	/// ãƒªã‚½ãƒ¼ã‚¹ã‚’ã‚³ãƒ”ãƒ¼ã€‚
+	/// </summary>
+	/// <param name="pDst">ã‚³ãƒ”ãƒ¼å…ˆã®ãƒªã‚½ãƒ¼ã‚¹</param>
+	/// <param name="pSrc">ã‚³ãƒ”ãƒ¼å…ƒã®ãƒªã‚½ãƒ¼ã‚¹</param>
+	void CopyResource(ID3D12Resource* pDst, ID3D12Resource* pSrc)
+	{
+		m_commandList->CopyResource(pDst, pSrc);
+	}
+	
+	
 private:
-    void SetGraphicsRootDescriptorTable(UINT RootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor)
-    {
-        this->command_List_->SetGraphicsRootDescriptorTable(RootParameterIndex, BaseDescriptor);
-    }
 
+	/// <summary>
+	/// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <param name="RootParameterIndex"></param>
+	/// <param name="BaseDescriptor"></param>
+	void SetGraphicsRootDescriptorTable(
+		UINT RootParameterIndex,
+		D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor)
+	{
+		m_commandList->SetGraphicsRootDescriptorTable(
+			RootParameterIndex,
+			BaseDescriptor
+		);
+	}
+	/// <summary>
+	/// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’è¨­å®šã€‚
+	/// </summary>
+	/// <param name="RootParameterIndex"></param>
+	/// <param name="BaseDescriptor"></param>
+	void SetComputeRootDescriptorTable(
+		UINT RootParameterIndex,
+		D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor)
+	{
+		m_commandList->SetComputeRootDescriptorTable(
+			RootParameterIndex,
+			BaseDescriptor
+		);
+	}
 private:
-#pragma region enum
-    //ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌÅ‘å”B
-    enum { MAX_DESCRIPTOR_HEAP = 4 };
+	enum { MAX_DESCRIPTOR_HEAP = 4 };	//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®æœ€å¤§æ•°ã€‚
+	enum { MAX_CONSTANT_BUFFER = 8 };	//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®æœ€å¤§æ•°ã€‚è¶³ã‚Šãªããªã£ãŸã‚‰å¢—ã‚„ã—ã¦ã­ã€‚
+	enum { MAX_SHADER_RESOURCE = 16 };	//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã®æœ€å¤§æ•°ã€‚è¶³ã‚Šãªããªã£ãŸã‚‰å¢—ã‚„ã—ã¦ã­ã€‚
 
-    //’è”ƒoƒbƒtƒ@‚ÌÅ‘å”B‘—Ê‰Â
-    enum { MAX_CONSTANT_BUFFER = 8 };
-
-    //ƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ÌÅ‘å”B‘—Ê‰Â
-    enum { MAX_SHADER_RESOURCE = 16 };	
-
-#pragma endregion
-
-
-private:
-    //ƒRƒ}ƒ“ƒh ƒŠƒXƒg
-    ComPtr<ID3D12GraphicsCommandList4> command_List_;
-    //Œ»İ‚Ìƒrƒ…[ƒ|[ƒgB
-    D3D12_VIEWPORT current_Viewport_;
-    //ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv
-    ComPtr<ID3D12DescriptorHeap> descriptor_Heap_[MAX_DESCRIPTOR_HEAP];
-    std::vector<ComPtr<ID3D12Resource>> scratch_Resource_List_;
-
-    //’è”ƒoƒbƒtƒ@
-    ConstantBuffer* constant_Buffer_[MAX_CONSTANT_BUFFER];
-
-    //ƒVƒF[ƒ_[ƒŠƒ\[ƒX
-    Texture* shader_Resources_[MAX_SHADER_RESOURCE];
+	D3D12_VIEWPORT m_currentViewport;				//ç¾åœ¨ã®ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã€‚
+	ID3D12GraphicsCommandList4* m_commandList;	//ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã€‚
+	ID3D12DescriptorHeap* m_descriptorHeaps[MAX_DESCRIPTOR_HEAP];			//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é…åˆ—ã€‚
+	ConstantBuffer* m_constantBuffers[MAX_CONSTANT_BUFFER] = { nullptr };	//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®é…åˆ—ã€‚
+	Texture* m_shaderResources[MAX_SHADER_RESOURCE] = { nullptr };			//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã®é…åˆ—ã€‚
+	std::vector< ComPtr<ID3D12Resource> > m_scratchResourceList;				//ã‚¹ã‚¯ãƒ©ãƒƒãƒãƒªã‚½ãƒ¼ã‚¹ã®ãƒªã‚¹ãƒˆã€‚
 };
+

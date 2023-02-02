@@ -1,208 +1,235 @@
-#pragma once
+ï»¿#pragma once
 
-#include <d3dx12.h>
-#include<wrl.h>
-
-using namespace Microsoft::WRL;
-
-class IShaderResource;
-class IUnorderAccessResrouce;
-class ConstantBuffer;
-class GraphicsEngine;
-
-class DescriptorHeap
-{
+/// <summary>
+/// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã€‚
+/// </summary>
+class DescriptorHeap {
 public:
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    DescriptorHeap();
-
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    ~DescriptorHeap();
-
-    /// <summary>
-    /// ƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ğƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É“o˜^
-    /// </summary>
-    /// <param name="registerNo">ƒŒƒWƒXƒ^”Ô† -1‚ªw—ß‚³‚ê‚½‚çCŒ»İ“o˜^‚³‚ê‚Ä‚¢‚éƒŠƒ\[ƒX‚ÌŸ‚ÉƒŒƒWƒXƒ^‚ğ“o˜^‚·‚é</param>
-    /// <param name="shaderResource">ƒVƒF[ƒ_[ƒŠƒ\[ƒX</param>
-    void RegistShaderResource(int registerNo, IShaderResource& shaderResource);
-
-    /// <summary>
-    /// ƒAƒ“ƒI[ƒ_[ƒAƒNƒZƒXƒŠƒ\[ƒX‚ğ“o˜^
-    /// </summary>
-    /// <param name="registerNo">ƒŒƒWƒXƒ^”Ô†C-1‚ª“o˜^‚³‚ê‚½‚çŒ»İ“o˜^‚³‚ê‚Ä‚¢‚éƒŠƒ\[ƒX‚Ìˆê”ÔŒã‚ë‚É“o˜^</param>
-    /// <param name="sr"></param>
-    void RegistUnorderAccessResource(int registerIndex, IUnorderAccessResrouce& unorderAccessResrouce);
-    
-    /// <summary>
-    /// ’è”ƒoƒbƒtƒ@‚ğƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É“o˜^
-    /// </summary>
-    /// <param name="registerNo">ƒŒƒWƒXƒ^”Ô† -1‚ªw—ß‚³‚ê‚½‚çCŒ»İ“o˜^‚³‚ê‚Ä‚¢‚éƒŠƒ\[ƒX‚ÌŸ‚ÉƒŒƒWƒXƒ^‚ğ“o˜^‚·‚é</param>
-    /// <param name="cb">’è”ƒoƒbƒtƒ@</param>
-    void RegistConstantBuffer(int registerIndex, ConstantBuffer& constantBuffer);
-
-    /// <summary>
-    /// ƒTƒ“ƒvƒ‰’è‹`‚ğƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É’Ç‰Á
-    /// </summary>
-    /// <param name="registerNo">ƒŒƒWƒXƒ^”Ô† -1‚ªw—ß‚³‚ê‚½‚çCŒ»İ“o˜^‚³‚ê‚Ä‚¢‚éƒŠƒ\[ƒX‚ÌŸ‚ÉƒŒƒWƒXƒ^‚ğ“o˜^‚·‚é</param>
-    /// <param name="desc">ƒTƒ“ƒvƒ‰’è‹`</param>
-    void RegistSamplerDesc(int registerIndex, const D3D12_SAMPLER_DESC& samplerDesc);
-
-    /// <summary>
-    /// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ö‚Ì“o˜^‚ğŠm’è
-    /// </summary>
-    /// <param name="graphicsEngine">ƒfƒoƒCƒX‚ªŠi”[‚³‚ê‚Ä‚¢‚é</param>
-    void Commit(GraphicsEngine*& graphicsEngine);
-
-    /// <summary>
-    /// ƒTƒ“ƒvƒ‰ƒXƒe[ƒg—p‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ö‚Ì“o˜^
-    /// </summary>
-    /// <param name="graphicsEngine">ƒfƒoƒCƒX‚ªŠi”[‚³‚ê‚Ä‚¢‚é</param>
-    void CommitSamplerHeap(GraphicsEngine*& graphicsEngine);
-
+	/// <summary>
+	/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	/// </summary>
+	DescriptorHeap();
+	/// <summary>
+	/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
+	/// </summary>
+	~DescriptorHeap(); 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	ID3D12DescriptorHeap* Get() const;
+	
+	/// <summary>
+	/// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã‚’ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã«ç™»éŒ²ã€‚
+	/// </summary>
+	/// <param name="registerNo">
+	/// ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·ã€‚-1ãŒæŒ‡å®šã•ã‚ŒãŸã‚‰ã€ç¾åœ¨ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ãƒªã‚½ãƒ¼ã‚¹æ•°ã®æ¬¡ã®ãƒ¬ã‚¸ã‚¹ã‚¿ãŒä½¿ç”¨ã•ã‚Œã‚‹ã€‚
+	/// </param>
+	/// <param name="sr">ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹</param>
+	void RegistShaderResource(int registerNo, IShaderResource& sr)
+	{
+		RegistResource(
+			registerNo,
+			&sr,
+			&m_shaderResources.front(),
+			m_numShaderResource,
+			MAX_SHADER_RESOURCE,
+			L"DescriptorHeap::RegistShaderResource() ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·ãŒç¯„å›²å¤–ã§ã™ã€‚"
+		);
+	}
+	
+	/// <summary>
+	/// ã‚¢ãƒ³ã‚ªãƒ¼ãƒ€ãƒ¼ã‚¢ã‚¯ã‚»ã‚¹ãƒªã‚½ãƒ¼ã‚¹ã‚’ç™»éŒ²ã€‚
+	/// </summary>
+	/// <param name="registerNo">
+	/// ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·ã€‚-1ãŒæŒ‡å®šã•ã‚ŒãŸã‚‰ã€ç¾åœ¨ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ãƒªã‚½ãƒ¼ã‚¹æ•°ã®æ¬¡ã®ãƒ¬ã‚¸ã‚¹ã‚¿ãŒä½¿ç”¨ã•ã‚Œã‚‹ã€‚
+	/// </param>
+	/// <param name="sr">ã‚¢ãƒ³ã‚ªãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹</param>
+	void RegistUnorderAccessResource(int registerNo, IUnorderAccessResrouce& sr)
+	{
+		RegistResource(
+			registerNo, 
+			&sr,
+			&m_uavResources.front(), 
+			m_numUavResource, 
+			MAX_SHADER_RESOURCE, 
+			L"DescriptorHeap::RegistUnorderAccessResource() ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·ãŒç¯„å›²å¤–ã§ã™ã€‚"
+		);
+	}
+	/// <summary>
+	/// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã«ç™»éŒ²ã€‚
+	/// </summary>
+	/// <param name="registerNo">
+	/// ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·ã€‚-1ãŒæŒ‡å®šã•ã‚ŒãŸã‚‰ã€ç¾åœ¨ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ãƒªã‚½ãƒ¼ã‚¹æ•°ã®æ¬¡ã®ãƒ¬ã‚¸ã‚¹ã‚¿ãŒä½¿ç”¨ã•ã‚Œã‚‹ã€‚
+	/// </param>
+	/// <param name="cb">å®šæ•°ãƒãƒƒãƒ•ã‚¡</param>
+	void RegistConstantBuffer(int registerNo, ConstantBuffer& cb)
+	{
+		RegistResource(
+			registerNo,
+			&cb,
+			&m_constantBuffers.front(),
+			m_numConstantBuffer,
+			MAX_CONSTANT_BUFFER,
+			L"DescriptorHeap::RegistConstantBuffer() ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·ãŒç¯„å›²å¤–ã§ã™ã€‚"
+		);
+	}
+	/// <summary>
+	/// ã‚µãƒ³ãƒ—ãƒ©å®šç¾©ã‚’ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã«è¿½åŠ ã€‚
+	/// </summary>
+	/// <param name="registerNo">
+	/// ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·ã€‚-1ãŒæŒ‡å®šã•ã‚ŒãŸã‚‰ã€ç¾åœ¨ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ãƒªã‚½ãƒ¼ã‚¹æ•°ã®æ¬¡ã®ãƒ¬ã‚¸ã‚¹ã‚¿ãŒä½¿ç”¨ã•ã‚Œã‚‹ã€‚
+	/// </param>
+	/// <param name="desc">
+	/// ã‚µãƒ³ãƒ—ãƒ©å®šç¾©
+	/// </param>
+	void RegistSamplerDesc(int registerNo, const D3D12_SAMPLER_DESC& desc)
+	{
+		RegistResource(
+			registerNo,
+			desc,
+			m_samplerDescs,
+			m_numSamplerDesc,
+			MAX_SAMPLER_STATE,
+			L"DescriptorHeap::RegistSamplerDesc() ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·ãŒç¯„å›²å¤–ã§ã™ã€‚"
+		);
+	}
+	/// <summary>
+	/// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã¸ã®ç™»éŒ²ã‚’ç¢ºå®šã€‚
+	/// </summary>
+	void Commit( );
+	/// <summary>
+	/// ã‚µãƒ³ãƒ—ãƒ©ã‚¹ãƒ†ãƒ¼ãƒˆç”¨ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã¸ã®ç™»éŒ²ã€‚
+	/// </summary>
+	void CommitSamplerHeap();
+	
+	/// <summary>
+	/// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	D3D12_GPU_DESCRIPTOR_HANDLE GetConstantBufferGpuDescriptorStartHandle() const;
+	/// <summary>
+	/// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	D3D12_GPU_DESCRIPTOR_HANDLE GetShaderResourceGpuDescriptorStartHandle() const;
+	/// <summary>
+	/// Unorder Access ãƒªã‚½ãƒ¼ã‚¹ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã€‚
+	/// </summary>
+	D3D12_GPU_DESCRIPTOR_HANDLE GetUavResourceGpuDescriptorStartHandle() const;
+	/// <summary>
+	/// Samplerã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã€‚
+	/// </summary>
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSamplerResourceGpuDescriptorStartHandle() const;
+	/// <summary>
+	/// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãŒä¸€ã¤ã§ã‚‚ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã‹åˆ¤å®šã€‚
+	/// </summary>
+	/// <returns></returns>
+	bool IsRegistShaderResource() const
+	{
+		return m_numShaderResource != 0;
+	}
+	/// <summary>
+	/// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãŒä¸€ã¤ã§ã‚‚ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã‹åˆ¤å®šã€‚
+	/// </summary>
+	/// <returns></returns>
+	bool IsRegistConstantBuffer() const
+	{
+		return m_numConstantBuffer != 0;
+	}
+	/// <summary>
+	/// UAVãƒªã‚½ãƒ¼ã‚¹ãŒä¸€ã¤ã§ã‚‚ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã‹åˆ¤å®šã€‚
+	/// </summary>
+	/// <returns></returns>
+	bool IsRegistUavResource() const
+	{
+		return m_numUavResource != 0;
+	}
+	/// <summary>
+	/// UAVãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãŒå§‹ã¾ã‚‹é…åˆ—ç•ªå·ã‚’å–å¾—ã™ã‚‹ã€‚
+	/// </summary>
+	/// <remarks>
+	/// UAVãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã¯SRVãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®æ¬¡ã‹ã‚‰ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã€‚
+	/// ãªã®ã§ã€SRVãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãŒ10å€‹ç™»éŒ²ã•ã‚Œã¦ã„ã‚Œã°ã€
+	/// UAVãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã¯é…åˆ—ã®10ç•ªç›®ã‹ã‚‰ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã“ã¨ã«ãªã‚‹ã€‚
+	/// ã“ã®é–¢æ•°ã¯ç¾åœ¨ãƒ¬ã‚¤ãƒˆãƒ¬ã‚¨ãƒ³ã‚¸ãƒ³ã§ä½¿ç”¨ã•ã‚Œã¦ã„ã‚‹ã€‚
+	/// </remarks>
+	/// <returns></returns>
+	int GetOffsetUAVDescriptorFromTableStart() const
+	{
+		return m_numShaderResource + m_numConstantBuffer;
+	}
+	/// <summary>
+	/// SRVãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãŒå§‹ã¾ã‚‹é…åˆ—ç•ªå·ã‚’å–å¾—ã™ã‚‹ã€‚
+	/// </summary>
+	/// <returns></returns>
+	int GetOffsetSRVDescriptorFromTableStart() const
+	{
+		return m_numConstantBuffer;
+	}
+	/// <summary>
+	/// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãŒå§‹ã¾ã‚‹é…åˆ—ç•ªå·ã‚’å–å¾—ã™ã‚‹ã€‚
+	/// </summary>
+	/// /// <remarks>
+	/// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã¯SRVãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã¨UAVãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®æ¬¡ã‹ã‚‰ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã€‚
+	/// ãªã®ã§ã€SRVãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãŒ10å€‹ã€UVAãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãŒ5å€‹ç™»éŒ²ã•ã‚Œã¦ã„ã‚Œã°ã€
+	/// å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã¯é…åˆ—ã®15ç•ªç›®ã‹ã‚‰ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã“ã¨ã«ãªã‚‹ã€‚
+	/// ã“ã®é–¢æ•°ã¯ç¾åœ¨ãƒ¬ã‚¤ãƒˆãƒ¬ã‚¨ãƒ³ã‚¸ãƒ³ã§ä½¿ç”¨ã•ã‚Œã¦ã„ã‚‹ã€‚
+	/// <returns></returns>
+	int GetOffsetConstantBufferDescriptorFromTableStart() const
+	{
+		return m_numShaderResource + m_numUavResource;
+	}
 private:
-    /// <summary>
-    /// ƒŠƒ\[ƒX‚ğƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É“o˜^
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="registerIndex">“o˜^”Ô†</param>
-    /// <param name="res">“o˜^‚·‚éƒŠƒ\[ƒX</param>
-    /// <param name="resTable">ƒŠƒ\[ƒXƒe[ƒuƒ‹B‚±‚Ìƒe[ƒuƒ‹‚ÉƒŠƒ\[ƒX‚ª’Ç‰Á‚³‚ê‚Ü‚·B</param>
-    /// <param name="numRes">“o˜^‚³‚ê‚Ä‚¢‚éƒŠƒ\[ƒX‚Ì”B–{ŠÖ”‚ğŒÄ‚Ño‚·‚ÆA‚±‚Ì”‚ª‚PƒCƒ“ƒNƒŠƒƒ“ƒg‚³‚ê‚Ü‚·B</param>
-    /// <param name="MAX_RESOURCE">ƒŠƒ\[ƒX‚ÌÅ‘å’l</param>
-    /// <param name="errorMessage">ƒGƒ‰[‚ª”­¶‚µ‚½Û‚É•\¦‚·‚éTEXT</param>
-    template<class T>
-    void RegistResource(int registerIndex, T res, T resTable[], int& numRes, const int MAX_RESOURCE, const wchar_t* errorMessage);
-
-public://get method
-
-    /// <summary>
-    /// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv æ“¾
-    /// </summary>
-    /// <param name="graphicsEngine">ƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚é</param>
-    /// <returns>this Descriptor Heap</returns>
-    ID3D12DescriptorHeap* GetDescriptorHeap(GraphicsEngine*& graphicsEngine)const;
-
-    /// <summary>
-    /// ’è”ƒoƒbƒtƒ@‚ÌŠJnƒnƒ“ƒhƒ‹ æ“¾
-    /// </summary>
-    /// <param name="graphicsEngine">ƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚é</param>
-    /// <returns>this constant Buffer GPU descriptor start handle</returns>
-    D3D12_GPU_DESCRIPTOR_HANDLE GetConstantBufferGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine)const;
-
-    /// <summary>
-    /// ƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ÌƒfƒBƒXƒNƒŠƒvƒ^‚ÌŠJnƒnƒ“ƒhƒ‹‚ğæ“¾
-    /// </summary>
-    /// <param name="graphicsEngine">ƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚é</param>
-    /// <returns>this shader resource GPU descriptor start handle</returns>
-    D3D12_GPU_DESCRIPTOR_HANDLE GetShaderResourceGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine)const;
-
-    /// <summary>
-    /// Unorder Access ƒŠƒ\[ƒX‚ÌƒfƒBƒXƒNƒŠƒvƒ^‚ÌŠJnƒnƒ“ƒhƒ‹‚ğæ“¾
-    /// </summary>
-    /// <param name="graphicsEngine">ƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚é</param>
-    /// <returns>this uav resource GPU descriptor start handle</returns>
-    D3D12_GPU_DESCRIPTOR_HANDLE GetUavResourceGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine) const;
-
-    /// <summary>
-    /// Sampler‚ÌƒfƒBƒXƒNƒŠƒvƒ^‚ÌŠJnƒnƒ“ƒhƒ‹‚ğæ“¾
-    /// </summary>
-    /// <param name="graphicsEngine">ƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚é</param>
-    /// <returns>this sampler resource GPU descriptor start handle</returns>
-    D3D12_GPU_DESCRIPTOR_HANDLE GetSamplerResourceGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine) const;
-
-    /// <summary>
-    /// ƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ªˆê‚Â‚Å‚à“o˜^‚³‚ê‚Ä‚¢‚é‚©”»’è
-    /// </summary>
-    /// <returns>true = not zero</returns>
-    bool IsRegistShaderResource() const { return this->num_Shader_Resource_ != 0; }
-
-    /// <summary>
-    /// ’è”ƒoƒbƒtƒ@‚ªˆê‚Â‚Å‚à“o˜^‚³‚ê‚Ä‚¢‚é‚©”»’è
-    /// </summary>
-    /// <returns>true = not zero</returns>
-    bool IsRegistConstantResource() const { return this->num_Constant_Buffer_ != 0; }
-
-    /// <summary>
-    /// UAVƒŠƒ\[ƒX‚ªˆê‚Â‚Å‚à“o˜^‚³‚ê‚Ä‚¢‚é‚©”»’è
-    /// </summary>
-    /// <returns>true = not zero</returns>
-    bool IsRegistUavResource() const { return this->num_Uav_Resource_ != 0; }
-
-    /// <summary>
-    /// ’è”ƒoƒbƒtƒ@‚ªˆê‚Â‚Å‚à“o˜^‚³‚ê‚Ä‚¢‚é‚©”»’èB
-    /// </summary>
-    /// <returns>tru = not zero</returns>
-    bool IsRegistConstantBuffer() const { return this->num_Constant_Buffer_ != 0; }
-
-    /// <summary>
-    /// UAVƒfƒBƒXƒNƒŠƒvƒ^‚ªn‚Ü‚é”z—ñ”Ô†‚ğæ“¾‚·‚éB
-    /// </summary>
-    /// <remarks>
-    /// UAVƒfƒBƒXƒNƒŠƒvƒ^‚ÍSRVƒfƒBƒXƒNƒŠƒvƒ^‚ÌŸ‚©‚ç“o˜^‚³‚ê‚Ä‚¢‚éB
-    /// ‚È‚Ì‚ÅASRVƒfƒBƒXƒNƒŠƒvƒ^‚ª10ŒÂ“o˜^‚³‚ê‚Ä‚¢‚ê‚ÎA
-    /// UAVƒfƒBƒXƒNƒŠƒvƒ^‚Í”z—ñ‚Ì10”Ô–Ú‚©‚ç“o˜^‚³‚ê‚Ä‚¢‚é‚±‚Æ‚É‚È‚éB
-    /// ‚±‚ÌŠÖ”‚ÍŒ»İƒŒƒCƒgƒŒƒGƒ“ƒWƒ“‚Åg—p‚³‚ê‚Ä‚¢‚éB
-    /// </remarks>
-    /// <returns></returns>
-    int GetOffsetUAVDescriptorFromTableStart() const { return this->num_Shader_Resource_ + this->num_Constant_Buffer_; }
-
-    /// <summary>
-    /// SRVƒfƒBƒXƒNƒŠƒvƒ^‚ªn‚Ü‚é”z—ñ”Ô†‚ğæ“¾‚·‚éB
-    /// </summary>
-    /// <returns></returns>
-    int GetOffsetSRVDescriptorFromTableStart() const { return this->num_Constant_Buffer_; }
-
-    /// <summary>
-    /// ’è”ƒoƒbƒtƒ@ƒfƒBƒXƒNƒŠƒvƒ^‚ªn‚Ü‚é”z—ñ”Ô†‚ğæ“¾‚·‚éB
-    /// </summary>
-    /// /// <remarks>
-    /// ’è”ƒoƒbƒtƒ@ƒfƒBƒXƒNƒŠƒvƒ^‚ÍSRVƒfƒBƒXƒNƒŠƒvƒ^‚ÆUAVƒfƒBƒXƒNƒŠƒvƒ^‚ÌŸ‚©‚ç“o˜^‚³‚ê‚Ä‚¢‚éB
-    /// ‚È‚Ì‚ÅASRVƒfƒBƒXƒNƒŠƒvƒ^‚ª10ŒÂAUVAƒfƒBƒXƒNƒŠƒvƒ^‚ª5ŒÂ“o˜^‚³‚ê‚Ä‚¢‚ê‚ÎA
-    /// ’è”ƒoƒbƒtƒ@ƒfƒBƒXƒNƒŠƒvƒ^‚Í”z—ñ‚Ì15”Ô–Ú‚©‚ç“o˜^‚³‚ê‚Ä‚¢‚é‚±‚Æ‚É‚È‚éB
-    /// ‚±‚ÌŠÖ”‚ÍŒ»İƒŒƒCƒgƒŒƒGƒ“ƒWƒ“‚Åg—p‚³‚ê‚Ä‚¢‚éB
-    /// <returns></returns>
-    int GetOffsetConstantBufferDescriptorFromTableStart() const{return this->num_Shader_Resource_ + this->num_Uav_Resource_;}
-
+	/// <summary>
+	/// ãƒªã‚½ãƒ¼ã‚¹ã‚’ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã«ç™»éŒ²ã€‚
+	/// </summary>
+	/// <param name="registerNo">ç™»éŒ²ç•ªå·</param>
+	/// <param name="res">ç™»éŒ²ã™ã‚‹ãƒªã‚½ãƒ¼ã‚¹</param>
+	/// <param name="resTbl">ãƒªã‚½ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒ–ãƒ«ã€‚ã“ã®ãƒ†ãƒ¼ãƒ–ãƒ«ã«ãƒªã‚½ãƒ¼ã‚¹ãŒè¿½åŠ ã•ã‚Œã¾ã™ã€‚</param>
+	/// <param name="numRes">ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ãƒªã‚½ãƒ¼ã‚¹ã®æ•°ã€‚æœ¬é–¢æ•°ã‚’å‘¼ã³å‡ºã™ã¨ã€ã“ã®æ•°ãŒï¼‘ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆã•ã‚Œã¾ã™ã€‚</param>
+	template<class T>
+	void RegistResource(
+		int registerNo,
+		T res,
+		T resTbl[],
+		int& numRes,
+		const int MAX_RESOURCE,
+		const wchar_t* errorMessage
+	)
+	{
+		if (registerNo == -1) {
+			//-1ãŒæŒ‡å®šã•ã‚Œã¦ã„ãŸã‚‰ã€ç¾åœ¨ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹æœ«å°¾ã®ãƒªã‚½ãƒ¼ã‚¹ã®æ¬¡ã«ç™»éŒ²ã•ã‚Œã‚‹ã€‚
+			registerNo = numRes;
+		}
+		if (registerNo < MAX_RESOURCE) {
+			resTbl[registerNo] = res;
+			if (numRes < registerNo + 1) {
+				numRes = registerNo + 1;
+			}
+		}
+		else {
+			MessageBox(nullptr, errorMessage, L"ã‚¨ãƒ©ãƒ¼", MB_OK);
+			std::abort();
+		}
+	}
 private:
-    enum {
-        MAX_SHADER_RESOURCE = 1024 * 10,	//ƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ÌÅ‘å”B
-        MAX_CONSTANT_BUFFER = 1024 * 10,	//’è”ƒoƒbƒtƒ@‚ÌÅ‘å”B
-        MAX_SAMPLER_STATE = 16,	            //ƒTƒ“ƒvƒ‰ƒXƒe[ƒg‚ÌÅ‘å”B
-    };
-
-private:
-    //ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv
-    //ComPtr<ID3D12DescriptorHeap> descriptor_Heap_[2];
-    ID3D12DescriptorHeap* descriptor_Heap_[2];
-    //ƒVƒF[ƒ_[ƒŠƒ\[ƒXB
-    std::vector<IShaderResource*> shader_Resources_;
-    //UAVƒŠƒ\[ƒXB
-    std::vector <IUnorderAccessResrouce*> uav_Resources_;
-    //’è”ƒoƒbƒtƒ@B
-    std::vector <ConstantBuffer*> constant_Buffers_;
-    //ƒTƒ“ƒvƒ‰ƒXƒe[ƒgB
-    D3D12_SAMPLER_DESC sampler_Descs_[MAX_SAMPLER_STATE];
-    //’è”ƒoƒbƒtƒ@‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌŠJnƒnƒ“ƒhƒ‹B
-    D3D12_GPU_DESCRIPTOR_HANDLE const_Buffer_Gpu_Descriptor_Start_[2];
-    //ƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌŠJnƒnƒ“ƒhƒ‹B
-    D3D12_GPU_DESCRIPTOR_HANDLE shader_Resource_Gpu_Descriptor_Start_[2];
-    //UAVƒŠƒ\[ƒX‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌŠJnƒnƒ“ƒhƒ‹B
-    D3D12_GPU_DESCRIPTOR_HANDLE uav_Gpu_Descriptor_Start_[2];
-    //ƒTƒ“ƒvƒ‰[ƒXƒe[ƒg‚ÌƒfƒBƒXƒNƒŠƒvƒ^‚ÌŠJnƒnƒ“ƒhƒ‹
-    D3D12_GPU_DESCRIPTOR_HANDLE sampler_Gpu_Descriptor_Start_[2];
-
-    //ƒVƒF[ƒ_[ƒŠƒ\[ƒX‚Ì”
-    int num_Shader_Resource_;
-    //’è”ƒoƒbƒtƒ@‚Ì”
-    int num_Constant_Buffer_;
-    //ƒAƒ“ƒI[ƒ_[ƒAƒNƒZƒXƒŠƒ\[ƒX‚Ì”
-    int num_Uav_Resource_;
-    //ƒTƒ“ƒvƒ‰‚Ì”
-    int num_Sampler_Desc_;
-    int num_Descriptor_Heap_;
+	enum {
+		MAX_SHADER_RESOURCE = 1024 * 10,	//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã®æœ€å¤§æ•°ã€‚
+		MAX_CONSTANT_BUFFER = 1024 * 10,	//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®æœ€å¤§æ•°ã€‚
+		MAX_SAMPLER_STATE = 16,	//ã‚µãƒ³ãƒ—ãƒ©ã‚¹ãƒ†ãƒ¼ãƒˆã®æœ€å¤§æ•°ã€‚
+	};
+	int m_numShaderResource = 0;	//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã®æ•°ã€‚
+	int m_numConstantBuffer = 0;	//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®æ•°ã€‚
+	int m_numUavResource = 0;		//ã‚¢ãƒ³ã‚ªãƒ¼ãƒ€ãƒ¼ã‚¢ã‚¯ã‚»ã‚¹ãƒªã‚½ãƒ¼ã‚¹ã®æ•°ã€‚
+	int m_numSamplerDesc = 0;		//ã‚µãƒ³ãƒ—ãƒ©ã®æ•°ã€‚
+	ID3D12DescriptorHeap* m_descriptorHeap[2] = { nullptr };					//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã€‚
+	std::vector<IShaderResource*> m_shaderResources;		//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã€‚
+	std::vector < IUnorderAccessResrouce*> m_uavResources;	//UAVãƒªã‚½ãƒ¼ã‚¹ã€‚
+	std::vector < ConstantBuffer*> m_constantBuffers;		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã€‚
+	D3D12_SAMPLER_DESC m_samplerDescs[MAX_SAMPLER_STATE];						//ã‚µãƒ³ãƒ—ãƒ©ã‚¹ãƒ†ãƒ¼ãƒˆã€‚
+	D3D12_GPU_DESCRIPTOR_HANDLE m_cbGpuDescriptorStart[2];						//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã€‚
+	D3D12_GPU_DESCRIPTOR_HANDLE m_srGpuDescriptorStart[2];						//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã€‚
+	D3D12_GPU_DESCRIPTOR_HANDLE m_uavGpuDescriptorStart[2];						//UAVãƒªã‚½ãƒ¼ã‚¹ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã€‚
+	D3D12_GPU_DESCRIPTOR_HANDLE m_samplerGpuDescriptorStart[2];					//Samplerã®ã§ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã€‚
 };
-

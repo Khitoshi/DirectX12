@@ -1,45 +1,14 @@
+ï»¿#include "stdafx.h"
 #include "RootSignature.h"
-#include "GraphicsEngine.h"
 
-RootSignature::RootSignature():
-    root_Signature_()
-{
-}
-
-RootSignature::~RootSignature()
-{
-}
+enum {
+	enDescriptorHeap_CB,
+	enDescriptorHeap_SRV,
+	enDescriptorHeap_UAV,
+	enNumDescriptorHeap
+};
 
 bool RootSignature::Init(
-	GraphicsEngine*& graphicsEngine,
-	D3D12_FILTER samplerFilter, 
-	D3D12_TEXTURE_ADDRESS_MODE textureAdressModeU, 
-	D3D12_TEXTURE_ADDRESS_MODE textureAdressModeV, 
-	D3D12_TEXTURE_ADDRESS_MODE textureAdressModeW, 
-	UINT maxCbvDescriptor, 
-	UINT maxSrvDescriptor, 
-	UINT maxUavDescritor)
-{
-	D3D12_STATIC_SAMPLER_DESC sampler = {};
-	sampler.Filter = samplerFilter;
-	sampler.AddressU = textureAdressModeU;
-	sampler.AddressV = textureAdressModeV;
-	sampler.AddressW = textureAdressModeW;
-	sampler.MipLODBias = 0;
-	sampler.MaxAnisotropy = 0;
-	sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-	sampler.BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
-	sampler.MinLOD = 0.0f;
-	sampler.MaxLOD = D3D12_FLOAT32_MAX;
-	sampler.ShaderRegister = 0;
-	sampler.RegisterSpace = 0;
-	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-
-	return Init(graphicsEngine, &sampler, 1, maxCbvDescriptor, maxSrvDescriptor, maxUavDescritor);
-}
-
-bool RootSignature::Init(
-	GraphicsEngine*& graphicsEngine, 
 	D3D12_STATIC_SAMPLER_DESC* samplerDescArray,
 	int numSampler,
 	UINT maxCbvDescriptor,
@@ -47,14 +16,10 @@ bool RootSignature::Init(
 	UINT maxUavDescritor,
 	UINT offsetInDescriptorsFromTableStartCB,
 	UINT offsetInDescriptorsFromTableStartSRV,
-	UINT offsetInDescriptorsFromTableStartUAV)
+	UINT offsetInDescriptorsFromTableStartUAV
+)
 {
-	enum {
-		enDescriptorHeap_CB,
-		enDescriptorHeap_SRV,
-		enDescriptorHeap_UAV,
-		enNumDescriptorHeap
-	};
+	auto d3dDevice = g_graphicsEngine->GetD3DDevice();
 
 	CD3DX12_DESCRIPTOR_RANGE1 ranges[enNumDescriptorHeap];
 	CD3DX12_ROOT_PARAMETER1 rootParameters[enNumDescriptorHeap];
@@ -80,15 +45,54 @@ bool RootSignature::Init(
 	Microsoft::WRL::ComPtr<ID3DBlob> signature;
 	Microsoft::WRL::ComPtr<ID3DBlob> error;
 	D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
-	//auto hr = device.CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&this->root_Signature_));
-
-	graphicsEngine->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), this->root_Signature_);
-
-	//if (FAILED(hr)) {
-	//	//TODO: MYASSERT‚ðŽÀ‘•‚·‚é
-	//	//ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚Ìì¬‚ÉŽ¸”s‚µ‚½B
-	//	return false;
-	//}
+	auto hr = d3dDevice->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature));
+	if (FAILED(hr)) {
+		//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã®ä½œæˆã«å¤±æ•—ã—ãŸã€‚
+		return false;
+	}
 	return true;
+}
+bool RootSignature::Init(
+	D3D12_FILTER samplerFilter,
+	D3D12_TEXTURE_ADDRESS_MODE textureAdressModeU,
+	D3D12_TEXTURE_ADDRESS_MODE textureAdressModeV,
+	D3D12_TEXTURE_ADDRESS_MODE textureAdressModeW,
+	UINT maxCbvDescriptor ,
+	UINT maxSrvDescriptor ,
+	UINT maxUavDescritor
+)
+{
+	
 
+	D3D12_STATIC_SAMPLER_DESC sampler = {};
+	sampler.Filter = samplerFilter;
+	sampler.AddressU = textureAdressModeU;
+	sampler.AddressV = textureAdressModeV;
+	sampler.AddressW = textureAdressModeW;
+	sampler.MipLODBias = 0;
+	sampler.MaxAnisotropy = 0;
+	sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	sampler.BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
+	sampler.MinLOD = 0.0f;
+	sampler.MaxLOD = D3D12_FLOAT32_MAX;
+	sampler.ShaderRegister = 0;
+	sampler.RegisterSpace = 0;
+	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	return Init(&sampler, 1, maxCbvDescriptor, maxSrvDescriptor, maxUavDescritor);
+}
+
+bool RootSignature::Init(Shader& shader)
+{
+	//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‹ã‚‰ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£æƒ…å ±ã‚’å–å¾—
+	ID3DBlob* sig = nullptr;
+	auto shaderBlob = shader.GetCompiledBlob();
+
+	auto hr = D3DGetBlobPart(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(),
+		D3D_BLOB_ROOT_SIGNATURE, 0, &sig);
+	//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã®ç”Ÿæˆ
+	auto d3dDevice = g_graphicsEngine->GetD3DDevice();
+	hr = d3dDevice->CreateRootSignature(0, sig->GetBufferPointer(), sig->GetBufferSize(),
+		IID_PPV_ARGS(&m_rootSignature));
+	return hr == S_OK;
 }

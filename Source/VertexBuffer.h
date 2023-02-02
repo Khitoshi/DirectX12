@@ -1,67 +1,64 @@
-#pragma once
+ï»¿#pragma once
 
-#include <d3dx12.h>
-#include <wrl.h>
-#include "GraphicsEngine.h"
-using namespace Microsoft::WRL;
 
-class VertexBuffer
-{
+/// <summary>
+/// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡
+/// </summary>
+class VertexBuffer {
+		
 public:
 	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	/// </summary>
-	VertexBuffer();
-
-	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
+	/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 	/// </summary>
 	~VertexBuffer();
-
 	/// <summary>
-	/// ‰Šú‰»
+	/// åˆæœŸåŒ–ã€‚
 	/// </summary>
-	/// <param name="graphicsEngine">g—p‚µ‚Ä‚¢‚éƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚éƒNƒ‰ƒX</param>
-	/// <param name="size">’¸“_ƒTƒCƒY</param>
-	/// <param name="stride">’¸“_ƒoƒbƒtƒ@‚ÌƒXƒgƒ‰ƒCƒhA1ŒÂ‚Ì’¸“_‚ÌƒTƒCƒY</param>
-	/// <param name="graphicsEngine">ƒfƒoƒCƒXæ“¾—p</param>
-	void Init(GraphicsEngine*& graphicsEngine,int size, int stride);
-
+	/// <param name="size">é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º</param>
+	/// <param name="stride">é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®ã‚¹ãƒˆãƒ©ã‚¤ãƒ‰ã€‚ä¸€å€‹ã®é ‚ç‚¹ã®ã‚µã‚¤ã‚º</param>
+	void Init(int size, int stride);
 	/// <summary>
-	/// ’¸“_ƒf[ƒ^‚ğ’¸“_ƒoƒbƒtƒ@‚ÉƒRƒs[
+	/// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã‚’é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã«ã‚³ãƒ”ãƒ¼ã€‚
 	/// </summary>
-	/// <param name="strVertices">ƒRƒs[Œ³‚Ì’¸“_ƒf[ƒ^(void*‚É•ÏŠ·)</param>
-	void Copy(void* strVertices);
-
-public:
+	/// <param name="srcVertices">ã‚³ãƒ”ãƒ¼å…ƒã®é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã€‚</param>
+	void Copy(void* srcVertices) ;
 	/// <summary>
-	/// ’¸“_ƒoƒbƒtƒ@[ƒrƒ…[‚ğæ“¾
+	/// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼ã‚’å–å¾—ã€‚
 	/// </summary>
-	/// <returns>this vertex buffer view</returns>
-	const D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView()const { return this->vertex_Buffer_View_; }
-
+	/// <returns>ãƒ“ãƒ¥ãƒ¼</returns>
+	const D3D12_VERTEX_BUFFER_VIEW& GetView() const
+	{
+		return m_vertexBufferView;
+	}
 	/// <summary>
-	/// ’¸“_ƒoƒbƒtƒ@‚ÌƒXƒgƒ‰ƒCƒh(’PˆÊ:byte)‚ğæ“¾
+	/// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®ã‚¹ãƒˆãƒ©ã‚¤ãƒ‰(å˜ä½ï¼šãƒã‚¤ãƒˆ)ã‚’å–å¾—ã€‚
 	/// </summary>
-	/// <returns>this vertex buffer view strideInBytes</returns>
-	UINT GetStrideInByte()const { return this->vertex_Buffer_View_.StrideInBytes; }
-
+	/// <remarks>
+	/// ã‚¹ãƒˆãƒ©ã‚¤ãƒ‰ã¨ã„ã†ã®ã¯ã€ï¼‘è¦ç´ ã®ã‚µã‚¤ã‚ºã®ã“ã¨ã€‚
+	/// ã“ã“ã§ã¯ã€ä¸€ã¤ã®é ‚ç‚¹ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹ã“ã¨ã«ãªã‚‹ã€‚
+	/// </remarks>
+	/// <returns></returns>
+	UINT GetStrideInBytes() const
+	{
+		return m_vertexBufferView.StrideInBytes;
+	}
 	/// <summary>
-	/// ’¸“_ƒoƒbƒtƒ@‚ÌƒTƒCƒY(’PˆÊ:byte)
+	/// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º(å˜ä½ï¼šãƒã‚¤ãƒˆ)ã‚’å–å¾—ã€‚
 	/// </summary>
-	/// <returns>this vertex buffer view size(byte)</returns>
-	UINT GetSizeInBytes()const { return this->vertex_Buffer_View_.SizeInBytes; }
-
+	/// <returns></returns>
+	UINT GetSizeInBytes() const
+	{
+		return m_vertexBufferView.SizeInBytes;
+	}
 	/// <summary>
-	/// ID3D12Resouce‚ÌƒAƒhƒŒƒX‚ğæ“¾
+	/// ID3D12Resourceã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã—ã¾ã™ã€‚
 	/// </summary>
-	/// <returns>this vertex buffer</returns>
-	ID3D12Resource* GetResourceAddress()const { return this->vertex_Buffer_.Get(); }
-
+	/// <returns></returns>
+	ID3D12Resource* GetID3DResourceAddress() const
+	{
+		return m_vertexBuffer;
+	}
 private:
-	//’¸“_ƒoƒbƒtƒ@
-	ComPtr<ID3D12Resource> vertex_Buffer_;
-
-	//’¸“_ƒoƒbƒtƒ@ƒrƒ…[
-	D3D12_VERTEX_BUFFER_VIEW vertex_Buffer_View_;
+	ID3D12Resource* m_vertexBuffer = nullptr;		//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã€‚
+	D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;	//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼ã€‚
 };

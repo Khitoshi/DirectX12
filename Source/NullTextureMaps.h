@@ -1,188 +1,137 @@
-#pragma once
-#include <string>
-#include <memory>
+ï»¿#pragma once
+
 /// <summary>
-/// NullƒeƒNƒXƒ`ƒƒƒ}ƒbƒv‚ğ•Û‚µ‚Ä‚¢‚éƒNƒ‰ƒXB
+/// Nullãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒãƒƒãƒ—ã‚’ä¿æŒã—ã¦ã„ã‚‹ã‚¯ãƒ©ã‚¹ã€‚
 /// </summary>
 /// <remarks>
-/// ‚±‚ÌƒNƒ‰ƒX‚ª•Û‚µ‚Ä‚¢‚é‚Ì‚ÍA
-/// ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒvA–@üƒ}ƒbƒvA”½Ë—¦ƒ}ƒbƒv‚È‚Ç‚Ì
-/// ƒ}ƒeƒŠƒAƒ‹‚Åg—p‚·‚éƒeƒNƒXƒ`ƒƒƒ}ƒbƒv‚Å‚·B
-/// ‚±‚ÌƒNƒ‰ƒX‚Ìƒ}ƒbƒv‚Íƒ}ƒeƒŠƒAƒ‹‚ÉAã‹L‚Ìƒ}ƒbƒv‚ª
-/// “\‚è•t‚¯‚ç‚ê‚Ä‚¢‚È‚¢ê‡‚Å‚·B
-/// ‚Å‚·‚Ì‚ÅA‚±‚ÌƒNƒ‰ƒX‚ª•Û‚µ‚Ä‚¢‚éƒ}ƒbƒv‚ÍAƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒv‚Å‚ ‚ê‚Î
-/// ‹¾–Ê”½Ë—¦‚OA–@üƒ}ƒbƒv‚Å‚ ‚ê‚Î“Ê‰š‚È‚µAƒŠƒtƒŒƒNƒVƒ‡ƒ“ƒ}ƒbƒv‚Å‚ ‚ê‚Î”½Ë—¦‚O‚Æ‚È‚è‚Ü‚·B
-/// ƒ}ƒeƒŠƒAƒ‹‚Éƒ}ƒbƒv‚ª“\‚è•t‚¯‚ç‚ê‚Ä‚¢‚È‚¢ê‡‚ÉA‚±‚ÌƒNƒ‰ƒX‚Ìƒ}ƒbƒv‚ğ—˜—p‚·‚é‚±‚Æ‚ÅA
-/// ƒVƒF[ƒ_[‚Å‚Ì“®“I•ªŠò‚ğŒ¸‚ç‚·‚±‚Æ‚ª‚Å‚«AƒVƒF[ƒ_\ƒvƒƒOƒ‰ƒ€‚ğƒVƒ“ƒvƒ‹‚É‚·‚é‚±‚Æ‚ª‚Å‚«‚é‚æ‚¤‚É‚È‚Á‚Ä‚¢‚Ü‚·B
-/// ‚±‚ÌƒNƒ‰ƒX‚Åƒ[ƒh‚³‚ê‚Ä‚¢‚éƒeƒNƒXƒ`ƒƒ‚ÍAAssets/modelData/preset‚Ì‰º‚É—pˆÓ‚³‚ê‚Ä‚¢‚Ü‚·B
+/// ã“ã®ã‚¯ãƒ©ã‚¹ãŒä¿æŒã—ã¦ã„ã‚‹ã®ã¯ã€
+/// ã‚¹ãƒšã‚­ãƒ¥ãƒ©ãƒãƒƒãƒ—ã€æ³•ç·šãƒãƒƒãƒ—ã€åå°„ç‡ãƒãƒƒãƒ—ãªã©ã®
+/// ãƒãƒ†ãƒªã‚¢ãƒ«ã§ä½¿ç”¨ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒãƒƒãƒ—ã§ã™ã€‚
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã®ãƒãƒƒãƒ—ã¯ãƒãƒ†ãƒªã‚¢ãƒ«ã«ã€ä¸Šè¨˜ã®ãƒãƒƒãƒ—ãŒ
+/// è²¼ã‚Šä»˜ã‘ã‚‰ã‚Œã¦ã„ãªã„å ´åˆã§ã™ã€‚
+/// ã§ã™ã®ã§ã€ã“ã®ã‚¯ãƒ©ã‚¹ãŒä¿æŒã—ã¦ã„ã‚‹ãƒãƒƒãƒ—ã¯ã€ã‚¹ãƒšã‚­ãƒ¥ãƒ©ãƒãƒƒãƒ—ã§ã‚ã‚Œã°
+/// é¡é¢åå°„ç‡ï¼ã€æ³•ç·šãƒãƒƒãƒ—ã§ã‚ã‚Œã°å‡¸å‡¹ãªã—ã€ãƒªãƒ•ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ãƒãƒƒãƒ—ã§ã‚ã‚Œã°åå°„ç‡ï¼ã¨ãªã‚Šã¾ã™ã€‚
+/// ãƒãƒ†ãƒªã‚¢ãƒ«ã«ãƒãƒƒãƒ—ãŒè²¼ã‚Šä»˜ã‘ã‚‰ã‚Œã¦ã„ãªã„å ´åˆã«ã€ã“ã®ã‚¯ãƒ©ã‚¹ã®ãƒãƒƒãƒ—ã‚’åˆ©ç”¨ã™ã‚‹ã“ã¨ã§ã€
+/// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã§ã®å‹•çš„åˆ†å²ã‚’æ¸›ã‚‰ã™ã“ã¨ãŒã§ãã€ã‚·ã‚§ãƒ¼ãƒ€â€•ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ã‚·ãƒ³ãƒ—ãƒ«ã«ã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã‚ˆã†ã«ãªã£ã¦ã„ã¾ã™ã€‚
+/// ã“ã®ã‚¯ãƒ©ã‚¹ã§ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¯ã€Assets/modelData/presetã®ä¸‹ã«ç”¨æ„ã•ã‚Œã¦ã„ã¾ã™ã€‚
 /// </remarks>
-class NullTextureMaps
-{
+class NullTextureMaps {
 public:
 	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	/// </summary>
-	NullTextureMaps();
-
-	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
-	/// </summary>
-	~NullTextureMaps();
-
-	/// <summary>
-	/// ‰Šú‰»
+	/// åˆæœŸåŒ–ã€‚
 	/// </summary>
 	void Init();
-
-public://get method
-
-
-#pragma region Get this AlbedoMap Infomation
-	
+	/// <summary>
+	/// æ³•ç·šãƒãƒƒãƒ—ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	const std::unique_ptr<char[]>& GetNormalMap() const
+	{
+		return m_normalMap;
+	}
+	/// <summary>
+	/// æ³•ç·šãƒãƒƒãƒ—ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	unsigned int GetNormalMapSize() const
+	{
+		return m_normalMapSize;
+	}
+	const char* GetNormalMapFilePath() const
+	{
+		return m_normalMapFilePath;
+	}
+	/// <summary>
+	/// ã‚¹ãƒšã‚­ãƒ¥ãƒ©ãƒãƒƒãƒ—ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	const std::unique_ptr<char[]>& GetSpecularMap() const
+	{
+		return m_specMap;
+	}
+	/// <summary>
+	/// ã‚¹ãƒšã‚­ãƒ¥ãƒ©ãƒãƒƒãƒ—ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	unsigned int GetSpecularMapSize() const
+	{
+		return m_specMapSize;
+	}
+	const char* GetSpecularMapFilePath() const
+	{
+		return m_specMapFilePath;
+	}
 	/// <summary> 
-	/// ƒAƒ‹ƒxƒhƒ}ƒbƒv‚ğæ“¾B
+	/// ã‚¢ãƒ«ãƒ™ãƒ‰ãƒãƒƒãƒ—ã‚’å–å¾—ã€‚
 	/// </summary>
 	/// <returns></returns>
 	const std::unique_ptr<char[]>& GetAlbedoMap() const
 	{
-		return this->albedo_Map_;
+		return m_albedoMap;
 	}
 	/// <summary>
-	/// ƒAƒ‹ƒxƒhƒ}ƒbƒv‚ÌƒTƒCƒY‚ğæ“¾B
+	/// ã‚¢ãƒ«ãƒ™ãƒ‰ãƒãƒƒãƒ—ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
 	/// </summary>
 	/// <returns></returns>
 	unsigned int GetAlbedoMapSize() const
 	{
-		return this->albedo_Map_Size_;
+		return m_albedoMapSize;
 	}
-
-	/// <summary>
-	/// ƒAƒ‹ƒxƒhƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹ƒpƒX æ“¾
-	/// </summary>
-	/// <returns></returns>
 	const char* GetAlbedoMapFilePath() const
 	{
-		return this->albedo_Map_File_Path_;
+		return m_albedoMapFilePath;
 	}
-
-#pragma endregion
-
-#pragma region Get this NormalMap Infomation
 	/// <summary>
-	/// –@üƒ}ƒbƒv æ“¾
+	/// ãƒªãƒ•ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ãƒãƒƒãƒ—ã‚’å–å¾—ã€‚
 	/// </summary>
-	/// <returns>this normal map</returns>
-	const std::unique_ptr<char[]>& GetNormalMap() const
-	{
-		return this->normal_Map_;
-	}
-
-	/// <summary>
-	/// –@üƒ}ƒbƒv‚ÌƒTƒCƒY æ“¾B
-	/// </summary>
-	/// <returns>this normal map size</returns>
-	unsigned int GetNormalMapSize() const
-	{
-		return this->normal_Map_Size_;
-	}
-
-	/// <summary>
-	/// –@üƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹ƒpƒX æ“¾
-	/// </summary>
-	/// <returns>this normal map file path</returns>
-	const char* GetNormalMapFilePath() const
-	{
-		return this->normal_Map_File_Path_;
-	}
-
-#pragma endregion
-
-#pragma region Get this SpecularMap Infomation
-	/// <summary>
-	/// ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒv‚ğæ“¾B
-	/// </summary>
-	/// <returns>this scecular map</returns>
-	const std::unique_ptr<char[]>& GetSpecularMap() const
-	{
-		return this->scecular_Map_;
-	}
-
-	/// <summary>
-	/// ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒv‚ÌƒTƒCƒY‚ğæ“¾B
-	/// </summary>
-	/// <returns>this scecular map size</returns>
-	unsigned int GetSpecularMapSize() const
-	{
-		return this->scecular_Map_Size_;
-	}
-
-	/// <summary>
-	/// ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹ƒpƒX æ“¾
-	/// </summary>
-	/// <returns>this scecular map map file path </returns>
-	const char* GetSpecularMapFilePath() const
-	{
-		return this->scecular_Map_File_Path_;
-	}
-
-#pragma endregion
-
-#pragma region Get this ReflectionMap Infomation
-	/// <summary>
-	/// ƒŠƒtƒŒƒNƒVƒ‡ƒ“ƒ}ƒbƒv‚ğæ“¾B
-	/// </summary>
-	/// <returns>this ReflectionMap </returns>
+	/// <returns></returns>
 	const std::unique_ptr<char[]>& GetReflectionMap() const
 	{
-		return this->zero_Value_Map_;
+		return m_zeroValueMap;
 	}
-
 	/// <summary>
-	/// ƒŠƒtƒŒƒNƒVƒ‡ƒ“ƒ}ƒbƒv‚ÌƒTƒCƒY‚ğæ“¾B
+	/// ãƒªãƒ•ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ãƒãƒƒãƒ—ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
 	/// </summary>
-	/// <returns>this ReflectionMap size</returns>
+	/// <returns></returns>
 	unsigned int GetReflectionMapSize() const
 	{
-		return this->zero_Value_Map_Size_;
+		return m_zeroValueMapSize;
 	}
-
-	/// <summary>
-	/// ƒŠƒtƒŒƒNƒVƒ‡ƒ“ƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹ƒpƒXæ“¾
-	/// </summary>
-	/// <returns>this Get ReflectionMap file path</returns>
 	const char* GetReflectionMapFilePath() const
 	{
-		return this->zero_Value_Map_File_Path_;
+		return m_zeroValueMapFilePath;
 	}
-
-#pragma endregion
-
+	/// <summary>
+	/// å±ˆæŠ˜ãƒãƒƒãƒ—ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	const std::unique_ptr<char[]>& GetRefractionMap() const
+	{
+		return m_zeroValueMap;
+	}
+	/// <summary>
+	/// å±ˆæŠ˜ãƒãƒƒãƒ—ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	unsigned int GetRefractionMapSize() const
+	{
+		return m_zeroValueMapSize;
+	}
+	const char* GetRefractionMapFilePath() const
+	{
+		return m_zeroValueMapFilePath;
+	}
 private:
-	//ƒAƒ‹ƒxƒhƒ}ƒbƒv
-	std::unique_ptr<char[]> albedo_Map_;
-	//ƒAƒ‹ƒxƒhƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹ƒpƒX
-	const char* albedo_Map_File_Path_;
-	//ƒAƒ‹ƒxƒhƒ}ƒbƒv‚ÌƒTƒCƒY
-	unsigned int albedo_Map_Size_;
-
-	//ƒAƒ‹ƒxƒhƒ}ƒbƒv
-	std::unique_ptr<char[]> normal_Map_;
-	//ƒAƒ‹ƒxƒhƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹ƒpƒX
-	const char* normal_Map_File_Path_;
-	//ƒAƒ‹ƒxƒhƒ}ƒbƒv‚ÌƒTƒCƒY
-	unsigned int normal_Map_Size_;
-
-	//ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒv
-	std::unique_ptr<char[]> scecular_Map_;
-	//ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹ƒpƒX
-	const char* scecular_Map_File_Path_;
-	//ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒv‚ÌƒTƒCƒY
-	unsigned int scecular_Map_Size_;
-
-	//ƒŠƒtƒŒƒNƒVƒ‡ƒ“ƒ}ƒbƒv
-	std::unique_ptr<char[]> zero_Value_Map_;
-	//ƒŠƒtƒŒƒNƒVƒ‡ƒ“ƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹ƒpƒX
-	const char* zero_Value_Map_File_Path_;
-	//ƒŠƒtƒŒƒNƒVƒ‡ƒ“ƒ}ƒbƒv‚ÌƒTƒCƒY
-	unsigned int zero_Value_Map_Size_;
+	std::unique_ptr<char[]> m_albedoMap;	//ã‚¢ãƒ«ãƒ™ãƒ‰ãƒãƒƒãƒ—ã€‚
+	unsigned int m_albedoMapSize = 0;		//ã‚¢ãƒ«ãƒ™ãƒ‰ãƒãƒƒãƒ—ã®ã‚µã‚¤ã‚ºã€‚
+	std::unique_ptr<char[]>	m_normalMap;	//æ³•ç·šãƒãƒƒãƒ—ã€‚
+	unsigned int m_normalMapSize = 0;		//æ³•ç·šãƒãƒƒãƒ—ã®ã‚µã‚¤ã‚ºã€‚
+	std::unique_ptr<char[]>	m_specMap;		//æ³•ç·šãƒãƒƒãƒ—ã€‚
+	unsigned int m_specMapSize = 0;			//æ³•ç·šãƒãƒƒãƒ—ã®ã‚µã‚¤ã‚ºã€‚
+	std::unique_ptr<char[]> m_zeroValueMap;	//0ã®å€¤ã‚’æ ¼ç´ã—ã¦ã„ã‚‹ãƒãƒƒãƒ—ã€‚
+	unsigned int m_zeroValueMapSize = 0;	//0ã®å€¤ã‚’æ ¼ç´ã—ã¦ã„ã‚‹ãƒãƒƒãƒ—ã®ã‚µã‚¤ã‚ºã€‚
+	const char*		m_albedoMapFilePath;
+	const char*		m_normalMapFilePath;
+	const char*		m_specMapFilePath;
+	const char*		m_zeroValueMapFilePath;
 };

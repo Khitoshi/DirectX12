@@ -1,236 +1,161 @@
+ï»¿/// <summary>
+/// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‘ãƒ¼ãƒ„ã‚¯ãƒ©ã‚¹ã€‚
+/// </summary>
+
 #pragma once
 
-#include <array>
-#include <vector>
-#include <memory>
-#include <functional>
-
-#include "TkmFile.h"
+#include "tkFile/TkmFile.h"
 #include "StructuredBuffer.h"
-#include "ConstantBuffer.h"
-#include "IShaderResource.h"
-#include "Matrix.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "DescriptorHeap.h"
-#include "MeshParts.h"
-#include "tkEngine.h"
-class Material;
+
+class RenderContext;
 class Skeleton;
+class Material;
+class IShaderResource;
 
-struct SMesh
-{
-    //’¸“_ƒoƒbƒtƒ@
-    VertexBuffer vertexBuffer;
-    //ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@
-    std::vector<IndexBuffer*> indexBufferArray;
-    //ƒ}ƒeƒŠƒAƒ‹
-    std::vector<Material*> materials;
-    //ƒXƒLƒ“‚ğ‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
-    std::vector<int> skinFlags;
+
+
+const int MAX_MODEL_EXPAND_SRV = 6;	//æ‹¡å¼µSRVã®æœ€å¤§æ•°ã€‚
+
+/// <summary>
+/// ãƒ¡ãƒƒã‚·ãƒ¥
+/// </summary>
+struct SMesh {
+	VertexBuffer m_vertexBuffer;						//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã€‚
+	std::vector< IndexBuffer* >		m_indexBufferArray;	//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã€‚
+	std::vector< Material* >		m_materials;			//ãƒãƒ†ãƒªã‚¢ãƒ«ã€‚
+	std::vector<int>				skinFlags;				//ã‚¹ã‚­ãƒ³ã‚’æŒã£ã¦ã„ã‚‹ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã€‚
 };
 
-class MeshParts
-{
-private:
-    //Šg’£SRV‚ªİ’è‚³‚ê‚éƒŒƒWƒXƒ^‚ÌŠJn”Ô†
-    enum { EXPAND_SRV_REG__START_NO = 10 };
-    //Šg’£SRV‚ÌÅ‘å”
-    enum { MAX_MODEL_EXPAND_SRV = 6 };
-    //‚P‚Â‚Ìƒ}ƒeƒŠƒAƒ‹‚Åg—p‚³‚ê‚éSRV‚Ì”
-    enum { NUM_SRV_ONE_MATERIAL = EXPAND_SRV_REG__START_NO + MAX_MODEL_EXPAND_SRV };
-    //‚P‚Â‚Ìƒ}ƒeƒŠƒAƒ‹‚Åg—p‚³‚ê‚éCBV‚Ì”
-    enum { NUM_CBV_ONE_MATERIAL = 6 };
+/// <summary>
+/// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‘ãƒ¼ãƒ„ã€‚
+/// </summary>
+class MeshParts {
 public:
-
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    MeshParts();
-
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    ~MeshParts();
-
-    /// <summary>
-    /// .tkm file ‰Šú‰»
-    /// </summary>
-    /// <param name="graphicsEngine">ƒfƒoƒCƒX æ“¾</param>
-    /// <param name="tkmFile">tkm file</param>
-    /// <param name="fxFilePath">.fx file path</param>
-    /// <param name="vsEntryPointFuncName">’¸“_ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg–¼</param>
-    /// <param name="vsSkinEntryPointFuncName">ƒXƒLƒ“‚ ‚èƒ}ƒeƒŠƒAƒ‹—p‚Ì’¸“_ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg–¼</param>
-    /// <param name="psEntryPointFuncName">ƒsƒNƒZƒ‹ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg–¼</param>
-    /// <param name="expandData"></param>
-    /// <param name="expandDataSize"></param>
-    /// <param name="expandShaderResourceView"></param>
-    /// <param name="colorBufferFormat">‚±‚Ìƒ‚ƒfƒ‹‚ğƒŒƒ“ƒ_ƒŠƒ“ƒO‚·‚éƒJƒ‰[ƒoƒbƒtƒ@‚ÌƒtƒH[ƒ}ƒbƒg</param>
-    /// <param name="samplerFilter">ƒTƒ“ƒvƒ‰ƒtƒBƒ‹ƒ^</param>
-    void InitFromTkmFile(
-        tkEngine*& tk,
-        GraphicsEngine*& graphicsEngine,
-        const TkmFile& tkmFile,
-        const char* fxFilePath,
-        const char* vsEntryPointFuncName,
-        const char* vsSkinEntryPointFuncName,
-        const char* psEntryPointFuncName,
-        void* expandData,
-        int expandDataSize,
-        const std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV>& expandShaderResourceView,
-        const std::array<DXGI_FORMAT, static_cast<int>(D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT)>& colorBufferFormat,
-        D3D12_FILTER samplerFilter
-    );
-
-    /// <summary>
-    /// •`‰æ
-    /// </summary>
-    /// <param name="renderContext">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒRƒ“ƒeƒLƒXƒg</param>
-    /// <param name="matrixWorld">ƒ[ƒ‹ƒh s—ñ</param>
-    /// <param name="matrixView">ƒrƒ…[ s—ñ</param>
-    /// <param name="matrixProjection">ƒvƒƒWƒFƒNƒVƒ‡ƒ“ s—ñ</param>
-    void Draw(
-        GraphicsEngine*& graphicsEngine,
-        RenderContext& renderContext,
-        const Matrix& matrixWorld,
-        const Matrix& matrixView,
-        const Matrix& matrixProjection
-    );
-
-    /// <summary>
-    /// ƒCƒ“ƒXƒ^ƒ“ƒVƒ“ƒO•`‰æ
-    /// </summary>
-    /// <param name="renderContext">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒRƒ“ƒeƒLƒXƒg</param>
-    /// <param name="numInstance">ƒCƒ“ƒXƒ^ƒ“ƒX”</param>
-    /// <param name="mView">ƒrƒ…[s—ñ</param>
-    /// <param name="mProj">ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ</param>
-    void DrawInstancing(GraphicsEngine*& graphicsEngine,RenderContext& renderContext, int numInstance, const Matrix& matrixView, const Matrix& matrixProjection);
-
-    /// <summary>
-    /// ƒXƒPƒ‹ƒgƒ“‚ğŠÖ˜A•t‚¯‚é
-    /// </summary>
-    /// <param name="skeleton">ƒXƒPƒ‹ƒgƒ“</param>
-    void BindSkeleton(GraphicsEngine*& graphicsEngine,Skeleton& skeleton);
-
-    /// <summary>
-    /// ƒƒbƒVƒ…‚É‘Î‚µ‚Ä–â‚¢‡‚í‚¹‚ğs‚¤B
-    /// </summary>
-    /// <param name="queryFunc">ƒNƒGƒŠŠÖ”</param>
-    void QueryMeshs(std::function<void(const SMesh& mesh)> queryFunc)
-    {
-        for (const auto& mesh : this->meshs_) {
-            queryFunc(*mesh);
-        }
-    }
-    void QueryMeshAndDescriptorHeap(std::function<void(const SMesh& mesh, const DescriptorHeap& ds)> queryFunc)
-    {
-        for (int i = 0; i < this->meshs_.size(); i++) {
-            queryFunc(*this->meshs_[i], this->descriptor_Heap_);
-        }
-    }
-
-
-    /// <summary>
-    /// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğì¬B
-    /// </summary>
-    /// <param name = "graphicsEngine">ƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚é</param>
-    void CreateDescriptorHeaps(GraphicsEngine*& graphicsEngine);
-
+	/// <summary>
+	/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
+	/// </summary>
+	~MeshParts();
+	/// <summary>
+	/// tkmãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰åˆæœŸåŒ–
+	/// </summary>
+	/// <param name="tkmFile">tkmãƒ•ã‚¡ã‚¤ãƒ«ã€‚</param>
+	/// /// <param name="fxFilePath">fxãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹</param>
+	/// <param name="vsEntryPointFunc">é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã®é–¢æ•°å</param>
+	/// <param name="vsSkinEntryPointFunc">ã‚¹ã‚­ãƒ³ã‚ã‚Šãƒãƒ†ãƒªã‚¢ãƒ«ç”¨ã®é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã®é–¢æ•°å</param>
+	/// <param name="psEntryPointFunc">ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã®é–¢æ•°å</param>
+	/// <param name="colorBufferFormat">ã“ã®ãƒ¢ãƒ‡ãƒ«ã‚’ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã™ã‚‹ã‚«ãƒ©ãƒ¼ãƒãƒƒãƒ•ã‚¡ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ</param>
+	/// <param name="samplerFilter">ã‚µãƒ³ãƒ—ãƒ©ãƒ•ã‚£ãƒ«ã‚¿</param>
+	void InitFromTkmFile(
+		const TkmFile& tkmFile,
+		const char* fxFilePath,
+		const char* vsEntryPointFunc,
+		const char* vsSkinEntryPointFunc,
+		const char* psEntryPointFunc,
+		void* expandData,
+		int expandDataSize,
+		const std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV>& expandShaderResourceView, 
+		const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET>& colorBufferFormat,
+		D3D12_FILTER samplerFilter
+	);
+	/// <summary>
+	/// æç”»ã€‚
+	/// </summary>
+	/// <param name="rc">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ</param>
+	/// <param name="mWorld">ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—</param>
+	/// <param name="mView">ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—</param>
+	/// <param name="mProj">ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—</param>
+	/// <param name="light">ãƒ©ã‚¤ãƒˆ</param>
+	void Draw(RenderContext& rc, const Matrix& mWorld, const Matrix& mView, const Matrix& mProj);
+	/// <summary>
+	/// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚·ãƒ³ã‚°æç”»
+	/// </summary>
+	/// <param name="rc">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ</param>
+	/// <param name="numInstance">ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹æ•°</param>
+	/// <param name="mView">ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—</param>
+	/// <param name="mProj">ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—</param>
+	void DrawInstancing(RenderContext& rc, int numInstance, const Matrix& mView, const Matrix& mProj );
+	/// <summary>
+	/// ã‚¹ã‚±ãƒ«ãƒˆãƒ³ã‚’é–¢é€£ä»˜ã‘ã‚‹ã€‚
+	/// </summary>
+	/// <param name="skeleton">ã‚¹ã‚±ãƒ«ãƒˆãƒ³</param>
+	void BindSkeleton(Skeleton& skeleton);
+	/// <summary>
+	/// ãƒ¡ãƒƒã‚·ãƒ¥ã«å¯¾ã—ã¦å•ã„åˆã‚ã›ã‚’è¡Œã†ã€‚
+	/// </summary>
+	/// <param name="queryFunc">ã‚¯ã‚¨ãƒªé–¢æ•°</param>
+	void QueryMeshs(std::function<void(const SMesh& mesh)> queryFunc)
+	{
+		for (const auto& mesh : m_meshs) {
+			queryFunc(*mesh);
+		}
+	}
+	void QueryMeshAndDescriptorHeap(std::function<void(const SMesh& mesh, const DescriptorHeap& ds)> queryFunc)
+	{
+		for( int i = 0; i < m_meshs.size(); i++ ){
+			queryFunc(*m_meshs[i], m_descriptorHeap);
+		}
+	}
+	/// <summary>
+	/// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’ä½œæˆã€‚
+	/// </summary>
+	void CreateDescriptorHeaps();
 private:
-    /// <summary>
-    /// tkmƒƒbƒVƒ…‚©‚çƒƒbƒVƒ…‚ğì¬B
-    /// </summary>
-    /// <param name="mesh">ƒƒbƒVƒ…</param>
-    /// <param name="meshNo">ƒƒbƒVƒ…”Ô†</param>
-    /// <param name="fxFilePath">fxƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒpƒX</param>
-    /// <param name="vsEntryPointFuncName">’¸“_ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚Ì–¼‘O</param>
-    /// <param name="vsSkinEntryPointFuncName">ƒXƒLƒ“‚ ‚èƒ}ƒeƒŠƒAƒ‹—p‚Ì’¸“_ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚Ì–¼‘O</param>
-    /// <param name="psEntryPointFuncName">ƒsƒNƒZƒ‹ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚Ì–¼‘O</param>
-    /// <param name="colorBufferFormat">‚±‚Ìƒ‚ƒfƒ‹‚ğƒŒƒ“ƒ_ƒŠƒ“ƒO‚·‚éƒJƒ‰[ƒoƒbƒtƒ@‚ÌƒtƒH[ƒ}ƒbƒg</param>
-    /// <param name="samplerFilter">ƒTƒ“ƒvƒ‰ƒtƒBƒ‹ƒ^</param>
-    void CreateMeshFromTkmMesh(
-        tkEngine*& tk,
-        GraphicsEngine*& graphicsEngine,
-        const TkmFile::SMesh& mesh,
-        int meshNo,
-        int& materialNum,
-        const char* fxFilePath,
-        const char* vsEntryPointFuncName,
-        const char* vsSkinEntryPointFuncName,
-        const char* psEntryPointFuncName,
-        const std::array<DXGI_FORMAT, static_cast<int>D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT>& colorBufferFormat,
-        D3D12_FILTER samplerFilter
-    );
-
-    /// <summary>
-    /// •`‰æˆ—‚Ì‹¤’Êˆ—
-    /// </summary>
-    /// <param name="rc">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒRƒ“ƒeƒLƒXƒg</param>
-    /// <param name="mWorld">ƒ[ƒ‹ƒhs—ñ</param>
-    /// <param name="mView">ƒrƒ…[s—ñ</param>
-    /// <param name="mProj">ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ</param>
-    void DrawCommon(GraphicsEngine*& graphicsEngine,RenderContext& renderContext, const Matrix& matrixWorld, const Matrix& matrixView, const Matrix& matrixProjection);
-
-public:
-#pragma region Get method
-    /// <summary>
-    /// Šg’£SRV‚ªİ’è‚³‚ê‚éƒŒƒWƒXƒ^‚ÌŠJn”Ô† æ“¾
-    /// </summary>
-    /// <returns>static int</returns>
-    const static int GetEXPANDSRVREGSTARTNO() { return EXPAND_SRV_REG__START_NO; }
-
-    /// <summary>
-    /// Šg’£SRV‚ÌÅ‘å” æ“¾
-    /// </summary>
-    /// <returns>static int</returns>
-    const static int GetMAXMODELEXPANDSRV() { return MAX_MODEL_EXPAND_SRV; }
-
-    /// <summary>
-    /// ‚P‚Â‚Ìƒ}ƒeƒŠƒAƒ‹‚Åg—p‚³‚ê‚éSRV‚Ì” æ“¾
-    /// </summary>
-    /// <returns>static int</returns>
-    const static int GetNUMSRVONEMATERIAL() { return NUM_SRV_ONE_MATERIAL; }
-
-    /// <summary>
-    /// ‚P‚Â‚Ìƒ}ƒeƒŠƒAƒ‹‚Åg—p‚³‚ê‚éCBV‚Ì” æ“¾
-    /// </summary>
-    /// <returns>static int</returns>
-    const static int GetNUMCBVONEMATERIAL() { return NUM_CBV_ONE_MATERIAL; }
-#pragma endregion
-
+	/// <summary>
+	/// tkmãƒ¡ãƒƒã‚·ãƒ¥ã‹ã‚‰ãƒ¡ãƒƒã‚·ãƒ¥ã‚’ä½œæˆã€‚
+	/// </summary>
+	/// <param name="mesh">ãƒ¡ãƒƒã‚·ãƒ¥</param>
+	/// <param name="meshNo">ãƒ¡ãƒƒã‚·ãƒ¥ç•ªå·</param>
+	/// <param name="fxFilePath">fxãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹</param>
+	/// <param name="vsEntryPointFunc">é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã®é–¢æ•°å</param>
+	/// <param name="vsSkinEntryPointFunc">ã‚¹ã‚­ãƒ³ã‚ã‚Šãƒãƒ†ãƒªã‚¢ãƒ«ç”¨ã®é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã®é–¢æ•°å</param>
+	/// <param name="psEntryPointFunc">ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã®é–¢æ•°å</param>
+	/// <param name="colorBufferFormat">ã“ã®ãƒ¢ãƒ‡ãƒ«ã‚’ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã™ã‚‹ã‚«ãƒ©ãƒ¼ãƒãƒƒãƒ•ã‚¡ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ</param>
+	/// <param name="samplerFilter">ã‚µãƒ³ãƒ—ãƒ©ãƒ•ã‚£ãƒ«ã‚¿</param>
+	void CreateMeshFromTkmMesh(
+		const TkmFile::SMesh& mesh, 
+		int meshNo,
+		int& materialNum,
+		const char* fxFilePath,
+		const char* vsEntryPointFunc,
+		const char* vsSkinEntryPointFunc,
+		const char* psEntryPointFunc,
+		const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET>& colorBufferFormat,
+		D3D12_FILTER samplerFilter
+	);
+	/// <summary>
+	/// æç”»å‡¦ç†ã®å…±é€šå‡¦ç†
+	/// </summary>
+	/// <param name="rc">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ</param>
+	/// <param name="mWorld">ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—</param>
+	/// <param name="mView">ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—</param>
+	/// <param name="mProj">ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—</param>
+	void DrawCommon(RenderContext& rc, const Matrix& mWorld, const Matrix& mView, const Matrix& mProj);
+	
 private:
-    /// <summary>
-    /// ’è”ƒoƒbƒtƒ@B
-    /// </summary>
-    /// <remarks>
-    /// ‚±‚Ì\‘¢‘Ì‚ğ•ÏX‚µ‚½‚çASimpleModel.fx‚ÌCB‚à•ÏX‚·‚é‚æ‚¤‚ÉB
-    /// </remarks>
-    struct SConstantBuffer {
-        Matrix world;		//ƒ[ƒ‹ƒhs—ñB
-        Matrix view;		//ƒrƒ…[s—ñB
-        Matrix proj;		//ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñB
-    };
-
-    //ƒƒbƒVƒ…‹¤’Ê‚Ì’è”ƒoƒbƒtƒ@
-    ConstantBuffer common_Constant_Buffer_;
-    //ƒ†[ƒU[Šg’£—p‚Ì’è”ƒoƒbƒtƒ@
-    ConstantBuffer expand_Constant_Buffer_;
-
-    std::array<IShaderResource*, static_cast<int>(MAX_MODEL_EXPAND_SRV)>expand_Shader_Resource_View_;
-    
-    //ƒ{[ƒ“‚Ìs—ñ‚Ì\‘¢‰»ƒoƒbƒtƒ@
-    StructuredBuffer bone_Matrices_Structure_Buffer_;
-
-    //ƒƒbƒVƒ…
-    std::vector<std::unique_ptr<SMesh>> meshs_;
-
-    //ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv
-    DescriptorHeap descriptor_Heap_;
-
-    //ƒXƒPƒ‹ƒgƒ“
-    Skeleton* skelton_;
-
-    void* expand_Data_;
-
+	//æ‹¡å¼µSRVãŒè¨­å®šã•ã‚Œã‚‹ãƒ¬ã‚¸ã‚¹ã‚¿ã®é–‹å§‹ç•ªå·ã€‚
+	const int EXPAND_SRV_REG__START_NO = 10;
+	//ï¼‘ã¤ã®ãƒãƒ†ãƒªã‚¢ãƒ«ã§ä½¿ç”¨ã•ã‚Œã‚‹SRVã®æ•°ã€‚
+	const int NUM_SRV_ONE_MATERIAL = EXPAND_SRV_REG__START_NO + MAX_MODEL_EXPAND_SRV;
+	//ï¼‘ã¤ã®ãƒãƒ†ãƒªã‚¢ãƒ«ã§ä½¿ç”¨ã•ã‚Œã‚‹CBVã®æ•°ã€‚
+	const int NUM_CBV_ONE_MATERIAL = 2;
+	/// <summary>
+	/// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã€‚
+	/// </summary>
+	/// <remarks>
+	/// ã“ã®æ§‹é€ ä½“ã‚’å¤‰æ›´ã—ãŸã‚‰ã€SimpleModel.fxã®CBã‚‚å¤‰æ›´ã™ã‚‹ã‚ˆã†ã«ã€‚
+	/// </remarks>
+	struct SConstantBuffer {
+		Matrix mWorld;		//ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã€‚
+		Matrix mView;		//ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã€‚
+		Matrix mProj;		//ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã€‚
+	};
+	ConstantBuffer m_commonConstantBuffer;					//ãƒ¡ãƒƒã‚·ãƒ¥å…±é€šã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã€‚
+	ConstantBuffer m_expandConstantBuffer;					//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡
+	std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV> m_expandShaderResourceView = { nullptr };	//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ã€‚
+	StructuredBuffer m_boneMatricesStructureBuffer;	//ãƒœãƒ¼ãƒ³è¡Œåˆ—ã®æ§‹é€ åŒ–ãƒãƒƒãƒ•ã‚¡ã€‚
+	std::vector< SMesh* > m_meshs;						//ãƒ¡ãƒƒã‚·ãƒ¥ã€‚
+	//std::vector< DescriptorHeap > m_descriptorHeap;	//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã€‚
+	DescriptorHeap m_descriptorHeap;					//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã€‚
+	Skeleton* m_skeleton = nullptr;						//ã‚¹ã‚±ãƒ«ãƒˆãƒ³ã€‚
+	void* m_expandData = nullptr;						//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µãƒ‡ãƒ¼ã‚¿ã€‚
 };
-

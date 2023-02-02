@@ -1,90 +1,80 @@
-#pragma once
-#include<d3dx12.h>
-#include<wrl.h>
-
-#include "GraphicsEngine.h"
-
-using namespace Microsoft::WRL;
+ï»¿#pragma once
 
 /// <summary>
-/// ƒCƒ“ƒfƒbƒNƒX ƒoƒbƒtƒ@
+/// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã€‚
 /// </summary>
-class IndexBuffer
-{
+/// <remarks>
+/// </remarks>
+class IndexBuffer {
 public:
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    IndexBuffer();
-
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    ~IndexBuffer();
-
-    /// <summary>
-    /// ‰Šú‰»
-    /// </summary>
-    /// <param name="graphicsEngine">g—p‚µ‚Ä‚¢‚éƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚éƒNƒ‰ƒX</param>
-    /// <param name="size">ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ÌƒTƒCƒY</param>
-    /// <param name="stride">ƒXƒgƒ‰ƒCƒh</param>
-    void Init(GraphicsEngine*& graphicsEngine,int size, int stride);
-
-    /// <summary>
-    /// ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^‚ğƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ÉƒRƒs[
-    /// </summary>
-    /// <param name="srcIndecies">ƒRƒs[Œ³‚ÌƒCƒ“ƒfƒbƒNƒXƒf[ƒ^</param>
-    void Copy(uint16_t* srcIndecies);
-
-
-    /// <summary>
-    /// ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^‚ğƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ÉƒRƒs[
-    /// </summary>
-    /// <param name="srcIndecies">ƒRƒs[Œ³‚ÌƒCƒ“ƒfƒbƒNƒXƒf[ƒ^</param>
-    void Copy(uint32_t* srcIndecies);
-
-
-public:
-    /// <summary>
-    /// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@ƒrƒ…[‚ğæ“¾
-    /// </summary>
-    /// <returns>this index buffer view</returns>
-    const D3D12_INDEX_BUFFER_VIEW& GetIndexBufferView()const { return this->index_Buffer_View_; }
-
-    /// <summary>
-    /// ƒCƒ“ƒfƒbƒNƒX‚Ì”‚ğæ“¾
-    /// </summary>
-    /// <returns></returns>
-    const int GetIndexCount()const { return this->index_Count_; }
-
-    /// <summary>
-    /// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ÌƒXƒgƒ‰ƒCƒh‚ğæ“¾
-    /// </summary>
-    /// <returns>this indexbuffer stride in bytes size</returns>
-    const UINT GetStrideInBytes() const { return static_cast<UINT>(this->stride_In_Bytes_); }
-
-    /// <summary>
-    /// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ÌƒTƒCƒY(’PˆÊ:byte)‚ğæ“¾
-    /// </summary>
-    /// <returns>this indexbuffer size in bytes</returns>
-    const UINT GetSizeInBytes()const { return static_cast<UINT>(this->size_In_Bytes_); }
-
-    /// <summary>
-    /// ID3D12Resouce‚ÌƒAƒhƒŒƒX‚ğŠt‹å
-    /// </summary>
-    /// <returns>return this Resouce</returns>
-    ID3D12Resource* GetResouceAddress()const { return this->index_Buffer_.Get(); }
-
+	/// <summary>
+	/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
+	/// </summary>
+	~IndexBuffer(); 
+	/// <summary>
+	/// åˆæœŸåŒ–ã€‚
+	/// </summary>
+	/// <param name="size">ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã€‚</param>
+	/// <param name="stride">ã‚¹ãƒˆãƒ©ã‚¤ãƒ‰ã€‚</param>
+	void Init(int size, int stride) ;
+	/// <summary>
+	/// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã«ã‚³ãƒ”ãƒ¼ã€‚
+	/// </summary>
+	/// <param name="srcIndecies">ã‚³ãƒ”ãƒ¼å…ƒã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿ã€‚</param>
+	void Copy(uint16_t* srcIndecies) ;
+	/// <summary>
+	/// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã«ã‚³ãƒ”ãƒ¼ã€‚
+	/// </summary>
+	/// <param name="srcIndecies">ã‚³ãƒ”ãƒ¼å…ƒã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿ã€‚</param>
+	void Copy(uint32_t* srcIndecies);
+	/// <summary>
+	/// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	const D3D12_INDEX_BUFFER_VIEW& GetView() const
+	{
+		return m_indexBufferView;
+	}
+	/// <summary>
+	/// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®æ•°ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns>ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®æ•°ã€‚</returns>
+	int GetCount() const
+	{
+		return m_count;
+	}
+	/// <summary>
+	/// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã®ã‚¹ãƒˆãƒ©ã‚¤ãƒ‰ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// ã‚¹ãƒˆãƒ©ã‚¤ãƒ‰ã¨ã„ã†ã®ã¯ã€ï¼‘è¦ç´ ã®ã‚µã‚¤ã‚ºã®ã“ã¨ã€‚
+	/// ã“ã“ã§ã¯ã€ä¸€ã¤ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹ã“ã¨ã«ãªã‚‹ã€‚
+	/// 2ã‹4ãŒè¿”ã£ã¦ãã¾ã™ã€‚
+	/// <returns></returns>
+	UINT GetStrideInBytes() const
+	{
+		return static_cast<UINT>(m_strideInBytes);
+	}
+	/// <summary>
+	/// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º(å˜ä½ï¼šãƒã‚¤ãƒˆ)ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	UINT GetSizeInBytes() const
+	{
+		return static_cast<UINT>(m_sizeInBytes);
+	}
+	/// <summary>
+	/// ID3D12Resourceã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã—ã¾ã™ã€‚
+	/// </summary>
+	/// <returns></returns>
+	ID3D12Resource* GetID3DResourceAddress() const
+	{
+		return m_indexBuffer;
+	}
 private:
-    //ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@
-    ComPtr<ID3D12Resource> index_Buffer_;
-    //ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@ƒrƒ…[
-    D3D12_INDEX_BUFFER_VIEW index_Buffer_View_;
-
-    //ƒCƒ“ƒfƒbƒNƒX‚Ì”
-    int index_Count_;
-    //ƒXƒgƒ‰ƒCƒh
-    int stride_In_Bytes_;
-    //ƒTƒCƒY
-    int size_In_Bytes_;
+private:
+	ID3D12Resource* m_indexBuffer = nullptr;	//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã€‚
+	D3D12_INDEX_BUFFER_VIEW m_indexBufferView;	//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼ã€‚
+	int m_count = 0;							//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®æ•°ã€‚
+	int m_strideInBytes = 0;					//ã‚¹ãƒˆãƒ©ã‚¤ãƒ‰(å˜ä½ï¼šãƒã‚¤ãƒˆ)ã€‚
+	int m_sizeInBytes = 0;						//ã‚µã‚¤ã‚º(å˜ä½ï¼šãƒã‚¤ãƒˆ)ã€‚
 };

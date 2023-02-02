@@ -1,64 +1,36 @@
+ï»¿#include "stdafx.h"
 #include "VertexBuffer.h"
 
-VertexBuffer::VertexBuffer():
-    vertex_Buffer_(),
-    vertex_Buffer_View_()
-{
-}
 
 VertexBuffer::~VertexBuffer()
 {
+	if (m_vertexBuffer) {
+		m_vertexBuffer->Release();
+	}
 }
-
-//‰Šú‰»
-void VertexBuffer::Init(GraphicsEngine*& graphicsEngine, int size, int stride)
+void VertexBuffer::Init(int size, int stride)
 {
-    //ƒq[ƒv‚ÌÝ’è Žæ“¾
-    auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    //ƒŠƒ\[ƒX‚ÌƒTƒCƒY Žæ“¾
-    auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
-
-    ////RESOURCE ¶¬
-    //HRESULT hr = device.CreateCommittedResource(
-    //    &heapProp,
-    //    D3D12_HEAP_FLAG_NONE,
-    //    &resourceDesc,
-    //    D3D12_RESOURCE_STATE_GENERIC_READ,
-    //    nullptr,
-    //    IID_PPV_ARGS(&vertex_Buffer_)
-    //);
-    
-    graphicsEngine->CreateCommittedResource(
-        heapProp,
-        D3D12_HEAP_FLAG_NONE,
-        resourceDesc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        vertex_Buffer_
-    );
-
-    //’¸“_ƒoƒbƒtƒ@‚Ì–¼‘O ƒZƒbƒg
-    vertex_Buffer_->SetName(L"VertexBuffer");
-
-    //GPU‚Ì‰¼‘zƒAƒhƒŒƒX ƒZƒbƒg
-    vertex_Buffer_View_.BufferLocation = vertex_Buffer_->GetGPUVirtualAddress();
-    //ƒoƒbƒtƒ@[‚ÌƒTƒCƒY ƒZƒbƒg
-    vertex_Buffer_View_.SizeInBytes = size;
-    //Še’¸“_ƒGƒ“ƒgƒŠ‚ÌƒTƒCƒY ƒZƒbƒg
-    vertex_Buffer_View_.StrideInBytes = stride;
+	auto d3dDevice = g_graphicsEngine->GetD3DDevice();
+	auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	auto rDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
+	d3dDevice->CreateCommittedResource(
+		&heapProp,
+		D3D12_HEAP_FLAG_NONE,
+		&rDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&m_vertexBuffer));
+	
+	m_vertexBuffer->SetName(L"VertexBuffer");
+	//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®ãƒ“ãƒ¥ãƒ¼ã‚’ä½œæˆã€‚
+	m_vertexBufferView.BufferLocation = m_vertexBuffer->GetGPUVirtualAddress();
+	m_vertexBufferView.SizeInBytes = size;
+	m_vertexBufferView.StrideInBytes = stride;
 }
-
-void VertexBuffer::Copy(void* strVertices)
+void VertexBuffer::Copy(void* srcVertices)
 {
-    uint8_t* data;
-    
-    //mapŠJŽn
-    this->vertex_Buffer_->Map(0, nullptr, (void**)&data);
-
-    //ƒƒ‚ƒŠ‚ðƒRƒs[@(map‚µ‚Ä‚¢‚é‚Ì‚Ådata‚ªvertexbuffer‚É“ü‚é)
-    //memcpy(data, strVertices, this->vertex_Buffer_View_.SizeInBytes);
-    memcpy(data, strVertices, vertex_Buffer_View_.SizeInBytes);
-    
-    //map‰ðœ
-    this->vertex_Buffer_->Unmap(0,nullptr);
+	uint8_t* pData;
+	m_vertexBuffer->Map(0, nullptr, (void**)&pData);
+	memcpy(pData, srcVertices, m_vertexBufferView.SizeInBytes);
+	m_vertexBuffer->Unmap(0, nullptr);
 }

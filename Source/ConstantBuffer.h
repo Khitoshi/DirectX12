@@ -1,94 +1,75 @@
-#pragma once
+ï»¿#pragma once
 
-#include <d3dx12.h>
 
-#include <wrl.h>
-
-using namespace Microsoft::WRL;
-
-class GraphicsEngine;
-
-class ConstantBuffer
-{
+class ConstantBuffer{
 public:
 	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	/// </summary>
-	ConstantBuffer();
-
+	ConstantBuffer() {}
 	/// <summary>
-	/// ƒ€[ƒuƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	/// *ƒRƒs[‚Å‚Í‚È‚­÷“n‚µ‚Ä‚¢‚é*
-	/// </summary>
-	/// <param name="constantBuffer"></param>
-	ConstantBuffer(ConstantBuffer&& cb);
-
-	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
+	/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 	/// </summary>
 	~ConstantBuffer();
-
 	/// <summary>
-	/// ‰Šú‰»
+	/// ãƒ ãƒ¼ãƒ–ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	/// </summary>
-	/// <param name="size">’è”ƒoƒbƒtƒ@‚ÌƒTƒCƒY</param>
-	/// <param name="srcData">ƒ\[ƒXƒf[ƒ^Cnull‚ğw’è‚·‚é‚±‚Æ‚à‰Â”\</param>
-	/// <param name="graphicsEngine">ƒfƒoƒCƒX‚ğŠi”[‚µ‚Ä‚¢‚é</param>
-	void Init(GraphicsEngine*& graphicsEngine, int constantBufferSize, void* srcData);
-
-	/// <summary>
-	/// ƒf[ƒ^‚ğVRAM‚ÉƒRƒs[
-	/// </summary>
-	/// <param name="data">ƒRƒs[Œ³‚Ìƒf[ƒ^</param>
-	void CopyToVRAM(GraphicsEngine*& graphicsEngine, void* data);
-	template<class T>
-	void CopyToVRAM(GraphicsEngine*& graphicsEngine, T& data)
+	/// <param name="r"></param>
+	ConstantBuffer(ConstantBuffer&& r)
 	{
-		CopyToVRAM(graphicsEngine, &data);
+		m_constantBuffer[0] = r.m_constantBuffer[0];
+		m_constantBuffer[1] = r.m_constantBuffer[1];
+		m_constBufferCPU[0] = r.m_constBufferCPU[0];
+		m_constBufferCPU[1] = r.m_constBufferCPU[1];
+		m_size = r.m_size;
+		m_allocSize = r.m_allocSize;
+		m_isValid = r.m_isValid;
+
+		r.m_constantBuffer[0] = nullptr;
+		r.m_constantBuffer[1] = nullptr;
+		r.m_constBufferCPU[0] = nullptr;
+		r.m_constBufferCPU[1] = nullptr;
 	}
-	
 	/// <summary>
-	/// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É’è”ƒoƒbƒtƒ@ƒrƒ…[‚ğ“o˜^
+	/// åˆæœŸåŒ–ã€‚
 	/// </summary>
-	/// <param name="descriptorHandle">ƒfƒBƒXƒNƒŠƒvƒ^ƒnƒ“ƒhƒ‹</param>
-	/// <param name="graphicsEngine">ƒfƒoƒCƒXæ“¾—p</param>
-	void RegistConstantBufferView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle);
-	void RegistConstantBufferView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo);
-
-public:
+	/// <param name="size">å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã€‚</param>
+	/// <param name="srcData">ã‚½ãƒ¼ã‚¹ãƒ‡ãƒ¼ã‚¿ã€‚nullã‚’æŒ‡å®šã™ã‚‹ã“ã¨ã‚‚å¯èƒ½ã€‚</param>
+	void Init(int size, void* srcData = nullptr);
 	/// <summary>
-	/// ’è”ƒoƒbƒtƒ@‚ÌGPU‰¼‘zƒAƒhƒŒƒX‚ğæ“¾
-	/// </summary>
-	/// <param name="graphicsEngine"></param>
-	/// <returns></returns>
-	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress(GraphicsEngine*& graphicsEngine);
-
-public:
-#pragma region Get Method
-	/// <summary>
-	/// —˜—p‰Â”\‚Èƒoƒbƒtƒ@‚©‚Ç‚¤‚©‚ğ”»’èB
+	/// åˆ©ç”¨å¯èƒ½ãªãƒãƒƒãƒ•ã‚¡ã‹ã©ã†ã‹ã‚’åˆ¤å®šã€‚
 	/// </summary>
 	/// <returns></returns>
 	bool IsValid() const
 	{
-		return this->is_Valid_;
+		return m_isValid;
 	}
-#pragma endregion
-
-
+	/// <summary>
+	/// ãƒ‡ãƒ¼ã‚¿ã‚’VRAMã«ã‚³ãƒ”ãƒ¼ã™ã‚‹ã€‚
+	/// </summary>
+	/// <param name="data"></param>
+	void CopyToVRAM(void* data);
+	template< class T>
+	void CopyToVRAM(T& data)
+	{
+		CopyToVRAM(&data);
+	}
+	/// <summary>
+	/// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã«ConstantBufferViewã‚’ç™»éŒ²ã€‚
+	/// </summary>
+	/// <param name="descriptorHandle"></param>
+	void RegistConstantBufferView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle);
+	void RegistConstantBufferView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo);
+	/// <summary>
+	/// VRAMä¸Šã®ä»®æƒ³ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹ã€‚
+	/// </summary>
+	/// <returns></returns>
+	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress();
+	
 private:
-	//’è”ƒoƒbƒtƒ@B
-	//ComPtr<ID3D12Resource> constant_Buffer_[2];
-	ID3D12Resource* constant_Buffer_[2];
-
-	//CPU‘¤‚©‚çƒAƒNƒZƒX‚Å‚«‚é‚·‚é’è”ƒoƒbƒtƒ@‚ÌƒAƒhƒŒƒXB
-	void* const_Buffer_CPU_[2];
-
-	//’è”ƒoƒbƒtƒ@‚ÌƒTƒCƒYB
-	int constant_Buffer_Size_;
-	//aoolc‚ÌƒTƒCƒY
-	int alloc_Size_;
-
-	//—˜—p‰Â”\ƒtƒ‰ƒO
-	bool is_Valid_;
+	ID3D12Resource* m_constantBuffer[2] = {nullptr};//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã€‚
+	void* m_constBufferCPU[2] = { nullptr };		//CPUå´ã‹ã‚‰ã‚¢ã‚¯ã‚»ã‚¹ã§ãã‚‹ã™ã‚‹å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã€‚
+	int m_size = 0;									//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã€‚
+	int m_allocSize = 0;
+	bool m_isValid = false;							//åˆ©ç”¨å¯èƒ½ï¼Ÿ
 };

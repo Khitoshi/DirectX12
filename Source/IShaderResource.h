@@ -1,18 +1,13 @@
-#pragma once
-#include "d3dx12.h"
-
-#include "GraphicsEngine.h"
-
+ï»¿
 class IShaderResource {
 public:
 	virtual ~IShaderResource()
 	{
 	}
 	/// <summary>
-	/// SRV‚É“o˜^B
+	/// SRVã«ç™»éŒ²ã€‚
 	/// </summary>
-	/// <param name="descriptorHandle">CPU ƒfƒBƒXƒNƒŠƒvƒ^@ƒnƒ“ƒhƒ‹</param>
-	/// <param name="bufferNumber">ƒoƒbƒtƒ@‚Ì”Ô†</param>
-	/// <param name="graphicsEngine">ƒfƒoƒCƒXæ“¾—p</param>
-	virtual void RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber) = 0;
+	/// <param name="descriptorHandle"></param>
+	virtual void RegistShaderResourceView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo) = 0;
+
 };

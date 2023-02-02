@@ -1,364 +1,330 @@
+ï»¿#include "stdafx.h"
 #include "Material.h"
-#include "RenderContext.h"
-#include "PipelineState.h"
-#include "GraphicsEngine.h"
-#include "tkEngine.h"
 
-//ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-Material::Material():
-    albedo_Map_(),
-    normal_Map_(),
-    specular_Map_(),
-    reflection_Map_(),
-    refraction_Map_(),
-    vs_Non_Skin_Model_(nullptr),
-    vs_Skin_Model_(nullptr),
-    ps_Model_(nullptr),
-    non_Skin_Model_Pipeline_State_(),
-    skin_Model_Pipeline_State_(),
-    trans_Skin_Model_Pipeline_State_(),
-    trans_Non_Skin_Model_Pipeline_State_(),
-    constant_Buffer_(),
-    root_Signature_()
+//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã¨ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆå‘¨ã‚Šã¯ã‚«ãƒªã‚«ãƒªã‚«ãƒª
+enum {
+	enDescriptorHeap_CB,
+	enDescriptorHeap_SRV,
+	enNumDescriptorHeap
+};
+	
+void Material::InitTexture(const TkmFile::SMaterial& tkmMat)
 {
-}
 
-//ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
-Material::~Material()
-{
-}
+	const auto& nullTextureMaps = g_graphicsEngine->GetNullTextureMaps();
 
-//tkm file ‚Ìƒ}ƒeƒŠƒAƒ‹î•ñ‚©‚ç‰Šú‰»‚·‚é
+	const char* filePath = nullptr;
+	char* map = nullptr;
+	unsigned int mapSize;
+
+	//ã‚¢ãƒ«ãƒ™ãƒ‰ãƒãƒƒãƒ—ã€‚
+	{
+		if (tkmMat.albedoMap != nullptr)
+		{
+			filePath = tkmMat.albedoMapFilePath.c_str();
+			map = tkmMat.albedoMap.get();
+			mapSize = tkmMat.albedoMapSize;
+		}
+		else
+		{
+			filePath = nullTextureMaps.GetAlbedoMapFilePath();
+			map = nullTextureMaps.GetAlbedoMap().get();
+			mapSize = nullTextureMaps.GetAlbedoMapSize();
+		}
+		auto albedoMap = g_engine->GetTextureFromBank(filePath);
+
+		if (albedoMap == nullptr)
+		{
+			albedoMap = new Texture();
+			albedoMap->InitFromMemory(map, mapSize);
+			g_engine->RegistTextureToBank(filePath, albedoMap);
+		}
+		m_albedoMap = albedoMap;
+	}
+
+
+	//æ³•ç·šãƒãƒƒãƒ—ã€‚
+	{
+		if (tkmMat.normalMap != nullptr)
+		{
+			filePath = tkmMat.normalMapFilePath.c_str();
+			map = tkmMat.normalMap.get();
+			mapSize = tkmMat.normalMapSize;
+		}
+		else
+		{
+			filePath = nullTextureMaps.GetNormalMapFilePath();
+			map = nullTextureMaps.GetNormalMap().get();
+			mapSize = nullTextureMaps.GetNormalMapSize();
+		}
+		auto normalMap = g_engine->GetTextureFromBank(filePath);
+
+		if (normalMap == nullptr)
+		{
+			normalMap = new Texture();
+			normalMap->InitFromMemory(map, mapSize);
+			g_engine->RegistTextureToBank(filePath, normalMap);
+		}
+		m_normalMap = normalMap;
+	}
+
+
+
+	//ã‚¹ãƒšã‚­ãƒ¥ãƒ©ãƒãƒƒãƒ—ã€‚
+	{
+		if (tkmMat.specularMap != nullptr)
+		{
+			filePath = tkmMat.specularMapFilePath.c_str();
+			map = tkmMat.specularMap.get();
+			mapSize = tkmMat.specularMapSize;
+		}
+		else
+		{
+			filePath = nullTextureMaps.GetSpecularMapFilePath();
+			map = nullTextureMaps.GetSpecularMap().get();
+			mapSize = nullTextureMaps.GetSpecularMapSize();
+		}
+		auto specularMap = g_engine->GetTextureFromBank(filePath);
+
+		if (specularMap == nullptr)
+		{
+			specularMap = new Texture();
+			specularMap->InitFromMemory(map, mapSize);
+			g_engine->RegistTextureToBank(filePath, specularMap);
+		}
+		m_specularMap = specularMap;
+	}
+
+	//åå°„ãƒãƒƒãƒ—ã€‚
+	{
+		if (tkmMat.reflectionMap != nullptr)
+		{
+			filePath = tkmMat.reflectionMapFilePath.c_str();
+			map = tkmMat.reflectionMap.get();
+			mapSize = tkmMat.reflectionMapSize;
+		}
+		else
+		{
+			filePath = nullTextureMaps.GetReflectionMapFilePath();
+			map = nullTextureMaps.GetReflectionMap().get();
+			mapSize = nullTextureMaps.GetReflectionMapSize();
+		}
+		auto reflectionMap = g_engine->GetTextureFromBank(filePath);
+
+		if (reflectionMap == nullptr)
+		{
+			reflectionMap = new Texture();
+			reflectionMap->InitFromMemory(map, mapSize);
+			g_engine->RegistTextureToBank(filePath, reflectionMap);
+		}
+		m_reflectionMap = reflectionMap;
+	}
+
+	//å±ˆæŠ˜ãƒãƒƒãƒ—ã€‚
+	{
+		if (tkmMat.refractionMap != nullptr)
+		{
+			filePath = tkmMat.refractionMapFilePath.c_str();
+			map = tkmMat.refractionMap.get();
+			mapSize = tkmMat.refractionMapSize;
+		}
+		else
+		{
+			filePath = nullTextureMaps.GetRefractionMapFilePath();
+			map = nullTextureMaps.GetRefractionMap().get();
+			mapSize = nullTextureMaps.GetRefractionMapSize();
+		}
+		auto refractionMap = g_engine->GetTextureFromBank(filePath);
+
+		if (refractionMap == nullptr)
+		{
+			refractionMap = new Texture();
+			refractionMap->InitFromMemory(map, mapSize);
+			g_engine->RegistTextureToBank(filePath, refractionMap);
+		}
+		m_refractionMap = refractionMap;
+	}
+
+
+}
 void Material::InitFromTkmMaterila(
-    tkEngine*& tkEngine,
-    GraphicsEngine*& graphicsEngine,
-    const TkmFile::SMaterial& tkmMat, 
-    const char* fxFilePath,
-    const char* vsEntryPointFuncName, 
-    const char* vsSkinEntryPointFuncName, 
-    const char* psEntryPointFuncName, 
-    const std::array<DXGI_FORMAT, 
-    static_cast<int>(D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT)>& colorBufferFormat, 
-    int numSrv, 
-    int numCbv, 
-    UINT offsetInDescriptorsFromTableStartCB, 
-    UINT offsetInDescriptorsFromTableStartSRV, 
-    D3D12_FILTER samplerFilter
+	const TkmFile::SMaterial& tkmMat,
+	const char* fxFilePath,
+	const char* vsEntryPointFunc,
+	const char* vsSkinEntryPointFunc,
+	const char* psEntryPointFunc,
+	const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET>& colorBufferFormat,
+	int numSrv,
+	int numCbv,
+	UINT offsetInDescriptorsFromTableStartCB,
+	UINT offsetInDescriptorsFromTableStartSRV,
+	D3D12_FILTER samplerFilter
 )
 {
-    //ƒeƒNƒXƒ`ƒƒ‚ğƒ[ƒh
-    InitTexture(tkEngine, graphicsEngine, tkmMat);
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
+	InitTexture(tkmMat);
+	
+	//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’ä½œæˆã€‚
+	SMaterialParam matParam;
+	matParam.hasNormalMap = m_normalMap->IsValid() ? 1 : 0;
+	matParam.hasSpecMap = m_specularMap->IsValid() ? 1 : 0;
+	m_constantBuffer.Init(sizeof(SMaterialParam), &matParam);
 
-    //’è”ƒoƒbƒtƒ@ ¶¬
-    SMaterialParam material_param;
-    material_param.hasNormalMap = this->normal_Map_->IsValid() ? 1 : 0;
-    material_param.hasSpecMap = this->specular_Map_->IsValid() ? 1 : 0;
-    this->constant_Buffer_.Init(graphicsEngine, sizeof(SMaterialParam), &material_param);
+	//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã‚’åˆæœŸåŒ–ã€‚
+	D3D12_STATIC_SAMPLER_DESC samplerDescArray[2];
+	//ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚µãƒ³ãƒ—ãƒ©
+	samplerDescArray[0].Filter = samplerFilter;
+	samplerDescArray[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplerDescArray[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplerDescArray[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplerDescArray[0].MipLODBias = 0;
+	samplerDescArray[0].MaxAnisotropy = 0;
+	samplerDescArray[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	samplerDescArray[0].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
+	samplerDescArray[0].MinLOD = 0.0f;
+	samplerDescArray[0].MaxLOD = D3D12_FLOAT32_MAX;
+	samplerDescArray[0].ShaderRegister = 0;
+	samplerDescArray[0].RegisterSpace = 0;
+	samplerDescArray[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ç”¨ã®ã‚µãƒ³ãƒ—ãƒ©ã€‚
+	samplerDescArray[1] = samplerDescArray[0];
+	//æ¯”è¼ƒå¯¾è±¡ã®å€¤ãŒå°ã•ã‘ã‚Œã°ï¼ã€å¤§ãã‘ã‚Œã°ï¼‘ã‚’è¿”ã™æ¯”è¼ƒé–¢æ•°ã‚’è¨­å®šã™ã‚‹ã€‚
+	samplerDescArray[1].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+	samplerDescArray[1].ComparisonFunc = D3D12_COMPARISON_FUNC_GREATER;
+	samplerDescArray[1].MaxAnisotropy = 1;
+	samplerDescArray[1].ShaderRegister = 1;
 
-    //ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚ğ‰Šú‰»(ƒfƒtƒHƒ‹ƒg‚ÆƒVƒƒƒhƒE‚Ì2‚Â)
-    D3D12_STATIC_SAMPLER_DESC sampler_desc_array[2];
-    
-    //ƒfƒtƒHƒ‹ƒgƒTƒ“ƒvƒ‰
-    sampler_desc_array[0].Filter = samplerFilter;
-    sampler_desc_array[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    sampler_desc_array[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    sampler_desc_array[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    sampler_desc_array[0].MipLODBias = 0;
-    sampler_desc_array[0].MaxAnisotropy = 0;
-    sampler_desc_array[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-    sampler_desc_array[0].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
-    sampler_desc_array[0].MinLOD = 0.0f;
-    sampler_desc_array[0].MaxLOD = D3D12_FLOAT32_MAX;
-    sampler_desc_array[0].ShaderRegister = 0;
-    sampler_desc_array[0].RegisterSpace = 0;
-    sampler_desc_array[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	m_rootSignature.Init(
+		samplerDescArray,
+		2,
+		numCbv,
+		numSrv,
+		8,
+		offsetInDescriptorsFromTableStartCB,
+		offsetInDescriptorsFromTableStartSRV
+	);
 
-    //ƒVƒƒƒhƒEƒ}ƒbƒv—pƒTƒ“ƒvƒ‰
-    sampler_desc_array[1] = sampler_desc_array[0];
-    //”äŠr‘ÎÛ‚Ì’l‚ª¬‚³‚¯‚ê‚Î0 ‘å‚«‚¯‚ê‚Î1‚ğ•Ô‚·”äŠrŠÖ”‚ğİ’è‚·‚é
-    sampler_desc_array[1].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
-    sampler_desc_array[1].ComparisonFunc = D3D12_COMPARISON_FUNC_GREATER;
-    sampler_desc_array[1].MaxAnisotropy = 1;
-    sampler_desc_array[1].ShaderRegister = 1;
-
-    //‰Šú‰»
-    this->root_Signature_.Init(
-        graphicsEngine,
-        sampler_desc_array,
-        2,
-        numCbv,
-        numSrv,
-        8,
-        offsetInDescriptorsFromTableStartCB,
-        offsetInDescriptorsFromTableStartSRV
-    );
-
-    //.fx file path ‚ª‘¶İ‚·‚éê‡
-    if (fxFilePath != nullptr && strlen(fxFilePath) > 0) {
-        //ƒVƒF[ƒ_[‚ğ‰Šú‰»B
-        InitShaders(
-            tkEngine,
-            fxFilePath,
-            vsEntryPointFuncName,
-            vsSkinEntryPointFuncName,
-            psEntryPointFuncName
-        );
-        //ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚ğ‰Šú‰»B
-        InitPipelineState(graphicsEngine,colorBufferFormat);
-    }
+	if (fxFilePath != nullptr && strlen(fxFilePath) > 0) {
+		//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’åˆæœŸåŒ–ã€‚
+		InitShaders(fxFilePath, vsEntryPointFunc, vsSkinEntryPointFunc, psEntryPointFunc);
+		//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã‚’åˆæœŸåŒ–ã€‚
+		InitPipelineState(colorBufferFormat);
+	}
 }
+void Material::InitPipelineState(const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET>& colorBufferFormat)
+{
+	// é ‚ç‚¹ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã‚’å®šç¾©ã™ã‚‹ã€‚
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 48, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_SINT, 0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 72, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	};
 
-//ƒŒƒ“ƒ_ƒŠƒ“ƒOŠJn‚·‚é‚ÉŒÄ‚Ño‚·ŠÖ”
+	//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ä½œæˆã€‚
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = { 0 };
+	psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
+	psoDesc.pRootSignature = m_rootSignature.Get();
+	psoDesc.VS = CD3DX12_SHADER_BYTECODE(m_vsSkinModel->GetCompiledBlob());
+	psoDesc.PS = CD3DX12_SHADER_BYTECODE(m_psModel->GetCompiledBlob());
+	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+#ifdef SAMPLE_11
+	// èƒŒé¢ã‚’æç”»ã—ã¦ã„ãªã„ã¨å½±ãŒãŠã‹ã—ããªã‚‹ãŸã‚ã€
+	// ã‚·ãƒ£ãƒ‰ã‚¦ã®ã‚µãƒ³ãƒ—ãƒ«ã®ã¿ã‚«ãƒªãƒ³ã‚°ã‚’ã‚ªãƒ•ã«ã™ã‚‹ã€‚
+	// æœ¬æ¥ã¯ã‚¢ãƒ—ãƒªå´ã‹ã‚‰ã‚«ãƒªãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰ã‚’æ¸¡ã™ã®ãŒã„ã„ã®ã ã‘ã©ã€
+	// æ›¸ç±ã«è¨˜è¼‰ã—ã¦ã„ã‚‹ã‚³ãƒ¼ãƒ‰ã«è¿½è¨˜ãŒã„ã‚‹ã®ã§ã€ã‚¨ãƒ³ã‚¸ãƒ³å´ã§å¸åã™ã‚‹ã€‚
+	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+#else
+	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+#endif
+	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+#ifdef TK_ENABLE_ALPHA_TO_COVERAGE
+	psoDesc.BlendState.AlphaToCoverageEnable = TRUE;
+#endif
+	psoDesc.DepthStencilState.DepthEnable = TRUE;
+	psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	psoDesc.DepthStencilState.StencilEnable = FALSE;
+	psoDesc.SampleMask = UINT_MAX;
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	
+	int numRenderTarget = 0;
+	for (auto& format : colorBufferFormat) {
+		if (format == DXGI_FORMAT_UNKNOWN) {
+			//ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãŒæŒ‡å®šã•ã‚Œã¦ã„ãªã„å ´æ‰€ãŒæ¥ãŸã‚‰çµ‚ã‚ã‚Šã€‚
+			break;
+		}
+		psoDesc.RTVFormats[numRenderTarget] = colorBufferFormat[numRenderTarget];
+		numRenderTarget++;
+	}
+	psoDesc.NumRenderTargets = numRenderTarget;
+	psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+	psoDesc.SampleDesc.Count = 1;
+
+	m_skinModelPipelineState.Init(psoDesc);
+
+	//ç¶šã„ã¦ã‚¹ã‚­ãƒ³ãªã—ãƒ¢ãƒ‡ãƒ«ç”¨ã‚’ä½œæˆã€‚
+	psoDesc.VS = CD3DX12_SHADER_BYTECODE(m_vsNonSkinModel->GetCompiledBlob());
+	m_nonSkinModelPipelineState.Init(psoDesc);
+
+	//ç¶šã„ã¦åŠé€æ˜ãƒãƒ†ãƒªã‚¢ãƒ«ç”¨ã€‚
+	psoDesc.VS = CD3DX12_SHADER_BYTECODE(m_vsSkinModel->GetCompiledBlob());
+	psoDesc.BlendState.IndependentBlendEnable = TRUE;
+	psoDesc.BlendState.RenderTarget[0].BlendEnable = TRUE;
+	psoDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	psoDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	psoDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+
+	
+	m_transSkinModelPipelineState.Init(psoDesc);
+
+	psoDesc.VS = CD3DX12_SHADER_BYTECODE(m_vsNonSkinModel->GetCompiledBlob());
+	m_transNonSkinModelPipelineState.Init(psoDesc);
+
+}
+void Material::InitShaders(
+	const char* fxFilePath,
+	const char* vsEntryPointFunc,
+	const char* vsSkinEntriyPointFunc,
+	const char* psEntryPointFunc
+)
+{
+	//ã‚¹ã‚­ãƒ³ãªã—ãƒ¢ãƒ‡ãƒ«ç”¨ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
+	m_vsNonSkinModel = g_engine->GetShaderFromBank(fxFilePath, vsEntryPointFunc);
+	if (m_vsNonSkinModel == nullptr) {
+		m_vsNonSkinModel = new Shader;
+		m_vsNonSkinModel->LoadVS(fxFilePath, vsEntryPointFunc);
+		g_engine->RegistShaderToBank(fxFilePath, vsEntryPointFunc, m_vsNonSkinModel);
+	}
+	//ã‚¹ã‚­ãƒ³ã‚ã‚Šãƒ¢ãƒ‡ãƒ«ç”¨ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
+	m_vsSkinModel = g_engine->GetShaderFromBank(fxFilePath, vsSkinEntriyPointFunc);
+	if (m_vsSkinModel == nullptr) {
+		m_vsSkinModel = new Shader;
+		m_vsSkinModel->LoadVS(fxFilePath, vsSkinEntriyPointFunc);
+		g_engine->RegistShaderToBank(fxFilePath, vsSkinEntriyPointFunc, m_vsSkinModel);
+	}
+
+	m_psModel = g_engine->GetShaderFromBank(fxFilePath, psEntryPointFunc);
+	if (m_psModel == nullptr) {
+		m_psModel = new Shader;
+		m_psModel->LoadPS(fxFilePath, psEntryPointFunc);
+		g_engine->RegistShaderToBank(fxFilePath, psEntryPointFunc, m_psModel);
+	}
+}
 void Material::BeginRender(RenderContext& rc, int hasSkin)
 {
-    //ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ@ƒZƒbƒg
-    rc.SetRootSignature(this->root_Signature_);
-    if (hasSkin)
-    {
-        rc.SetPipelineState(this->trans_Skin_Model_Pipeline_State_);
-    }
-    else
-    {
-        rc.SetPipelineState(this->trans_Non_Skin_Model_Pipeline_State_);
-    }
-}
-
-void Material::InitPipelineState(GraphicsEngine*& graphicsEngine,const std::array<DXGI_FORMAT, static_cast<int>(D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT)>& colorBufferFormat)
-{
-    // ’¸“_ƒŒƒCƒAƒEƒg‚ğ’è‹`‚·‚éB
-    D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
-    {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 48, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_SINT, 0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 72, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-    };
-
-    //ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚ğİ’è
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC pso_desc = { 0 };
-    pso_desc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
-    pso_desc.pRootSignature = this->root_Signature_.GetRootSignature();
-    pso_desc.VS = CD3DX12_SHADER_BYTECODE(this->vs_Skin_Model_->GetCompiledBlob());
-    pso_desc.PS = CD3DX12_SHADER_BYTECODE(this->ps_Model_->GetCompiledBlob());
-    pso_desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    pso_desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-    pso_desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-
-    pso_desc.DepthStencilState.DepthEnable = TRUE;
-    pso_desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-    pso_desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-    pso_desc.DepthStencilState.StencilEnable = FALSE;
-    pso_desc.SampleMask = UINT_MAX;
-    pso_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
-    int num_render_target = 0;
-    for (auto& format : colorBufferFormat) {
-        if (format == DXGI_FORMAT_UNKNOWN) {
-            //ƒtƒH[ƒ}ƒbƒg‚ªw’è‚³‚ê‚Ä‚¢‚È‚¢êŠ‚ª—ˆ‚½‚çI‚í‚èB
-            break;
-        }
-        pso_desc.RTVFormats[num_render_target] = colorBufferFormat[num_render_target];
-        num_render_target++;
-    }
-    pso_desc.NumRenderTargets = num_render_target;
-    pso_desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-    pso_desc.SampleDesc.Count = 1;
-
-
-    this->skin_Model_Pipeline_State_.Init(graphicsEngine,pso_desc);
-
-    //‘±‚¢‚ÄƒXƒLƒ“‚È‚µƒ‚ƒfƒ‹—p‚ğì¬B
-    pso_desc.VS = CD3DX12_SHADER_BYTECODE(this->vs_Non_Skin_Model_->GetCompiledBlob());
-    this->non_Skin_Model_Pipeline_State_.Init(graphicsEngine,pso_desc);
-
-    //‘±‚¢‚Ä”¼“§–¾ƒ}ƒeƒŠƒAƒ‹—pB
-    pso_desc.VS = CD3DX12_SHADER_BYTECODE(this->vs_Skin_Model_->GetCompiledBlob());
-    pso_desc.BlendState.IndependentBlendEnable = TRUE;
-    pso_desc.BlendState.RenderTarget[0].BlendEnable = TRUE;
-    pso_desc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-    pso_desc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-    pso_desc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-
-
-    this->trans_Skin_Model_Pipeline_State_.Init(graphicsEngine,pso_desc);
-
-    pso_desc.VS = CD3DX12_SHADER_BYTECODE(this->vs_Non_Skin_Model_->GetCompiledBlob());
-    this->trans_Non_Skin_Model_Pipeline_State_.Init(graphicsEngine,pso_desc);
-
-
-}
-
-void Material::InitShaders(
-    tkEngine*& tk,
-    const char* fxFilePath, 
-    const char* vsEntryPointFuncName, 
-    const char* vsSkinEntriyPointFuncName, 
-    const char* psEntryPointFuncName)
-{
-    //ƒXƒLƒ“‚È‚µƒ‚ƒfƒ‹—p‚ÌƒVƒF[ƒ_[‚ğƒ[ƒh‚·‚éB
-    this->vs_Non_Skin_Model_ = tk->GetShaderFromBank(fxFilePath, vsEntryPointFuncName);
-    if (this->vs_Non_Skin_Model_ == nullptr) {
-        this->vs_Non_Skin_Model_ = new Shader;
-        this->vs_Non_Skin_Model_->LoadVS(fxFilePath, vsEntryPointFuncName);
-        tk->RegistShaderToBank(fxFilePath, vsEntryPointFuncName, this->vs_Non_Skin_Model_);
-    }
-    //ƒXƒLƒ“‚ ‚èƒ‚ƒfƒ‹—p‚ÌƒVƒF[ƒ_[‚ğƒ[ƒh‚·‚éB
-    this->vs_Skin_Model_ = tk->GetShaderFromBank(fxFilePath, vsSkinEntriyPointFuncName);
-    if (this->vs_Skin_Model_ == nullptr) {
-        this->vs_Skin_Model_ = new Shader;
-        this->vs_Skin_Model_->LoadVS(fxFilePath, vsSkinEntriyPointFuncName);
-        tk->RegistShaderToBank(fxFilePath, vsSkinEntriyPointFuncName, this->vs_Skin_Model_);
-    }
-
-    this->ps_Model_ = tk->GetShaderFromBank(fxFilePath, psEntryPointFuncName);
-    if (this->ps_Model_ == nullptr) {
-        this->ps_Model_ = new Shader;
-        this->ps_Model_->LoadPS(fxFilePath, psEntryPointFuncName);
-        tk->RegistShaderToBank(fxFilePath, psEntryPointFuncName, this->ps_Model_);
-    }
-}
-
-void Material::InitTexture(
-    tkEngine*& tk,
-    GraphicsEngine*& graphicsEngine,
-    const TkmFile::SMaterial& tkmMat)
-{
-    const auto& nullTextureMaps = graphicsEngine->GetNullTextureMaps();
-
-    const char* filePath = nullptr;
-    char* map = nullptr;
-    unsigned int mapSize;
-    
-    //ƒAƒ‹ƒxƒhƒ}ƒbƒvB
-    {
-        if (tkmMat.albedoMap != nullptr)
-        {
-            filePath = tkmMat.albedoMapFilePath.c_str();
-            map = tkmMat.albedoMap.get();
-            mapSize = tkmMat.albedoMapSize;
-        }
-        else
-        {
-            filePath = nullTextureMaps.GetAlbedoMapFilePath();
-            map = nullTextureMaps.GetAlbedoMap().get();
-            mapSize = nullTextureMaps.GetAlbedoMapSize();
-        }
-        auto albedoMap = tk->GetTextureFromBank(filePath);
-
-        if (albedoMap == nullptr)
-        {
-            albedoMap = new Texture();
-            albedoMap->InitFromMemory(graphicsEngine,map, mapSize);
-            tk->RegistTextureToBank(filePath, albedoMap);
-        }
-        this->albedo_Map_ = albedoMap;
-    }
-
-
-    //–@üƒ}ƒbƒvB
-    {
-        if (tkmMat.normalMap != nullptr)
-        {
-            filePath = tkmMat.normalMapFilePath.c_str();
-            map = tkmMat.normalMap.get();
-            mapSize = tkmMat.normalMapSize;
-        }
-        else
-        {
-            filePath = nullTextureMaps.GetNormalMapFilePath();
-            map = nullTextureMaps.GetNormalMap().get();
-            mapSize = nullTextureMaps.GetNormalMapSize();
-        }
-        auto normalMap = tk->GetTextureFromBank(filePath);
-
-        if (normalMap == nullptr)
-        {
-            normalMap = new Texture();
-            normalMap->InitFromMemory(graphicsEngine,map, mapSize);
-            tk->RegistTextureToBank(filePath, normalMap);
-        }
-        this->normal_Map_ = normalMap;
-    }
-
-
-
-    //ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒvB
-    {
-        if (tkmMat.specularMap != nullptr)
-        {
-            filePath = tkmMat.specularMapFilePath.c_str();
-            map = tkmMat.specularMap.get();
-            mapSize = tkmMat.specularMapSize;
-        }
-        else
-        {
-            filePath = nullTextureMaps.GetSpecularMapFilePath();
-            map = nullTextureMaps.GetSpecularMap().get();
-            mapSize = nullTextureMaps.GetSpecularMapSize();
-        }
-        auto specularMap = tk->GetTextureFromBank(filePath);
-
-        if (specularMap == nullptr)
-        {
-            specularMap = new Texture();
-            specularMap->InitFromMemory(graphicsEngine,map, mapSize);
-            tk->RegistTextureToBank(filePath, specularMap);
-        }
-        this->specular_Map_ = specularMap;
-    }
-
-    //”½Ëƒ}ƒbƒvB
-    {
-        if (tkmMat.reflectionMap != nullptr)
-        {
-            filePath = tkmMat.reflectionMapFilePath.c_str();
-            map = tkmMat.reflectionMap.get();
-            mapSize = tkmMat.reflectionMapSize;
-        }
-        else
-        {
-            filePath = nullTextureMaps.GetReflectionMapFilePath();
-            map = nullTextureMaps.GetReflectionMap().get();
-            mapSize = nullTextureMaps.GetReflectionMapSize();
-        }
-        auto reflectionMap = tk->GetTextureFromBank(filePath);
-
-        if (reflectionMap == nullptr)
-        {
-            reflectionMap = new Texture();
-            reflectionMap->InitFromMemory(graphicsEngine,map, mapSize);
-            tk->RegistTextureToBank(filePath, reflectionMap);
-        }
-        this->reflection_Map_ = reflectionMap;
-    }
-
-    //‹üÜƒ}ƒbƒvB
-    {
-        if (tkmMat.refractionMap != nullptr)
-        {
-            filePath = tkmMat.refractionMapFilePath.c_str();
-            map = tkmMat.refractionMap.get();
-            mapSize = tkmMat.refractionMapSize;
-        }
-        else
-        {
-            filePath = nullTextureMaps.GetReflectionMapFilePath();
-            map = nullTextureMaps.GetReflectionMap().get();
-            mapSize = nullTextureMaps.GetReflectionMapSize();
-        }
-        auto refractionMap = tk->GetTextureFromBank(filePath);
-
-        if (refractionMap == nullptr)
-        {
-            refractionMap = new Texture();
-            refractionMap->InitFromMemory(graphicsEngine,map, mapSize);
-            tk->RegistTextureToBank(filePath, refractionMap);
-        }
-        this->refraction_Map_ = refractionMap;
-    }
-
-
+	rc.SetRootSignature(m_rootSignature);
+	
+	if (hasSkin) {
+	//	rc.SetPipelineState(m_skinModelPipelineState);
+		rc.SetPipelineState(m_transSkinModelPipelineState);
+	}
+	else {
+	//	rc.SetPipelineState(m_nonSkinModelPipelineState);
+		rc.SetPipelineState(m_transNonSkinModelPipelineState);
+	}
 }

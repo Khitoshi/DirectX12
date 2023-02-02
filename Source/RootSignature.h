@@ -1,26 +1,25 @@
-#pragma once
-#include <d3dx12.h>
-#include<wrl.h>
+﻿#pragma once
 
-using namespace Microsoft::WRL;
-
-class GraphicsEngine;
-
-class RootSignature
-{
+class Shader;
+class RootSignature {
 public:
+	~RootSignature()
+	{
+		if (m_rootSignature) {
+			m_rootSignature->Release();
+		}
+	}
 	/// <summary>
-	/// �f�t�H���g�R���X�g���N�^
+	/// 初期化
 	/// </summary>
-	RootSignature();
-
-	/// <summary>
-	/// �f�t�H���g �f�X�g���N
-	/// </summary>
-	~RootSignature();
-
+	/// <param name="samplerFilter">サンプラフィルタ</param>
+	/// <param name="textureAdressModeU">テクスチャのアドレッシングモード(U方向)</param>
+	/// <param name="textureAdressModeV">テクスチャのアドレッシングモード(V方向)</param>
+	/// <param name="textureAdressModeW">テクスチャのアドレッシングモード(W方向)</param>
+	/// <param name="maxCbvDescriptor">定数バッファ用のディスクリプタの最大数</param>
+	/// <param name="maxSrvDescriptor">シェーダーリソース用のディスクリプタの最大数</param>
+	/// <param name="maxUavDescritor">UAV用のディスクリプタの最大数</param>
 	bool Init(
-		GraphicsEngine*& graphicsEngine,
 		D3D12_FILTER samplerFilter,
 		D3D12_TEXTURE_ADDRESS_MODE textureAdressModeU,
 		D3D12_TEXTURE_ADDRESS_MODE textureAdressModeV,
@@ -29,9 +28,16 @@ public:
 		UINT maxSrvDescriptor = 32,
 		UINT maxUavDescritor = 8
 	);
-	
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	/// <param name="samplerDescArray"></param>
+	/// <param name="numSampler">サンプラの数</param>
+	/// <param name="maxCbvDescriptor">定数バッファ用のディスクリプタの最大数</param>
+	/// <param name="maxSrvDescriptor">シェーダーリソース用のディスクリプタの最大数</param>
+	/// <param name="maxUavDescritor">UAV用のディスクリプタの最大数</param>
+	/// <returns></returns>
 	bool Init(
-		GraphicsEngine*& graphicsEngine,
 		D3D12_STATIC_SAMPLER_DESC* samplerDescArray,
 		int numSampler,
 		UINT maxCbvDescriptor = 8,
@@ -41,11 +47,11 @@ public:
 		UINT offsetInDescriptorsFromTableStartSRV = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND,
 		UINT offsetInDescriptorsFromTableStartUAV = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
 	);
-
-public://get method
-
-	ID3D12RootSignature* GetRootSignature() { return this->root_Signature_.Get(); }
-
+	bool Init(Shader& shader);
+	ID3D12RootSignature* Get()
+	{
+		return m_rootSignature;
+	}
 private:
-	ComPtr<ID3D12RootSignature> root_Signature_;
+	ID3D12RootSignature* m_rootSignature = nullptr;	//ルートシグネチャ。
 };

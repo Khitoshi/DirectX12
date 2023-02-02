@@ -1,130 +1,96 @@
-#pragma once
+ï»¿#pragma once
 
-#include "IShaderResource.h"
-#include "GraphicsEngine.h"
-#include <wrl.h>
 
-using namespace Microsoft::WRL;
-
-class Texture :public IShaderResource
-{
+class Texture  : public IShaderResource{
 public:
+	/// <summary>
+	/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
+	/// </summary>
+	Texture() {}
+	/// <summary>
+	/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
+	/// </summary>
+	~Texture();
 
-    /// <summary>
-    /// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    Texture();
-
-    /// <summary>
-    /// –¾¦“I ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    /// <param name = "filePath">ƒ[ƒh‚·‚éƒeƒNƒXƒ`ƒƒ‚Ìƒtƒ@ƒCƒ‹ƒpƒX</param>
-    explicit Texture(GraphicsEngine*& graphicsEngine,const wchar_t* filePath);
-
-    /// <summary>
-    /// ƒfƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    ~Texture();
-
-    /// <summary>
-    /// DDSƒtƒ@ƒCƒ‹‚©‚çƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»‚·‚éB
-    /// </summary>
-    /// <param name="filePath">ƒ[ƒh‚·‚éƒeƒNƒXƒ`ƒƒ‚Ìƒtƒ@ƒCƒ‹ƒpƒXB</param>
-    void InitFromDDSFile(GraphicsEngine*& graphicsEngine,const wchar_t* filePath);
-
-    /// <summary>
-    /// ƒƒ‚ƒŠ‚©‚çƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»‚·‚éB
-    /// </summary>
-    /// <param name="memory">ƒeƒNƒXƒ`ƒƒƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚¢‚éƒƒ‚ƒŠ‚Ìæ“ªƒAƒhƒŒƒX</param>
-    /// <param name="size">ƒeƒNƒXƒ`ƒƒ‚ÌƒTƒCƒYB</param>
-    void InitFromMemory(GraphicsEngine*& graphicsEngine,const char* memory, unsigned int size);
-    
-    /// <summary>
-    /// D3DƒŠƒ\[ƒX‚©‚çƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»‚·‚éB
-    /// </summary>
-    /// <param name="resrouce">D3DƒŠƒ\[ƒXB</param>
-    void InitFromD3DResource(ID3D12Resource*& texture);
-    
-    /// <summary>
-    /// SRV‚É“o˜^B
-    /// </summary>
-    /// <param name="descriptorHandle"></param>
-    void RegistShaderResourceView(GraphicsEngine*& graphicsEngine,D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo);
-
+	/// <summary>
+	/// ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	/// </summary>
+	/// <param name="filePath">ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
+	explicit Texture(const wchar_t* filePath);
+	
+	/// <summary>
+	/// DDSãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+	/// </summary>
+	/// <param name="filePath">ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
+	void InitFromDDSFile(const wchar_t* filePath);
+	/// <summary>
+	/// ãƒ¡ãƒ¢ãƒªã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+	/// </summary>
+	/// <param name="memory">ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹ãƒ¡ãƒ¢ãƒªã®å…ˆé ­ã‚¢ãƒ‰ãƒ¬ã‚¹</param>
+	/// <param name="size">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚ºã€‚</param>
+	void InitFromMemory(const char* memory, unsigned int size);
+	/// <summary>
+	/// D3Dãƒªã‚½ãƒ¼ã‚¹ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+	/// </summary>
+	/// <param name="resrouce">D3Dãƒªã‚½ãƒ¼ã‚¹ã€‚</param>
+	void InitFromD3DResource(ID3D12Resource* texture);
+	/// <summary>
+	/// SRVã«ç™»éŒ²ã€‚
+	/// </summary>
+	/// <param name="descriptorHandle"></param>
+	void RegistShaderResourceView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo) ;
+	/// <summary>
+	/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒæœ‰åŠ¹ã‹åˆ¤å®šã€‚
+	/// </summary>
+	/// <returns>trueãŒè¿”ã£ã¦ããŸã‚‰æœ‰åŠ¹ã€‚</returns>
+	bool IsValid() const
+	{
+		return m_texture != nullptr;
+	}
+	ID3D12Resource* Get()
+	{
+		return m_texture;
+	}
+	/// <summary>
+	/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å¹…ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	int GetWidth() const
+	{
+		return static_cast<int>(m_textureDesc.Width);
+	}
+	/// <summary>
+	/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é«˜ã•ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	int GetHeight() const
+	{
+		return static_cast<int>(m_textureDesc.Height);
+	}
+	/// <summary>
+	/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	DXGI_FORMAT GetFormat() const
+	{
+		return m_textureDesc.Format;
+	}
 private:
-#pragma region Load Texture Method
-    /// <summary>
-    /// DDSƒtƒ@ƒCƒ‹‚©‚çƒeƒNƒXƒ`ƒƒ‚ğƒ[ƒhB
-    /// </summary>
-    /// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒXB</param>
-    void LoadTextureFromDDSFile(GraphicsEngine*& graphicsEngine,const wchar_t* filePath);
-
-    /// <summary>
-    /// ƒƒ‚ƒŠ‚©‚çƒeƒNƒXƒ`ƒƒ‚ğƒ[ƒhB
-    /// </summary>
-    /// <param name="memory">ƒeƒNƒXƒ`ƒƒƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚¢‚éƒƒ‚ƒŠ‚Ìæ“ªƒAƒhƒŒƒXB</param>
-    /// <param name="size">ƒeƒNƒXƒ`ƒƒ‚ÌƒTƒCƒYB</param>
-    /// <param name="ge12">Dx12”Å‚ÌƒOƒ‰ƒtƒBƒbƒNƒXƒGƒ“ƒWƒ“</param>
-    /// <param name="device">D3DƒfƒoƒCƒX</param>
-    void LoadTextureFromMemory(GraphicsEngine*& graphicsEngine,const char* memory, unsigned int size);
-
-#pragma endregion
-
-public:
-#pragma region Get method
-    
-    /// <summary>
-    /// ƒeƒNƒXƒ`ƒƒ‚ª—LŒø‚©”»’èB
-    /// </summary>
-    /// <returns>true‚ª•Ô‚Á‚Ä‚«‚½‚ç—LŒøB</returns>
-    bool IsValid() const
-    {
-        return this->texture_ != nullptr;
-    }
-
-    /// <summary>
-    /// ƒeƒNƒXƒ`ƒƒæ“¾
-    /// </summary>
-    /// <returns></returns>
-    ID3D12Resource*& GetTexture()
-    {
-        return this->texture_;
-    }
-
-    /// <summary>
-    /// ƒeƒNƒXƒ`ƒƒ‚Ì•‚ğæ“¾B
-    /// </summary>
-    /// <returns></returns>
-    int GetWeight()const
-    {
-        return static_cast<int>(this->texture_Desc_.Width); 
-    }
-    
-    /// <summary>
-    /// ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³‚ğæ“¾B
-    /// </summary>
-    /// <returns></returns>
-    int GetHeight() const
-    {
-        return static_cast<int>(this->texture_Desc_.Height);
-    }
-
-    /// <summary>
-    /// ƒeƒNƒXƒ`ƒƒ‚ÌƒtƒH[ƒ}ƒbƒg‚ğæ“¾B
-    /// </summary>
-    /// <returns></returns>
-    DXGI_FORMAT GetFormat() const
-    {
-        return this->texture_Desc_.Format;
-    }
-
-#pragma endregion
-
+	/// <summary>
+	/// DDSãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
+	/// </summary>
+	/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
+	void LoadTextureFromDDSFile(const wchar_t* filePath);
+	/// <summary>
+	/// ãƒ¡ãƒ¢ãƒªã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
+	/// </summary>
+	/// <param name="memory">ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹ãƒ¡ãƒ¢ãƒªã®å…ˆé ­ã‚¢ãƒ‰ãƒ¬ã‚¹ã€‚</param>
+	/// <param name="size">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚ºã€‚</param>
+	/// <param name="ge12">Dx12ç‰ˆã®ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ã‚¨ãƒ³ã‚¸ãƒ³</param>
+	/// <param name="device">D3Dãƒ‡ãƒã‚¤ã‚¹</param>
+	void LoadTextureFromMemory(const char* memory, unsigned int size );
+		
 private:
-    //ƒeƒNƒXƒ`ƒƒB
-    //ComPtr<ID3D12Resource> texture_ = nullptr;	
-    ID3D12Resource* texture_;
-    //ƒeƒNƒXƒ`ƒƒî•ñ
-    D3D12_RESOURCE_DESC texture_Desc_;	
+	ID3D12Resource*	m_texture = nullptr;	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚
+	D3D12_RESOURCE_DESC m_textureDesc;	//ãƒ†ã‚¯ã‚¹ãƒãƒ£æƒ…å ±
 };
-

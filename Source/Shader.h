@@ -1,123 +1,61 @@
-#pragma once
-
-#include <d3dx12.h>
-#include <dxcapi.h>
-#include <wrl.h>
-#include <string>
-
-using namespace Microsoft::WRL;
+ï»¿#pragma once
 
 
-class Shader
-{
+class Shader {
 public:
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    Shader();
-
-    /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
-    /// </summary>
-    ~Shader();
-
-
 	/// <summary>
-	/// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[‚ğƒ[ƒh
+	/// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 	/// </summary>
-	/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒX</param>
-	/// <param name="entryFuncName">ƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚ÌŠÖ”–¼B</param>
+	/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
+	/// <param name="entryFuncName">ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã®é–¢æ•°åã€‚</param>
 	void LoadPS(const char* filePath, const char* entryFuncName);
-	
 	/// <summary>
-	/// ’¸“_ƒVƒF[ƒ_[‚ğƒ[ƒh
+	/// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 	/// </summary>
-	/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒX</param>
-	/// <param name="entryFuncName">ƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚ÌŠÖ”–¼B</param>
+	/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹</param>
+	/// <param name="entryFuncName">ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã®é–¢æ•°åã€‚</param>
 	void LoadVS(const char* filePath, const char* entryFuncName);
-	
 	/// <summary>
-	/// ƒRƒ“ƒsƒ…[ƒgƒVƒF[ƒ_[‚ğƒ[ƒh
+	/// ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ãƒˆã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 	/// </summary>
 	/// <param name="filePath"></param>
 	/// <param name="entryFuncName"></param>
 	void LoadCS(const char* filePath, const char* entryFuncName);
-	
 	/// <summary>
-	/// ƒŒƒCƒgƒŒ[ƒVƒ“ƒO—p‚ÌƒVƒF[ƒ_[‚ğƒ[ƒh
+	/// ãƒ¬ã‚¤ãƒˆãƒ¬ãƒ¼ã‚·ãƒ³ã‚°ç”¨ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 	/// </summary>
-	//void LoadRaytracing(const wchar_t* filePath);
-
-private:
+	void LoadRaytracing(const wchar_t* filePath);
 	/// <summary>
-	/// ƒVƒF[ƒ_[‚ğƒ[ƒh
+	/// ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ¸ˆã¿ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
 	/// </summary>
-	/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒX</param>
-	/// <param name="entryFuncName">ƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚ÌŠÖ”–¼B</param>
-	/// <param name="shaderModel">ƒVƒF[ƒ_[ƒ‚ƒfƒ‹</param>
-	void Load(const char* filePath, const char* entryFuncName, const char* shaderModel);
-
-	//¶¬Šm”F—p
-	void CreateCheck(HRESULT hr, std::wstring message)const;
-
-
-public:
-#pragma region Get Method
-	/// <summary>
-	/// ƒRƒ“ƒpƒCƒ‹Ï‚İƒVƒF[ƒ_[ƒf[ƒ^‚ğæ“¾B
-	/// </summary>
-	/// <returns>this blob</returns>
+	/// <returns></returns>
 	ID3DBlob* GetCompiledBlob() const
 	{
-		return this->blob_.Get();
+		return m_blob;
 	}
-
-	/// <summary>
-	/// //DXCƒRƒ“ƒpƒCƒ‰‚ğg—p‚µ‚½‚Æ‚«‚ÌƒVƒF[ƒ_[ƒf[ƒ^B
-	/// </summary>
-	/// <returns>this dxc Blob</returns>
 	IDxcBlob* GetCompiledDxcBlob() const
 	{
-		return this->dxc_Blob_.Get();
+		return m_dxcBlob;
 	}
-
 	/// <summary>
-	/// ‰Šú‰»Ï‚İ”»•Ê—pƒtƒ‰ƒOæ“¾
+	/// åˆæœŸåŒ–æ¸ˆã¿ï¼Ÿ
 	/// </summary>
-	/// <returns>true = ‰Šú‰»Ï‚İ</returns>
-	bool IsInited()const
+	/// <returns></returns>
+	bool IsInited() const
 	{
-		return this->is_Inited_;
+		return m_isInited;
 	}
-
-	/// <summary>
-	/// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[ƒ‚ƒfƒ‹–¼ æ“¾
-	/// </summary>
-	/// <returns></returns>
-	static const std::string GetPixelShaderModelName() { return "ps_5_0"; }
-
-	/// <summary>
-	/// ’¸“_ƒVƒF[ƒ_[ƒ‚ƒfƒ‹–¼ æ“¾
-	/// </summary>
-	/// <returns></returns>
-	static const std::string GetVertexShaderModelName() { return "vs_5_0"; }
-
-	/// <summary>
-	/// ƒRƒ“ƒsƒ…[ƒgƒVƒF[ƒ_[ƒ‚ƒfƒ‹–¼ æ“¾
-	/// </summary>
-	/// <returns></returns>
-	static const std::string GetComputeShaderModelName() { return "cs_5_0"; }
-
-#pragma endregion
-
-
 private:
-	//ƒRƒ“ƒpƒCƒ‹Ï‚İ‚ÌƒVƒF[ƒ_[ƒf[ƒ^
-	ComPtr<ID3DBlob> blob_;
-
-	//DXCƒRƒ“ƒpƒCƒ‰‚ğg—p‚µ‚½‚Æ‚«‚ÌƒVƒF[ƒ_[ƒf[ƒ^
-	ComPtr<IDxcBlob> dxc_Blob_;
-
-	bool is_Inited_;
-
+	/// <summary>
+	/// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
+	/// </summary>
+	/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹</param>
+	/// <param name="entryFuncName">ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã®é–¢æ•°åã€‚</param>
+	/// <param name="shaderModel">ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ¢ãƒ‡ãƒ«</param>
+	void Load(const char* filePath, const char* entryFuncName, const char* shaderModel);
+private:
+	ID3DBlob*	m_blob = nullptr;	//ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ¸ˆã¿ã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ‡ãƒ¼ã‚¿ã€‚
+	IDxcBlob* m_dxcBlob = nullptr;	//DXCã‚³ãƒ³ãƒ‘ã‚¤ãƒ©ã‚’ä½¿ç”¨ã—ãŸã¨ãã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ‡ãƒ¼ã‚¿ã€‚
+	bool m_isInited = false;		//åˆæœŸåŒ–æ¸ˆã¿ï¼Ÿ
 };
+

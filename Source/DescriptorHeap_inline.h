@@ -1,33 +1,27 @@
-#pragma once
-#include "DescriptorHeap.h"
-#include "GraphicsEngine.h"
+﻿#pragma once
 
-inline ID3D12DescriptorHeap* DescriptorHeap::GetDescriptorHeap(GraphicsEngine*& graphicsEngine)const
+inline ID3D12DescriptorHeap* DescriptorHeap::Get()const
 {
-	auto back_Buffer_Index= graphicsEngine->GetBackBufferIndex();
-	return this->descriptor_Heap_[back_Buffer_Index];
+	auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+	return m_descriptorHeap[backBufferIndex];
 }
-
-inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetConstantBufferGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine) const
+inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetConstantBufferGpuDescriptorStartHandle() const
 {
-	auto back_Buffer_Index = graphicsEngine->GetBackBufferIndex();
-	return this->const_Buffer_Gpu_Descriptor_Start_[back_Buffer_Index];
+	auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+	return m_cbGpuDescriptorStart[backBufferIndex];
 }
-
-inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetShaderResourceGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine) const
+inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetShaderResourceGpuDescriptorStartHandle() const
 {
-	auto back_Buffer_Index = graphicsEngine->GetBackBufferIndex();
-	return this->shader_Resource_Gpu_Descriptor_Start_[back_Buffer_Index];
+	auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+	return m_srGpuDescriptorStart[backBufferIndex];
 }
-
-inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetUavResourceGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine) const
+inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetUavResourceGpuDescriptorStartHandle() const
 {
-	auto back_Buffer_Index = graphicsEngine->GetBackBufferIndex();
-	return this->uav_Gpu_Descriptor_Start_[back_Buffer_Index];
+	auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+	return m_uavGpuDescriptorStart[backBufferIndex];
 }
-
-inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetSamplerResourceGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine) const
+inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetSamplerResourceGpuDescriptorStartHandle() const
 {
-	auto back_Buffer_Index = graphicsEngine->GetBackBufferIndex();
-	return this->sampler_Gpu_Descriptor_Start_[back_Buffer_Index];
+	auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+	return m_samplerGpuDescriptorStart[backBufferIndex];
 }

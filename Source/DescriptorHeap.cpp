@@ -1,241 +1,123 @@
+ï»¿#include "stdafx.h"
 #include "DescriptorHeap.h"
-#include "GraphicsEngine.h"
-#include "ConstantBuffer.h"
-#include "IShaderResource.h"
-#include "IUnorderAccessResrouce.h"
 
-//ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-DescriptorHeap::DescriptorHeap():
-    descriptor_Heap_(),
-    shader_Resources_(MAX_SHADER_RESOURCE),
-    uav_Resources_(MAX_SHADER_RESOURCE),
-    constant_Buffers_(MAX_CONSTANT_BUFFER),
-    sampler_Descs_(),
-    const_Buffer_Gpu_Descriptor_Start_(),
-    shader_Resource_Gpu_Descriptor_Start_(),
-    uav_Gpu_Descriptor_Start_(),
-    sampler_Gpu_Descriptor_Start_(),
 
-    num_Shader_Resource_(0),
-    num_Constant_Buffer_(0),
-    num_Uav_Resource_(0),
-    num_Sampler_Desc_(0),
-    num_Descriptor_Heap_(0)
+DescriptorHeap::DescriptorHeap()
 {
+	m_shaderResources.resize(MAX_SHADER_RESOURCE);
+	m_uavResources.resize(MAX_SHADER_RESOURCE);
+	m_constantBuffers.resize(MAX_CONSTANT_BUFFER);
+	for (auto& srv : m_shaderResources) {
+		srv = nullptr;
+	}
+	for (auto& uav : m_uavResources) {
+		uav = nullptr;
+	}
+	for (auto& cbv : m_constantBuffers) {
+		cbv = nullptr;
+	}
 }
-
-//ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
 DescriptorHeap::~DescriptorHeap()
 {
+	for (auto& ds : m_descriptorHeap) {
+		if (ds) {
+			ds->Release();
+		}
+	}
 }
-
-//ƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ğƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É“o˜^
-void DescriptorHeap::RegistShaderResource(int registerNo, IShaderResource& shaderResource)
+void DescriptorHeap::CommitSamplerHeap()
 {
-    RegistResource(
-        registerNo,
-        &shaderResource,
-        &this->shader_Resources_.front(),
-        this->num_Shader_Resource_,
-        MAX_SHADER_RESOURCE,
-        L"DescriptorHeap::RegistShaderResource() ƒŒƒWƒXƒ^”Ô†‚ª”ÍˆÍŠO‚Å‚·B"
-    );
+	const auto& d3dDevice = g_graphicsEngine->GetD3DDevice();
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+
+	srvHeapDesc.NumDescriptors = m_numSamplerDesc;
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+	for (auto& ds : m_descriptorHeap) {
+		auto hr = d3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&ds));
+		if (FAILED(hr)) {
+			MessageBox(nullptr, L"DescriptorHeap::Commit ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚", L"ã‚¨ãƒ©ãƒ¼", MB_OK);
+			std::abort();
+		}
+	}
+	int bufferNo = 0;
+	for (auto& descriptorHeap : m_descriptorHeap) {
+		auto cpuHandle = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		auto gpuHandle = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		for (int i = 0; i < m_numSamplerDesc; i++) {
+			//ã‚µãƒ³ãƒ—ãƒ©ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã«ç™»éŒ²ã—ã¦ã„ãã€‚
+			d3dDevice->CreateSampler(&m_samplerDescs[i], cpuHandle);
+			cpuHandle.ptr += g_graphicsEngine->GetSapmerDescriptorSize();
+		}
+		m_samplerGpuDescriptorStart[bufferNo] = gpuHandle;
+		bufferNo++;
+	}
+
 }
-
-//ƒAƒ“ƒI[ƒ_[ƒAƒNƒZƒXƒŠƒ\[ƒX‚ğ“o˜^
-void DescriptorHeap::RegistUnorderAccessResource(int registerIndex, IUnorderAccessResrouce& unorderAccessResrouce)
+int g_numDescriptorHeap = 0;
+void DescriptorHeap::Commit()
 {
-    RegistResource(
-        registerIndex,
-        &unorderAccessResrouce,
-        &this->uav_Resources_.front(),
-        this->num_Uav_Resource_,
-        MAX_SHADER_RESOURCE,
-        L"DescriptorHeap::RegistUnorderAccessResource() ƒŒƒWƒXƒ^”Ô†‚ª”ÍˆÍŠO‚Å‚·B"
-    );
-}
+	const auto& d3dDevice = g_graphicsEngine->GetD3DDevice();
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 
-//’è”ƒoƒbƒtƒ@‚ğƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É“o˜^
-void DescriptorHeap::RegistConstantBuffer(int registerIndex, ConstantBuffer& constantBuffer)
-{
-    RegistResource(
-        registerIndex,
-        &constantBuffer,
-        &this->constant_Buffers_.front(),
-        this->num_Constant_Buffer_,
-        MAX_CONSTANT_BUFFER,
-        L"DescriptorHeap::RegistConstantBuffer() ƒŒƒWƒXƒ^”Ô†‚ª”ÍˆÍŠO‚Å‚·B"
-    );
-}
+	srvHeapDesc.NumDescriptors = m_numShaderResource + m_numConstantBuffer + m_numUavResource;
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
-//ƒTƒ“ƒvƒ‰’è‹`‚ğƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É’Ç‰Á
-void DescriptorHeap::RegistSamplerDesc(int registerIndex, const D3D12_SAMPLER_DESC& samplerDesc)
-{
-    RegistResource(
-        registerIndex,
-        samplerDesc,
-        this->sampler_Descs_,
-        this->num_Sampler_Desc_,
-        MAX_SAMPLER_STATE,
-        L"DescriptorHeap::RegistSamplerDesc() ƒŒƒWƒXƒ^”Ô†‚ª”ÍˆÍŠO‚Å‚·B"
-    );
-}
+	for (auto& ds : m_descriptorHeap) {
+		auto hr = d3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&ds));
+		g_numDescriptorHeap++;
+		if (FAILED(hr)) {
+			MessageBox(nullptr, L"DescriptorHeap::Commit ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚", L"ã‚¨ãƒ©ãƒ¼", MB_OK);
+			std::abort();
+		}
+	}
+	//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚„ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’ãƒ’ãƒ¼ãƒ—ã«æ›¸ãè¾¼ã‚“ã§ã„ãã€‚
+	int bufferNo = 0;
+	for (auto& descriptorHeap : m_descriptorHeap) {
+		auto cpuHandle = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		auto gpuHandle = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
-//ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ö‚Ì“o˜^‚ğŠm’è
-void DescriptorHeap::Commit(GraphicsEngine*& graphicsEngine)
-{
-    //ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv ƒfƒXƒN
-    D3D12_DESCRIPTOR_HEAP_DESC srv_Heap_Desc = {};
-    //ƒVƒF[ƒ_[ƒŠƒ\[ƒX” + ’è”ƒoƒbƒtƒ@” + ƒAƒ“ƒI[ƒ_[ƒAƒNƒZƒXƒŠƒ\[ƒX”
-    //‚ğƒfƒBƒXƒNƒŠƒvƒ^”‚Éİ’è
-    srv_Heap_Desc.NumDescriptors = num_Shader_Resource_ + num_Constant_Buffer_+ num_Uav_Resource_;
-    srv_Heap_Desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    srv_Heap_Desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’ç™»éŒ²ã—ã¦ã„ãã€‚
+		for (int i = 0; i < m_numConstantBuffer; i++) {
+			//@todo bug
+			if (m_constantBuffers[i] != nullptr) {
+				m_constantBuffers[i]->RegistConstantBufferView(cpuHandle, bufferNo);
+			}
+			//æ¬¡ã«é€²ã‚ã‚‹ã€‚
+			cpuHandle.ptr += g_graphicsEngine->GetCbrSrvDescriptorSize();
+		}
 
-    const auto& device = graphicsEngine->GetDevice();
+		//ç¶šã„ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã€‚
+		for (int i = 0; i < m_numShaderResource; i++) {
+			if (m_shaderResources[i] != nullptr) {
+				m_shaderResources[i]->RegistShaderResourceView(cpuHandle, bufferNo);
+			}
+			//æ¬¡ã«é€²ã‚ã‚‹ã€‚
+			cpuHandle.ptr += g_graphicsEngine->GetCbrSrvDescriptorSize();
+		}
 
-    //ƒfƒBƒXƒNƒŠƒvƒ^ ¶¬ loop
-    for (auto& descriptor_Heap : this->descriptor_Heap_) 
-    {
-        //ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv ¶¬
-        //HRESULT hr = device.CreateDescriptorHeap(&srv_Heap_Desc, IID_PPV_ARGS(&descriptor_Heap));
-        //graphicsEngine->CreateDescriptorHeap(srv_Heap_Desc, descriptor_Heap);
+		//ç¶šã„ã¦UAVã€‚
+		for (int i = 0; i < m_numUavResource; i++) {
+			if (m_uavResources[i] != nullptr) {
+				m_uavResources[i]->RegistUnorderAccessView(cpuHandle, bufferNo);
+			}
+			//æ¬¡ã«é€²ã‚ã‚‹ã€‚
+			cpuHandle.ptr += g_graphicsEngine->GetCbrSrvDescriptorSize();
+		}
 
-        HRESULT hr = device->CreateDescriptorHeap(&srv_Heap_Desc, IID_PPV_ARGS(&descriptor_Heap));
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã‚’è¨ˆç®—ã€‚
+		m_cbGpuDescriptorStart[bufferNo] = gpuHandle;
+		//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã‚’è¨ˆç®—ã€‚
+		m_srGpuDescriptorStart[bufferNo] = gpuHandle;
+		m_srGpuDescriptorStart[bufferNo].ptr += (UINT64)g_graphicsEngine->GetCbrSrvDescriptorSize() * m_numConstantBuffer;
+		//UAVãƒªã‚½ãƒ¼ã‚¹ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã‚’è¨ˆç®—ã€‚
+		m_uavGpuDescriptorStart[bufferNo] = gpuHandle;
+		m_uavGpuDescriptorStart[bufferNo].ptr += (UINT64)g_graphicsEngine->GetCbrSrvDescriptorSize() * ( m_numShaderResource + m_numConstantBuffer );
 
-        if (FAILED(hr))
-        {
-            return;
-        }
-
-        //ƒfƒBƒXƒNƒŠƒvƒ^” ƒCƒ“ƒNƒŠƒƒ“ƒg
-        this->num_Descriptor_Heap_++;
-    }
-
-    //’è”ƒoƒbƒtƒ@‚âƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ÌƒfƒBƒXƒNƒŠƒvƒ^‚ğƒq[ƒv‚É‘‚«‚Ş
-    int buffer_Index = 0;
-    for (auto& descriptor_heap : this->descriptor_Heap_)
-    {
-        //CPU ƒnƒ“ƒhƒ‹æ“¾
-        auto cpu_Handle = descriptor_heap->GetCPUDescriptorHandleForHeapStart();
-        //GPU ƒnƒ“ƒhƒ‹Š“¾
-        auto gpu_Handle = descriptor_heap->GetGPUDescriptorHandleForHeapStart();
-
-        //’è”ƒoƒbƒtƒ@
-        for (int i = 0; i < this->num_Constant_Buffer_; i++) {
-            if (this->constant_Buffers_[i] != nullptr) {
-                this->constant_Buffers_[i]->RegistConstantBufferView(graphicsEngine,cpu_Handle, buffer_Index);
-            }
-            //Ÿ‚Éi‚ß‚éB
-            cpu_Handle.ptr += graphicsEngine->GetCbrSrvDescriptorSize();
-        }
-
-
-        //‘±‚¢‚ÄƒVƒF[ƒ_[ƒŠƒ\[ƒXB
-        for (int i = 0; i < this->num_Shader_Resource_; i++) 
-        {
-            if (this->shader_Resources_[i] != nullptr) 
-            {
-
-                this->shader_Resources_[i]->RegistShaderResourceView(graphicsEngine,cpu_Handle, buffer_Index);
-            }
-            //Ÿ‚Éi‚ß‚éB
-            cpu_Handle.ptr += graphicsEngine->GetCbrSrvDescriptorSize();
-        }
-
-        //‘±‚¢‚ÄUAVB
-        for (int i = 0; i < this->num_Uav_Resource_; i++) {
-            if (this->uav_Resources_[i] != nullptr) {
-                this->uav_Resources_[i]->RegistUnorderAccessView(cpu_Handle, buffer_Index);
-            }
-            //Ÿ‚Éi‚ß‚éB
-            cpu_Handle.ptr += graphicsEngine->GetCbrSrvDescriptorSize();
-        }
-
-        //’è”ƒoƒbƒtƒ@‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌŠJnƒnƒ“ƒhƒ‹‚ğŒvZB
-        this->const_Buffer_Gpu_Descriptor_Start_[buffer_Index] = gpu_Handle;
-        //ƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌŠJnƒnƒ“ƒhƒ‹‚ğŒvZB
-        this->shader_Resource_Gpu_Descriptor_Start_[buffer_Index] = gpu_Handle;
-        this->uav_Gpu_Descriptor_Start_[buffer_Index].ptr += (UINT64)graphicsEngine->GetCbrSrvDescriptorSize() * this->num_Constant_Buffer_;
-        //UAVƒŠƒ\[ƒX‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌŠJnƒnƒ“ƒhƒ‹‚ğŒvZB
-        this->uav_Gpu_Descriptor_Start_[buffer_Index] = gpu_Handle;
-        this->uav_Gpu_Descriptor_Start_[buffer_Index].ptr += (UINT64)graphicsEngine->GetCbrSrvDescriptorSize() * (this->num_Shader_Resource_ + this->num_Constant_Buffer_);
-
-        //ƒ|ƒCƒ“ƒ^‚ği‚ß‚é
-        gpu_Handle.ptr += (UINT64)graphicsEngine->GetCbrSrvDescriptorSize() * (this->num_Shader_Resource_ + this->num_Constant_Buffer_ + this->num_Uav_Resource_);
-
-        //ƒoƒbƒtƒ@”‚ğƒCƒ“ƒNƒŠƒƒ“ƒg
-        buffer_Index++;
-    }
-}
-
-//ƒTƒ“ƒvƒ‰ƒXƒe[ƒg—p‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ö‚Ì“o˜^
-void DescriptorHeap::CommitSamplerHeap(GraphicsEngine*& graphicsEngine)
-{
-    //ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[@ƒq[ƒvƒfƒXƒN
-    D3D12_DESCRIPTOR_HEAP_DESC srv_Heap_Desc = {};
-    
-    //ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[@ƒq[ƒvƒfƒXƒNİ’è
-    srv_Heap_Desc.NumDescriptors = this->num_Sampler_Desc_;
-    srv_Heap_Desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
-    srv_Heap_Desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-    //ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv@¶¬ loop
-    for (auto& descriptor_Heap : this->descriptor_Heap_) {
-        //¶¬
-        graphicsEngine->CreateDescriptorHeap(srv_Heap_Desc, descriptor_Heap);
-    }
-
-    int buffer_Index = 0;
-    //ƒTƒ“ƒvƒ‰ƒXƒe[ƒg‚ğƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É“o˜^‚µ‚Ä‚¢‚­loop
-    for (auto& descriptorHeap : this->descriptor_Heap_) {
-        //CPU‚Ìƒnƒ“ƒhƒ‹‚ğæ“¾
-        auto cpuHandle = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-        //GPU‚Ìƒnƒ“ƒhƒ‹‚ğæ“¾
-        auto gpuHandle = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
-
-        for (int i = 0; i < this->num_Sampler_Desc_; i++) {
-            //ƒTƒ“ƒvƒ‰ƒXƒe[ƒg‚ğƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É“o˜^
-            //device->CreateSampler(&this->sampler_Descs_[i], cpuHandle);
-            graphicsEngine->CreateSampler(this->sampler_Descs_[i], cpuHandle);
-            cpuHandle.ptr += graphicsEngine->GetSapmerDescriptorSize();
-        }
-        this->sampler_Gpu_Descriptor_Start_[buffer_Index] = gpuHandle;
-        //ƒoƒbƒtƒ@‚Ì”‚ğƒCƒ“ƒNƒŠƒƒ“ƒg
-        buffer_Index++;
-    }
-}
-
-//ƒŠƒ\[ƒX‚ğƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É“o˜^
-template<class T>
-void DescriptorHeap::RegistResource(int registerIndex, T res, T resTable[], int& numRes, const int MAX_RESOURCE, const wchar_t* errorMessage)
-{
-    if (registerIndex == -1)
-    {
-        //-1‚ªw’è‚³‚ê‚Ä‚¢‚é‚Ì‚ÅC
-        //Œ»İ“o˜^‚³‚ê‚Ä‚¢‚éƒŠƒ\[ƒX‚Ìˆê”ÔŒã‚ë‚É“o˜^
-        registerIndex = numRes;
-    }
-
-    //“o˜^”Ô†‚ªƒŠƒ\[ƒXÅ‘å’lˆÈ‰º‚Ìê‡
-    if (registerIndex < MAX_RESOURCE)
-    {
-        //“o˜^
-        resTable[registerIndex] = res;
-
-        if(numRes < registerIndex + 1)
-        {
-            //“o˜^‚³‚ê‚Ä‚¢‚éƒŠƒ\[ƒX”‚ğ‘‚â‚·
-            numRes = registerIndex + 1;
-        }
-    }
-    else
-    {
-        //ƒŠƒ\[ƒX‚ÌÅ‘å’l‚æ‚è‘½‚¢ê‡
-        //ƒGƒ‰[ƒƒbƒZ[ƒW‚ğo‚·
-        MessageBox(nullptr, errorMessage, L"DescriptorHeap::RegistResource‚Å¸”s", MB_OK);
-        std::abort();
-        //‹­§I—¹
-        std::abort();
-    }
+		gpuHandle.ptr += (UINT64)g_graphicsEngine->GetCbrSrvDescriptorSize() * (m_numShaderResource + m_numConstantBuffer + m_numUavResource);
+		
+		bufferNo++;
+	}
 }

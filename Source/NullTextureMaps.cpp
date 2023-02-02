@@ -1,88 +1,57 @@
+ï»¿#include "stdafx.h"
 #include "NullTextureMaps.h"
-#include <memory>
-#include <Windows.h>
 
-
-NullTextureMaps::NullTextureMaps():
-	albedo_Map_(),
-	albedo_Map_File_Path_(),
-	albedo_Map_Size_(),
-
-	normal_Map_(),
-	normal_Map_File_Path_(),
-	normal_Map_Size_(),
-
-	scecular_Map_(),
-	scecular_Map_File_Path_(),
-	scecular_Map_Size_(),
-
-	zero_Value_Map_(),
-	zero_Value_Map_File_Path_(),
-	zero_Value_Map_Size_()
-{
-}
-NullTextureMaps::~NullTextureMaps()
-{
-}
-//‰Šú‰»
 void NullTextureMaps::Init()
 {
-	//ƒeƒNƒXƒ`ƒƒƒ[ƒh
+	//å„ç¨®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 	auto TexLoad = [&](
 		const char* loadTexFilePath,
 		std::unique_ptr<char[]>& outTexData,
 		unsigned int& outTexSize
 		) {
-			//FILE* fp = fopen(loadTexFilePath, "rb");
-			FILE* fp;
-			errno_t er = fopen_s(&fp,loadTexFilePath, "rb");
-			if (fp == nullptr) {
-				//nullƒeƒNƒXƒ`ƒƒ‚Ìƒ[ƒh‚É¸”sB
-				MessageBoxA(nullptr, "nullƒeƒNƒXƒ`ƒƒ‚Ìƒ[ƒh‚É¸”s‚µ‚Ü‚µ‚½B", "ƒGƒ‰[", MB_OK);
-				std::abort();
-			}
-			//ƒeƒNƒXƒ`ƒƒƒTƒCƒY‚ğŒvZB
-			fseek(fp, 0L, SEEK_END);
-			outTexSize = ftell(fp);
-			fseek(fp, 0L, SEEK_SET);
+		FILE* fp = fopen(loadTexFilePath, "rb");
+		if (fp == nullptr) {
+			//nullãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ­ãƒ¼ãƒ‰ã«å¤±æ•—ã€‚
+			MessageBoxA(nullptr, "nullãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ­ãƒ¼ãƒ‰ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", "ã‚¨ãƒ©ãƒ¼", MB_OK);
+			std::abort();
+		}
+		//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚µã‚¤ã‚ºã‚’è¨ˆç®—ã€‚
+		fseek(fp, 0L, SEEK_END);
+		outTexSize = ftell(fp);
+		fseek(fp, 0L, SEEK_SET);
 
-			//ƒƒ‚ƒŠ‚ğŠm•Û
-			outTexData = std::make_unique<char[]>(outTexSize);
-			fread(outTexData.get(), outTexSize, 1, fp);
-			fclose(fp);
+		//ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿
+		outTexData = std::make_unique<char[]>(outTexSize);
+		fread(outTexData.get(), outTexSize, 1, fp);
+		fclose(fp);
 	};
 
-	//ƒAƒ‹ƒxƒhƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹ƒpƒX İ’è
-	this->albedo_Map_File_Path_ = "./Assets/Model/Preset/NullAlbedoMap.DDS";
-	//ƒAƒ‹ƒxƒhƒ}ƒbƒv‚ğƒ[ƒh
+	m_albedoMapFilePath = "Assets/modelData/preset/NullAlbedoMap.DDS";
+	//ã‚¢ãƒ«ãƒ™ãƒ‰ãƒãƒƒãƒ—ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 	TexLoad(
-		this->albedo_Map_File_Path_, 
-		this->albedo_Map_, 
-		this->albedo_Map_Size_
-	);
-
-
-	//–@üƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹ƒpƒX İ’è
-	this->normal_Map_File_Path_ = "./Assets/Model/Preset/NullNormalMap.DDS";
-	//–@üƒ}ƒbƒv‚ğƒ[ƒhB
+		m_albedoMapFilePath,
+		m_albedoMap,
+		m_albedoMapSize);
+	
+	m_normalMapFilePath = "Assets/modelData/preset/NullNormalMap.DDS";
+	//æ³•ç·šãƒãƒƒãƒ—ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 	TexLoad(
-		this->normal_Map_File_Path_,
-		this->normal_Map_,
-		this->normal_Map_Size_
-	);
+		m_normalMapFilePath,
+		m_normalMap,
+		m_normalMapSize);
 
-	this->scecular_Map_File_Path_ = "./Assets/Model/Preset/specMap_None.DDS";
-	//ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒvƒ}ƒbƒv‚ğƒ[ƒhB
+	m_specMapFilePath = "Assets/modelData/preset/specMap_None.DDS";
+	//ã‚¹ãƒšã‚­ãƒ¥ãƒ©ãƒãƒƒãƒ—ãƒãƒƒãƒ—ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 	TexLoad(
-		this->scecular_Map_File_Path_,
-		this->scecular_Map_,
-		this->scecular_Map_Size_);
+		m_specMapFilePath,
+		m_specMap,
+		m_specMapSize);
 
-	this->zero_Value_Map_File_Path_ = "./Assets/Model/Preset/ZeroValueMap.DDS";
-	//‚O‚Ì’l‚ğŠi”[‚µ‚Ä‚¢‚éƒ}ƒbƒv‚ğƒ[ƒhB
+	m_zeroValueMapFilePath = "Assets/modelData/preset/ZeroValueMap.DDS";
+	//ï¼ã®å€¤ã‚’æ ¼ç´ã—ã¦ã„ã‚‹ãƒãƒƒãƒ—ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 	TexLoad(
-		this->zero_Value_Map_File_Path_,
-		this->zero_Value_Map_,
-		this->zero_Value_Map_Size_);
+		m_zeroValueMapFilePath,
+		m_zeroValueMap,
+		m_zeroValueMapSize);
 
 }

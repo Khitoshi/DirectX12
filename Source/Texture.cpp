@@ -1,164 +1,99 @@
+ï»¿#include "stdafx.h"
 #include "Texture.h"
-#include "GraphicsEngine.h"
-#include "d3dx12.h"
-#include <d3d12.h>
-#include <ResourceUploadBatch.h>
-#include <DDSTextureLoader.h>
-
-
-using namespace DirectX;
-
-//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-Texture::Texture():
-    texture_(nullptr),
-    texture_Desc_()
+Texture::Texture(const wchar_t* filePath)
 {
+	InitFromDDSFile(filePath);
 }
-
-//–¾Ž¦“I ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-Texture::Texture(GraphicsEngine*& graphicsEngine,const wchar_t* filePath):
-    texture_(nullptr),
-    texture_Desc_()
-{
-    //‰Šú‰»
-    InitFromDDSFile(graphicsEngine, filePath);
-}
-
-//ƒfƒXƒgƒ‰ƒNƒ^
 Texture::~Texture()
 {
+	if (m_texture) {
+		m_texture->Release();
+	}
 }
-
-//.DDS file ‚©‚çƒeƒNƒXƒ`ƒƒ‚ð‰Šú‰»‚·‚é
-void Texture::InitFromDDSFile(GraphicsEngine*& graphicsEngine,const wchar_t* filePath)
+void Texture::InitFromDDSFile(const wchar_t* filePath)
 {
-    //DDSƒtƒ@ƒCƒ‹‚©‚çƒeƒNƒXƒ`ƒƒ‚ðƒ[ƒhB
-    LoadTextureFromDDSFile(graphicsEngine, filePath);
+	//DDSãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
+	LoadTextureFromDDSFile(filePath);
+	
 }
-
-//ƒƒ‚ƒŠ‚©‚çƒeƒNƒXƒ`ƒƒ ‰Šú‰»
-void Texture::InitFromMemory(GraphicsEngine*& graphicsEngine,const char* memory, unsigned int size)
+void Texture::InitFromD3DResource(ID3D12Resource* texture)
 {
-    //DDSƒtƒ@ƒCƒ‹‚©‚çƒeƒNƒXƒ`ƒƒ‚ðƒ[ƒhB
-    LoadTextureFromMemory(graphicsEngine,memory, size);
+	if (m_texture) {
+		m_texture->Release();
+	}
+	m_texture = texture;
+	m_texture->AddRef();
+	m_textureDesc = m_texture->GetDesc();
 }
-
-//D3DƒŠƒ\[ƒX‚©‚çƒeƒNƒXƒ`ƒƒ‚ð‰Šú‰»‚·‚é
-void Texture::InitFromD3DResource(ID3D12Resource*& texture)
+void Texture::InitFromMemory(const char* memory, unsigned int size)
 {
-    //‚·‚Å‚É‘¶Ý‚µ‚Ä‚¢‚éê‡‚Í‰ð•ú‚·‚é
-    if (this->texture_)texture->Release();
+	//DDSãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
+	LoadTextureFromMemory(memory, size);
 
-    //‰Šú‰»
-    this->texture_ = texture;
-    this->texture_->AddRef();
-    this->texture_Desc_ = this->texture_->GetDesc();
 }
-
-//SRV‚É“o˜^
-void Texture::RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
+void Texture::LoadTextureFromMemory(const char* memory, unsigned int size
+)
 {
-    //ƒeƒNƒXƒ`ƒƒ‚ª‘¶Ý‚µ‚È‚¢ê‡
-    if (!this->texture_) return;
+	auto device = g_graphicsEngine->GetD3DDevice();
+	DirectX::ResourceUploadBatch re(device);
+	re.Begin();
+	ID3D12Resource* texture;
+	auto hr = DirectX::CreateDDSTextureFromMemoryEx(
+		device,
+		re,
+		(const uint8_t*)memory,
+		size,
+		0,
+		D3D12_RESOURCE_FLAG_NONE,
+		0,
+		&texture
+	);
+	re.End(g_graphicsEngine->GetCommandQueue());
 
-    //ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[@Ý’è
-    D3D12_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc;
-    shader_resource_view_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    shader_resource_view_desc.Format = this->texture_Desc_.Format;
-    shader_resource_view_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    shader_resource_view_desc.Texture2D.MipLevels = this->texture_Desc_.MipLevels;
-    
-    ////ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[ ¶¬
-    graphicsEngine->CreateShaderResourceView(
-        this->texture_,
-        shader_resource_view_desc,
-        descriptorHandle);
-    /*
-    const auto& device = graphicsEngine->GetDevice();
-    device->CreateShaderResourceView(
-        this->texture_, 
-        &shader_resource_view_desc, 
-        descriptorHandle);
-    
-    graphicsEngine->GetDevice()->CreateShaderResourceView(
-        this->texture_,
-        &shader_resource_view_desc,
-        descriptorHandle);
+	if (FAILED(hr)) {
+		//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚
+		return;
+	}
 
-    
-        */
-    return;
+	m_texture = texture;
+	m_textureDesc = m_texture->GetDesc();
 }
-
-//.DDS file ‚©‚çƒeƒNƒXƒ`ƒƒ‚ðƒ[ƒh
-void Texture::LoadTextureFromDDSFile(GraphicsEngine*& graphicsEngine, const wchar_t* filePath)
+void Texture::LoadTextureFromDDSFile(const wchar_t* filePath)
 {
-    //ResourceUploadBatch resouce_upload_batch(device);
-    ResourceUploadBatch resouce_upload_batch(graphicsEngine->GetDevice());
-    resouce_upload_batch.Begin();
+	auto device = g_graphicsEngine->GetD3DDevice();
+	DirectX::ResourceUploadBatch re(device);
+	re.Begin();
+	ID3D12Resource* texture;
+	auto hr = DirectX::CreateDDSTextureFromFileEx(
+		device,
+		re,
+		filePath,
+		0,
+		D3D12_RESOURCE_FLAG_NONE,
+		0,
+		&texture
+	);
+	re.End(g_graphicsEngine->GetCommandQueue());
 
-    ComPtr<ID3D12Resource> texture;
-    
-    //DDSƒeƒNƒXƒ`ƒƒ‚ð¶¬‚·‚é
-    HRESULT hr = DirectX::CreateDDSTextureFromFileEx(
-        //device,
-        graphicsEngine->GetDevice(),
-        resouce_upload_batch,
-        filePath,
-        0,
-        D3D12_RESOURCE_FLAG_NONE,
-        0,
-        &texture
-    );
+	if (FAILED(hr)) {
+		//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚
+		return;
+	}
 
-    //ResourceUploadBatch‚ðI—¹‚·‚é
-    resouce_upload_batch.End(graphicsEngine->GetCommandQueue());
-    
-    //¶¬Šm”F
-    if (FAILED(hr))
-    {
-        //Ž¸”s‚µ‚½‚Ì‚ÅˆÙíI—¹‚·‚é
-        MessageBoxA(nullptr, "CreateDDSTextureFromFileEx‚ÉŽ¸”s‚µ‚Ü‚µ‚½", "ƒGƒ‰[", MB_OK);
-        std::abort();
-    }
-
-    this->texture_ = texture.Get();
-    this->texture_Desc_ = this->texture_->GetDesc();
-
-    //texture->Release();
+	m_texture = texture;
+	m_textureDesc = m_texture->GetDesc();
 }
-
-//ƒƒ‚ƒŠ‚©‚çƒeƒNƒXƒ`ƒƒ‚ðƒ[ƒh
-void Texture::LoadTextureFromMemory(GraphicsEngine*& graphicsEngine, const char* memory, unsigned int size)
+	
+void Texture::RegistShaderResourceView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
 {
-    
-    ResourceUploadBatch resouce_upload_batch(graphicsEngine->GetDevice());
-    resouce_upload_batch.Begin();
-    ComPtr<ID3D12Resource> texture;
-    
-    //DDSƒeƒNƒXƒ`ƒƒƒƒ‚ƒŠ ¶¬
-    HRESULT hr = CreateDDSTextureFromMemoryEx(
-        graphicsEngine->GetDevice(),
-        resouce_upload_batch,
-        (const uint8_t*)memory,
-        size,
-        0,
-        D3D12_RESOURCE_FLAG_NONE,
-        0,
-        &texture
-    );
-
-    //ResourceUploadBatch‚ðI—¹‚·‚é
-    resouce_upload_batch.End(graphicsEngine->GetCommandQueue());
-
-    //¶¬Šm”F
-    if (FAILED(hr))
-    {
-        //Ž¸”s‚µ‚½‚Ì‚ÅˆÙíI—¹‚·‚é
-        MessageBoxA(nullptr, "CreateDDSTextureFromMemoryEx‚ÉŽ¸”s‚µ‚Ü‚µ‚½", "ƒGƒ‰[", MB_OK);
-        std::abort();
-    }
-
-    this->texture_ = texture.Get();
-    this->texture_Desc_ = this->texture_->GetDesc();
+	if (!m_texture) return;
+	
+	auto device = g_graphicsEngine->GetD3DDevice();
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = m_textureDesc.Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = m_textureDesc.MipLevels;
+	device->CreateShaderResourceView(m_texture, &srvDesc, descriptorHandle);
+	
 }

@@ -8,116 +8,27 @@
     <Filter Include="シェーダーファイル">
       <UniqueIdentifier>{85f17626-e150-44ec-8bdc-beb2bb53dd3b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\System">
-      <UniqueIdentifier>{56ecc5fa-6add-4fb9-a9fc-c7c52063ede8}</UniqueIdentifier>
+    <Filter Include="ソース ファイル\Util">
+      <UniqueIdentifier>{9f315b50-e46c-4056-8ecd-f1d68b512244}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Camera">
-      <UniqueIdentifier>{8394fcdb-6372-47c0-882c-25a3f7fc8170}</UniqueIdentifier>
+    <Filter Include="ソース ファイル\tkFile">
+      <UniqueIdentifier>{8aae2415-ca1c-4064-8553-9dbd6c4ed442}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Light">
-      <UniqueIdentifier>{19195cab-7a25-4c1b-b8b8-436b7cedc82f}</UniqueIdentifier>
+    <Filter Include="ソース ファイル\Raytracing">
+      <UniqueIdentifier>{1c63b220-b1b4-45a9-aaa4-bfbe0ca3d0b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\System\Math">
-      <UniqueIdentifier>{fce4ca7f-1a8f-41d9-9d68-7843fd635887}</UniqueIdentifier>
+    <Filter Include="ソース ファイル\Math">
+      <UniqueIdentifier>{290371eb-b991-4eda-8762-ae80df6c6f99}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Source\main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Camera.cpp">
-      <Filter>ソース ファイル\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Light.cpp">
-      <Filter>ソース ファイル\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GraphicsEngine.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\RenderContext.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\VertexBuffer.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\IndexBuffer.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\RootSignature.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PipelineState.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\DescriptorHeap.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ConstantBuffer.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\NullTextureMaps.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Math.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Model.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bone.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Skeleton.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\TksFile.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\MeshParts.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\StructuredBuffer.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\TkmFile.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Material.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Texture.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Shader.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Vector2.cpp">
-      <Filter>ソース ファイル\System\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Vector3.cpp">
-      <Filter>ソース ファイル\System\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Matrix.cpp">
-      <Filter>ソース ファイル\System\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Quaternion.cpp">
-      <Filter>ソース ファイル\System\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\tkEngine.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GamePad.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\TResourceBank.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\RenderTarget.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
+    <Filter Include="ソース ファイル\HID">
+      <UniqueIdentifier>{b0b205a7-f626-40db-92b5-7511cc0635b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Font">
+      <UniqueIdentifier>{2846caaa-b1a5-4f64-b985-8271ad391ad0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\dbg">
+      <UniqueIdentifier>{2f53e6c7-6e10-46ab-8f1f-3db49cd1897b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\BasicVertexShader.hlsl">
@@ -133,116 +44,292 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Animation.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\AnimationClip.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\AnimationPlayController.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Camera.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ConstantBuffer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DescriptorHeap.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GaussianBlur.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GPUBuffer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GraphicsEngine.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IndexBuffer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Material.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MeshParts.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Model.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\NullTextureMaps.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PipelineState.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RenderTarget.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RootSignature.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RWStructuredBuffer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Skeleton.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sprite.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StructuredBuffer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Texture.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\tkEngine.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VertexBuffer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\tkFile\TkaFile.cpp">
+      <Filter>ソース ファイル\tkFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\tkFile\TkmFile.cpp">
+      <Filter>ソース ファイル\tkFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\tkFile\TksFile.cpp">
+      <Filter>ソース ファイル\tkFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\raytracing\BLASBuffer.cpp">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\raytracing\RaytracingDescriptorHeaps.cpp">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\raytracing\RaytracingEngine.cpp">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\raytracing\RaytracingInstance.cpp">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\raytracing\RaytracingPSO.cpp">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\raytracing\RaytracingShaderTable.cpp">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\raytracing\RaytracingWorld.cpp">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\raytracing\TLASBuffer.cpp">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\math\Math.cpp">
+      <Filter>ソース ファイル\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\math\Matrix.cpp">
+      <Filter>ソース ファイル\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\math\Vector.cpp">
+      <Filter>ソース ファイル\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\HID\GamePad.cpp">
+      <Filter>ソース ファイル\HID</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\font\Font.cpp">
+      <Filter>ソース ファイル\Font</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\font\FontEngine.cpp">
+      <Filter>ソース ファイル\Font</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Animation.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\AnimationClip.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\AnimationPlayController.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Camera.h">
-      <Filter>ソース ファイル\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Light.h">
-      <Filter>ソース ファイル\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GraphicsEngine.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\RenderContext.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\VertexBuffer.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\IndexBuffer.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\RootSignature.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PipelineState.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\DescriptorHeap.h">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Source\ConstantBuffer.h">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\IShaderResource.h">
-      <Filter>ソース ファイル\System</Filter>
+    <ClInclude Include="Source\d3dx12.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\IUnorderAccessResrouce.h">
-      <Filter>ソース ファイル\System</Filter>
+    <ClInclude Include="Source\DescriptorHeap.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Source\DescriptorHeap_inline.h">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\RenderContext_inline.h">
-      <Filter>ソース ファイル\System</Filter>
+    <ClInclude Include="Source\GaussianBlur.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\NullTextureMaps.h">
-      <Filter>ソース ファイル\System</Filter>
+    <ClInclude Include="Source\GPUBuffer.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Math.h">
-      <Filter>ソース ファイル\System</Filter>
+    <ClInclude Include="Source\GraphicsEngine.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Model.h">
-      <Filter>ソース ファイル\System</Filter>
+    <ClInclude Include="Source\IndexBuffer.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ModelData.h">
-      <Filter>ソース ファイル\System</Filter>
+    <ClInclude Include="Source\IShaderResource.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Skeleton.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bone.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\TksFile.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\MeshParts.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\StructuredBuffer.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\TkmFile.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Texture.h">
-      <Filter>ソース ファイル\System</Filter>
+    <ClInclude Include="Source\IUnorderAccessResource.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Source\Material.h">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Shader.h">
-      <Filter>ソース ファイル\System</Filter>
+    <ClInclude Include="Source\MeshParts.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Vector2.h">
-      <Filter>ソース ファイル\System\Math</Filter>
+    <ClInclude Include="Source\MiniEngine.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Vector3.h">
-      <Filter>ソース ファイル\System\Math</Filter>
+    <ClInclude Include="Source\Model.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Vector4.h">
-      <Filter>ソース ファイル\System\Math</Filter>
+    <ClInclude Include="Source\NullTextureMaps.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Matrix.h">
-      <Filter>ソース ファイル\System\Math</Filter>
+    <ClInclude Include="Source\PipelineState.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Quaternion.h">
-      <Filter>ソース ファイル\System\Math</Filter>
+    <ClInclude Include="Source\RenderContext.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\tkEngine.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GamePad.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\TResourceBank.h">
-      <Filter>ソース ファイル\System</Filter>
+    <ClInclude Include="Source\RenderContext_inline.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Source\RenderTarget.h">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RootSignature.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RWStructuredBuffer.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Skeleton.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sprite.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StructuredBuffer.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Texture.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\tkEngine.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TResourceBank.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\VertexBuffer.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\util\Stopwatch.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\tkFile\TkaFile.h">
+      <Filter>ソース ファイル\tkFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\tkFile\TkmFile.h">
+      <Filter>ソース ファイル\tkFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\tkFile\TksFile.h">
+      <Filter>ソース ファイル\tkFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\raytracing\BLASBuffer.h">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\raytracing\Raytracing.h">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\raytracing\RaytracingDescriptorHeaps.h">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\raytracing\RaytracingEngine.h">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\raytracing\RaytracingInstance.h">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\raytracing\RaytracingPSO.h">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\raytracing\RaytracingShaderTable.h">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\raytracing\RaytracingWorld.h">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\raytracing\TLASBuffer.h">
+      <Filter>ソース ファイル\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\math\Math.h">
+      <Filter>ソース ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\math\Matrix.h">
+      <Filter>ソース ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\math\Vector.h">
+      <Filter>ソース ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\HID\GamePad.h">
+      <Filter>ソース ファイル\HID</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\font\Font.h">
+      <Filter>ソース ファイル\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\font\FontEngine.h">
+      <Filter>ソース ファイル\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\dbg\MyAssert.h">
+      <Filter>ソース ファイル\dbg</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

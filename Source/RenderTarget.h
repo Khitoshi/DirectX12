@@ -1,217 +1,164 @@
+ï»¿#pragma once
 #pragma once
+
 #include "Texture.h"
 
 class GraphicsEngine;
 
-class RenderTarget
-{
+/// <summary>
+/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã€‚
+/// </summary>
+class RenderTarget {
 public:
 	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	/// </summary>
-	RenderTarget();
-
-	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
+	/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 	/// </summary>
 	~RenderTarget();
-
 	/// <summary>
-	/// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ìì¬
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ä½œæˆã€‚
 	/// </summary>
-	/// <param name="graphicsEngine">ƒfƒoƒCƒXŠÖŒW‚ğ•Û—L‚µ‚Ä‚¢‚é</param>
-	/// <param name="renderTargetWidth">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì•</param>
-	/// <param name="renderTargetHeight">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì‚‚³</param>
-	/// <param name="mipLevel">ƒ~ƒbƒvƒ}ƒbƒvƒŒƒxƒ‹B0‚ğw’è‚µ‚½ê‡‚Íƒ~ƒbƒvƒ}ƒbƒv‚ªƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚éGPU‚Å‚Í1*1ƒsƒNƒZƒ‹‚Ü‚Å‚Ìƒ~ƒbƒvƒ}ƒbƒv‚ªì¬‚³‚ê‚éB</param>
-	/// <param name="arraySize">ƒeƒNƒXƒ`ƒƒ”z—ñ‚ÌƒTƒCƒY</param>
-	/// <param name="colorFormat">ƒJƒ‰[ƒoƒbƒtƒ@‚ÌƒtƒH[ƒ}ƒbƒgB</param>
-	/// <param name="depthStencilFormat">[“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚ÌƒtƒH[ƒ}ƒbƒgB</param>
-	/// <returns>true‚ª•Ô‚Á‚Ä‚«‚½‚çì¬¬Œ÷</returns>
+	/// <param name="w">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å¹…</param>
+	/// <param name="h">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é«˜ã•</param>
+	/// <param name="mipLevel">ãƒŸãƒƒãƒ—ãƒãƒƒãƒ—ãƒ¬ãƒ™ãƒ«ã€‚0ã‚’æŒ‡å®šã—ãŸå ´åˆã¯ãƒŸãƒƒãƒ—ãƒãƒƒãƒ—ãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹GPUã§ã¯1*1ãƒ”ã‚¯ã‚»ãƒ«ã¾ã§ã®ãƒŸãƒƒãƒ—ãƒãƒƒãƒ—ãŒä½œæˆã•ã‚Œã‚‹ã€‚</param>
+	/// <param name="arraySize">ãƒ†ã‚¯ã‚¹ãƒãƒ£é…åˆ—ã®ã‚µã‚¤ã‚º</param>
+	/// <param name="colorFormat">ã‚«ãƒ©ãƒ¼ãƒãƒƒãƒ•ã‚¡ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã€‚</param>
+	/// <param name="depthStencilFormat">æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã€‚</param>
+	/// <returns>trueãŒè¿”ã£ã¦ããŸã‚‰ä½œæˆæˆåŠŸ</returns>
 	bool Create(
-		GraphicsEngine*& graphicsEngine,
-		int renderTargetWidth,
-		int renderTargetHeight,
+		int w,
+		int h,
 		int mipLevel,
 		int arraySize,
 		DXGI_FORMAT colorFormat,
 		DXGI_FORMAT depthStencilFormat,
 		float clearColor[4] = nullptr
 	);
-
+	/// <summary>
+	/// CPUå´ã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVCpuDescriptorHandle() const
+	{
+		return m_rtvHeap->GetCPUDescriptorHandleForHeapStart();
+	}
+	/// <summary>
+	/// CPUå´ã®ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	D3D12_CPU_DESCRIPTOR_HANDLE GetDSVCpuDescriptorHandle() const
+	{
+		return m_dsvHeap->GetCPUDescriptorHandleForHeapStart();
+	}
+	/// <summary>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	Texture& GetRenderTargetTexture()
+	{
+		return m_renderTargetTexture;
+	}
+	/// <summary>
+	/// ãƒ‡ãƒ—ã‚¹ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ãŒå­˜åœ¨ã—ã¦ã„ã‚‹ã‹åˆ¤å®š
+	/// </summary>
+	/// <returns></returns>
+	bool IsExsitDepthStencilBuffer() const
+	{
+		return m_depthStencilTexture;
+	}
+	/// <summary>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å¹…ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	int GetWidth() const
+	{
+		return m_width;
+	}
+	/// <summary>
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é«˜ã•ã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	int GetHeight() const
+	{
+		return m_height;
+	}
+	/// <summary>
+	/// ã‚«ãƒ©ãƒ¼ãƒãƒƒãƒ•ã‚¡ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’å–å¾—ã€‚
+	/// </summary>
+	/// <returns></returns>
+	DXGI_FORMAT GetColorBufferFormat() const
+	{
+		return m_renderTargetTexture.GetFormat();
+	}
+	const float* GetRTVClearColor() const
+	{
+		return m_rtvClearColor;
+	}
+	float GetDSVClearValue() const
+	{
+		return m_dsvClearValue;
+	}
 private:
-#pragma region Create Method
 	/// <summary>
-	/// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒrƒ…[—p ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv ì¬
+	/// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’ä½œæˆã€‚
 	/// </summary>
-	/// <param name="graphicsEngine">ƒOƒ‰ƒtƒBƒbƒNƒGƒ“ƒWƒ“</param>
+	/// <param name="ge">ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¨ãƒ³ã‚¸ãƒ³</param>
+	/// <param name="d3dDevice">D3Dãƒ‡ãƒã‚¤ã‚¹</param>
 	/// <returns></returns>
-	void CreateDescriptorRTVHeap(GraphicsEngine*& graphicsEngine);
-
+	bool CreateDescriptorHeap(GraphicsEngine& ge, ID3D12Device5*& d3dDevice);
 	/// <summary>
-	/// [“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@—p ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv ì¬
+	/// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã€‚
 	/// </summary>
-	/// <param name="graphicsEngine"></param>
-	void CreateDescriptorDSVHeap(GraphicsEngine*& graphicsEngine);
-
-	/// <summary>
-	/// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ‚ğì¬
-	/// </summary>
-	/// <param name="graphicsEngine">ƒOƒ‰ƒtƒBƒbƒNƒGƒ“ƒWƒ“</param>
-	/// <param name="textureWidth">ƒeƒNƒXƒ`ƒƒ‚Ì•</param>
-	/// <param name="textureHeight">ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³</param>
-	/// <param name="mipLevel">ƒ~ƒbƒvƒ}ƒbƒvƒŒƒxƒ‹</param>
-	/// <param name="arraySize">ƒeƒNƒXƒ`ƒƒ”z—ñ‚ÌƒTƒCƒY</param>
-	/// <param name="format">ƒeƒNƒXƒ`ƒƒ‚ÌƒtƒH[ƒ}ƒbƒg</param>
-	/// <returns></returns>
-	void CreateRenderTargetTexture(
-		GraphicsEngine*& graphicsEngine,
-		int textureWidth,
-		int textureHeight,
+	/// <param name="ge">ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¨ãƒ³ã‚¸ãƒ³</param>
+	/// <param name="d3dDevice">D3Dãƒ‡ãƒã‚¤ã‚¹</param>
+	/// <param name="w">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å¹…</param>
+	/// <param name="h">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é«˜ã•</param>
+	/// <param name="mipLevel">ãƒŸãƒƒãƒ—ãƒãƒƒãƒ—ãƒ¬ãƒ™ãƒ«</param>
+	/// <param name="arraySize">ãƒ†ã‚¯ã‚¹ãƒãƒ£é…åˆ—ã®ã‚µã‚¤ã‚º</param>
+	/// <param name="format">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ</param>
+	/// <returns>trueãŒè¿”ã£ã¦ããŸã‚‰æˆåŠŸã€‚</returns>
+	bool CreateRenderTargetTexture(
+		GraphicsEngine& ge,
+		ID3D12Device5*& d3dDevice,
+		int w, 
+		int h,
 		int mipLevel,
 		int arraySize,
 		DXGI_FORMAT format,
 		float clearColor[4]
 	);
-
 	/// <summary>
-	/// [“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ‚ğì¬
+	/// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã€‚
 	/// </summary>
-	/// <param name="graphicsEngine">ƒOƒ‰ƒtƒBƒbƒNƒGƒ“ƒWƒ“</param>
-	/// <param name="textureWidth">ƒeƒNƒXƒ`ƒƒ‚Ì•</param>
-	/// <param name="TextureHeight">ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³</param>
-	/// <param name="format">ƒeƒNƒXƒ`ƒƒ‚ÌƒtƒH[ƒ}ƒbƒg</param>
-	/// <returns></returns>
-	void CreateDepthStencilTexture(
-		GraphicsEngine*& graphicsEngine,
-		int textureWidth,
-		int textureHeight,
+	/// <param name="ge">ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¨ãƒ³ã‚¸ãƒ³</param>
+	/// <param name="d3dDevice">D3Dãƒ‡ãƒã‚¤ã‚¹</param>
+	/// <param name="w">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å¹…</param>
+	/// <param name="h">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é«˜ã•</param>
+	/// <param name="format">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ</param>
+	/// <returns>trueãŒè¿”ã£ã¦ããŸã‚‰æˆåŠŸ</returns>
+	bool CreateDepthStencilTexture(
+		GraphicsEngine& ge,
+		ID3D12Device5*& d3dDevice,
+		int w,
+		int h,
 		DXGI_FORMAT format);
-
 	/// <summary>
-	/// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒrƒ…[‚ÌƒfƒBƒXƒNƒŠƒvƒ^ ì¬
+	/// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®ä½œæˆã€‚
 	/// </summary>
-	/// <param name="d3dDevice">D3DƒfƒoƒCƒX</param>
-	/// <returns></returns>
-	void CreateDescriptorRTV(GraphicsEngine*& graphicsEngine);
-	/// <summary>
-	/// ƒeƒNƒXƒ`ƒƒ‚ª‚ ‚éê‡
-	/// [“xƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚ÌƒfƒBƒXƒNƒŠƒvƒ^ ì¬
-	/// </summary>
-	/// <param name="d3dDevice">D3DƒfƒoƒCƒX</param>
-	/// <returns></returns>
-	void CreateDescriptorDSV(GraphicsEngine*& graphicsEngine);
-
-#pragma endregion
-
-public:
-#pragma region Get Method
-	/// <summary>
-	/// CPU‘¤‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒnƒ“ƒhƒ‹ æ“¾B
-	/// </summary>
-	/// <returns></returns>
-	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVCpuDescriptorHandle() const
-	{
-		return this->rtv_Heap_->GetCPUDescriptorHandleForHeapStart();
-	}
-
-	/// <summary>
-	/// CPU‘¤‚ÌƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒnƒ“ƒhƒ‹ æ“¾B
-	/// </summary>
-	/// <returns></returns>
-	D3D12_CPU_DESCRIPTOR_HANDLE GetDSVCpuDescriptorHandle() const
-	{
-		return this->dsv_Heap_->GetCPUDescriptorHandleForHeapStart();
-	}
-
-	/// <summary>
-	/// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ æ“¾B
-	/// </summary>
-	/// <returns></returns>
-	Texture& GetRenderTargetTexture()
-	{
-		return this->render_Target_Texture_;
-	}
-
-	/// <summary>
-	/// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚ª‘¶İ‚µ‚Ä‚¢‚é‚©”»’è
-	/// </summary>
-	/// <returns></returns>
-	bool IsExsitDepthStencilBuffer() const
-	{
-		return this->depth_Stencil_Texture_;
-	}
-
-	/// <summary>
-	/// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì• æ“¾B
-	/// </summary>
-	/// <returns></returns>
-	int GetWidth() const
-	{
-		return this->width_;
-	}
-
-	/// <summary>
-	/// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì‚‚³ æ“¾B
-	/// </summary>
-	/// <returns></returns>
-	int GetHeight() const
-	{
-		return this->height_;
-	}
-
-	/// <summary>
-	/// ƒJƒ‰[ƒoƒbƒtƒ@‚ÌƒtƒH[ƒ}ƒbƒg æ“¾
-	/// </summary>
-	/// <returns></returns>
-	DXGI_FORMAT GetColorBufferFormat() const
-	{
-		return this->render_Target_Texture_.GetFormat();
-	}
-
-	/// <summary>
-	/// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒgƒrƒ…[‚ÌƒNƒŠƒAƒJƒ‰[ æ“¾
-	/// </summary>
-	/// <returns></returns>
-	const float* GetRTVClearColor() const
-	{
-		return this->rtv_Clear_Color_;
-	}
-
-	/// <summary>
-	/// DSV‚ÌƒNƒŠƒAƒJƒ‰[ æ“¾
-	/// </summary>
-	/// <returns></returns>
-	float GetDSVClearValue() const
-	{
-		return this->dsv_Clear_Value_;
-	}
-#pragma endregion
-
+	/// <param name="d3dDevice">D3Dãƒ‡ãƒã‚¤ã‚¹</param>
+	/// <returns>trueãŒè¿”ã£ã¦ï½‹ãƒã‚¢ã‚‰æˆåŠŸã€‚</returns>
+	void CreateDescriptor(ID3D12Device5*& d3dDevice);
 private:
-	//ƒeƒNƒXƒ`ƒƒ
-	Texture render_Target_Texture_;
-	//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ
-	ID3D12Resource* render_Target_Texture_Dx12_;
-	//[“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚Æ‚È‚éƒeƒNƒXƒ`ƒƒ
-	ID3D12Resource* depth_Stencil_Texture_;
-	//RTV—p‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv
-	ID3D12DescriptorHeap* rtv_Heap_;
-	//[“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@ƒrƒ…[‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv
-	ID3D12DescriptorHeap* dsv_Heap_;
-
-	//ƒtƒŒ[ƒ€ƒoƒbƒtƒ@‚ÌƒfƒBƒXƒNƒŠƒvƒ^‚ÌƒTƒCƒY
-	UINT rtv_Descriptor_Size_;
-	//[“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚ÌƒfƒBƒXƒNƒŠƒvƒ^‚ÌƒTƒCƒY
-	UINT dsv_Descriptor_Size_;
-
-	//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì•
-	int width_;
-	//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ì‚‚³
-	int height_;
-
-	//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒgƒrƒ…[‚ÌƒNƒŠƒAƒJƒ‰[
-	float rtv_Clear_Color_[4];
-	//DSV‚ÌƒNƒŠƒAƒJƒ‰[
-	float dsv_Clear_Value_;
-
+	Texture m_renderTargetTexture;
+	ID3D12Resource* m_renderTargetTextureDx12 = nullptr;//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚
+	ID3D12Resource* m_depthStencilTexture = nullptr;	//æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ã¨ãªã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚
+	ID3D12DescriptorHeap*		m_rtvHeap = nullptr;	//RTVç”¨ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã€‚
+	ID3D12DescriptorHeap*		m_dsvHeap = nullptr;	//æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã€‚
+	UINT m_rtvDescriptorSize = 0;						//ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®ã‚µã‚¤ã‚ºã€‚
+	UINT m_dsvDescriptorSize = 0;						//æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®ã‚µã‚¤ã‚ºã€‚
+	int m_width = 0;									//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å¹…ã€‚
+	int m_height = 0;									//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é«˜ã•ã€‚
+	float m_rtvClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };	//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒ“ãƒ¥ãƒ¼ã®ã‚¯ãƒªã‚¢ã‚«ãƒ©ãƒ¼ã€‚
+	float m_dsvClearValue = 1.0f;							//DSVã®ã‚¯ãƒªã‚¢ã‚«ãƒ©ãƒ¼ã€‚
 };
+
+

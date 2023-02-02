@@ -1,170 +1,158 @@
+ï»¿/*!
+*@brief	ã‚¹ã‚±ãƒ«ãƒˆãƒ³
+*/
+#include "stdafx.h"
 #include "Skeleton.h"
-
-//#include <comutil.h>
-#include <stdlib.h>
-
-#pragma warning(disable : 4996)
+#include <comdef.h> 
 
 
-//ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-Skeleton::Skeleton():
-    tks_file_(),
-    bones_(BONE_MAX),
-    bone_Matrixs_(),
-
-    is_Inited_(false),
-    is_Play_Animation_(false)
+void Bone::CalcWorldTRS(Vector3& trans, Quaternion& rot, Vector3& scale)
 {
+	Matrix mWorld = m_worldMatrix;
+	//è¡Œåˆ—ã‹ã‚‰æ‹¡å¤§ç‡ã‚’å–å¾—ã™ã‚‹ã€‚
+	scale.x = mWorld.v[0].Length();
+	scale.y = mWorld.v[1].Length();
+	scale.z = mWorld.v[2].Length();
+	m_scale = scale;
+	//è¡Œåˆ—ã‹ã‚‰å¹³è¡Œç§»å‹•é‡ã‚’å–å¾—ã™ã‚‹ã€‚
+	trans.Set(mWorld.v[3]);
+	m_positoin = trans;
+	//è¡Œåˆ—ã‹ã‚‰æ‹¡å¤§ç‡ã¨å¹³è¡Œç§»å‹•é‡ã‚’é™¤å»ã—ã¦å›è»¢é‡ã‚’å–å¾—ã™ã‚‹ã€‚
+	mWorld.v[0].Normalize();
+	mWorld.v[1].Normalize();
+	mWorld.v[2].Normalize();
+	mWorld.v[3].Set(0.0f, 0.0f, 0.0f, 1.0f);
+	rot.SetRotation(mWorld);
+	m_rotation = rot;
 }
-
-//ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
+Skeleton::Skeleton()
+{
+	//ãƒªã‚¶ãƒ¼ãƒ–ã€‚
+	m_bones.reserve(BONE_MAX);
+}
 Skeleton::~Skeleton()
 {
 }
-
-//‰Šú‰»
-void Skeleton::Init(const char* tksFilePath)
-{
-    //.tks file “Ç‚İ‚İ
-    this->tks_file_.Load(tksFilePath);
-
-    //ƒ{[ƒ“s—ñ‚Ì\’z
-    this->BuildBoneMatrices();
-}
-
-//ƒ{[ƒ“s—ñ‚Ì\’z
-void Skeleton::BuildBoneMatrices()
-{
-    this->tks_file_.QueryBone([&](TksFile::SBone& tks_bone) {
-        //ƒoƒCƒ“ƒhƒ|[ƒY
-        Matrix bind_pose_matrix;
-        memcpy(bind_pose_matrix.m[0], &tks_bone.bind_Pose[0], sizeof(tks_bone.bind_Pose[0]));
-        memcpy(bind_pose_matrix.m[1], &tks_bone.bind_Pose[1], sizeof(tks_bone.bind_Pose[1]));
-        memcpy(bind_pose_matrix.m[2], &tks_bone.bind_Pose[2], sizeof(tks_bone.bind_Pose[2]));
-        memcpy(bind_pose_matrix.m[3], &tks_bone.bind_Pose[3], sizeof(tks_bone.bind_Pose[3]));
-
-        //ƒoƒCƒ“ƒhƒ|[ƒY‚Ì‹ts—ñ
-        Matrix inv_bind_pose_matrix;
-        memcpy(inv_bind_pose_matrix.m[0], &tks_bone.inv_Bind_Pose[0], sizeof(tks_bone.inv_Bind_Pose[0]));
-        memcpy(inv_bind_pose_matrix.m[1], &tks_bone.inv_Bind_Pose[1], sizeof(tks_bone.inv_Bind_Pose[1]));
-        memcpy(inv_bind_pose_matrix.m[2], &tks_bone.inv_Bind_Pose[2], sizeof(tks_bone.inv_Bind_Pose[2]));
-        memcpy(inv_bind_pose_matrix.m[3], &tks_bone.inv_Bind_Pose[3], sizeof(tks_bone.inv_Bind_Pose[3]));
-        inv_bind_pose_matrix.m[0][3] = 0.0f;
-        inv_bind_pose_matrix.m[1][3] = 0.0f;
-        inv_bind_pose_matrix.m[2][3] = 0.0f;
-        inv_bind_pose_matrix.m[3][3] = 1.0f;
-
-        wchar_t bone_name[256];
-        size_t value;
-        //ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñ‚ğƒƒCƒh•¶š—ñ‚É•ÏŠ·
-        //mbstowcs_s(&value, bone_name, static_cast<size_t>(256), tks_bone.name.get(), _TRUNCATE);
-        mbstowcs(bone_name, tks_bone.name.get(), 256);
-        //ƒ{[ƒ“ ¶¬
-        std::unique_ptr<Bone> bone = std::make_unique<Bone>(
-            bone_name,
-            bind_pose_matrix,
-            inv_bind_pose_matrix,
-            tks_bone.parent_No,
-            tks_bone.id
-            );
-
-        //“o˜^
-        this->bones_.push_back(move(bone));
-        });
-
-    for (auto& bone : this->bones_)
-    {
-        if (bone->GetParentBoneNumber() != -1) {
-            //ƒ{[ƒ“’Ç‰Á
-            this->bones_.at(bone->GetParentBoneNumber())->AddChild(bone.get());
-
-            //ƒ[ƒJƒ‹ƒ}ƒgƒŠƒNƒX‚ğŒvZ
-            const Matrix& parent_matrix = this->bones_.at(bone->GetParentBoneNumber())->GetInvBindPoseMatrix();
-            Matrix local_matrix;
-            local_matrix = bone->GetBindPoseMatrix() * parent_matrix;
-            bone->SetLocalMatrix(local_matrix);
-        }
-        else
-        {
-            //ƒ[ƒJƒ‹s—ñ İ’è
-            bone->SetLocalMatrix(bone->GetBindPoseMatrix());
-        }
-    }
-    
-    //ƒ{[ƒ“ƒ}ƒgƒŠƒbƒNƒX¶¬
-    this->bone_Matrixs_ = std::make_unique<Matrix[]>(this->bones_.size());
-    //‰Šú‰»‚µ‚½‚Ì‚Å‰Šú‰»Ï‚İƒtƒ‰ƒO‚ğŒš‚Ä‚é
-    this->is_Inited_ = true;
-}
-
-int Skeleton::FindBoneID(const wchar_t* boneName) const
-{
-    
-    //ŒŸõ
-    for (int i = 0; i < (int)this->bones_.size(); i++) {
-        if (wcscmp(this->bones_[i]->GetName(), boneName) == 0) {
-            return i;
-        }
-    }
-    //Œ©‚Â‚©‚ç‚È‚©‚Á‚½B
-    return -1;
-    
-}
-
-//XV
-void Skeleton::Update(const Matrix& matrix_World)
-{
-    //ƒAƒjƒ[ƒVƒ‡ƒ“XV
-    AnimationUpdate(matrix_World);
-
-    //ƒ{[ƒ“s—ñ‚ğŒvZB
-    int bone_no = 0;
-    for (auto& bonePtr : this->bones_) {
-        Matrix matrix_bone;
-        matrix_bone = bonePtr->GetInvBindPoseMatrix() * bonePtr->GetWorldMatrix();
-        this->bone_Matrixs_[bone_no] = matrix_bone;
-        bone_no++;
-    }
-}
-
-//ƒ{[ƒ“‚Ìƒ[ƒ‹ƒhs—ñ‚ÌXVŠÖ”
 void Skeleton::UpdateBoneWorldMatrix(Bone& bone, const Matrix& parentMatrix)
 {
-    Matrix bone_world;
-    Matrix local_matrix = bone.GetLocalMatrix();
-    bone_world = local_matrix * parentMatrix;
+	Matrix mBoneWorld;
+	Matrix localMatrix = bone.GetLocalMatrix();
+	mBoneWorld = localMatrix * parentMatrix;
+	
+	bone.SetWorldMatrix(mBoneWorld);
+	for (auto childBone : bone.GetChildren()) {
+		UpdateBoneWorldMatrix(*childBone, mBoneWorld);
+	}
+}
+bool Skeleton::Init(const char* tksFilePath)
+{
+	//tksãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
+	if (m_tksFile.Load(tksFilePath)) {
+		//ãƒœãƒ¼ãƒ³è¡Œåˆ—ã‚’æ§‹ç¯‰ã™ã‚‹ã€‚
+		BuildBoneMatrices();
+		return true;
+	}
+	return false;
+}
+void Skeleton::BuildBoneMatrices()
+{
+	m_tksFile.QueryBone([&](TksFile::SBone & tksBone) {
+		//ãƒã‚¤ãƒ³ãƒ‰ãƒãƒ¼ã‚ºã€‚
+		Matrix bindPoseMatrix;
+		memcpy(bindPoseMatrix.m[0], &tksBone.bindPose[0], sizeof(tksBone.bindPose[0]));
+		memcpy(bindPoseMatrix.m[1], &tksBone.bindPose[1], sizeof(tksBone.bindPose[1]));
+		memcpy(bindPoseMatrix.m[2], &tksBone.bindPose[2], sizeof(tksBone.bindPose[2]));
+		memcpy(bindPoseMatrix.m[3], &tksBone.bindPose[3], sizeof(tksBone.bindPose[3]));
+		bindPoseMatrix.m[0][3] = 0.0f;
+		bindPoseMatrix.m[1][3] = 0.0f;
+		bindPoseMatrix.m[2][3] = 0.0f;
+		bindPoseMatrix.m[3][3] = 1.0f;
 
-    bone.SetWorldMatrix(bone_world);
-    for (auto childBone : bone.GetChildren()) {
-        UpdateBoneWorldMatrix(*childBone, bone_world);
-    }
+		//ãƒã‚¤ãƒ³ãƒ‰ãƒãƒ¼ã‚ºã®é€†è¡Œåˆ—ã€‚
+		Matrix invBindPoseMatrix;
+		memcpy(invBindPoseMatrix.m[0], &tksBone.invBindPose[0], sizeof(tksBone.invBindPose[0]));
+		memcpy(invBindPoseMatrix.m[1], &tksBone.invBindPose[1], sizeof(tksBone.invBindPose[1]));
+		memcpy(invBindPoseMatrix.m[2], &tksBone.invBindPose[2], sizeof(tksBone.invBindPose[2]));
+		memcpy(invBindPoseMatrix.m[3], &tksBone.invBindPose[3], sizeof(tksBone.invBindPose[3]));
+		invBindPoseMatrix.m[0][3] = 0.0f;
+		invBindPoseMatrix.m[1][3] = 0.0f;
+		invBindPoseMatrix.m[2][3] = 0.0f;
+		invBindPoseMatrix.m[3][3] = 1.0f;
+
+		wchar_t boneName[256];
+		mbstowcs(boneName, tksBone.name.get(), 256);
+		BonePtr bone = std::make_unique<Bone>(
+			boneName,
+			bindPoseMatrix,
+			invBindPoseMatrix,
+			tksBone.parentNo,
+			tksBone.no
+			);
+#if BUILD_LEVEL != BUILD_LEVEL_MASTER
+		//ãƒœãƒ¼ãƒ³ã®ãƒãƒªãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³ãƒã‚§ãƒƒã‚¯ã€‚
+		//maxScriptã§ã‚„ã‚ŠãŸã„ã¨ã“ã‚ã§ã¯ã‚ã‚‹ãŒã€ã¨ã‚Šã‚ãˆãšã“ã£ã¡ã€‚
+		auto it = std::find_if(m_bones.begin(), m_bones.end(), [&](auto & bone) {return wcscmp(boneName, bone->GetName()) == 0;  });
+		if (it != m_bones.end()) {
+			//åŒåã®ãƒœãƒ¼ãƒ³ãŒè¦‹ã¤ã‹ã£ãŸã€‚
+			_bstr_t b(boneName);
+			const char* c = b;
+			TK_WARNING("åŒåã®ãƒœãƒ¼ãƒ³ãŒè¦‹ã¤ã‹ã‚Šã¾ã—ãŸã€‚æœªå®šã®å‹•ä½œã§ã™ã€‚ãƒ‡ãƒ¼ã‚¿ã‚’ä¿®æ­£ã—ã¦ãã ã•ã„ã€‚%s", c);
+		}
+#endif
+		m_bones.push_back(std::move(bone));
+		});
+	for (auto& bone : m_bones) {
+		if (bone->GetParentBoneNo() != -1) {
+			m_bones.at(bone->GetParentBoneNo())->AddChild(bone.get());
+			//ãƒ­ãƒ¼ã‚«ãƒ«ãƒãƒˆãƒªã‚¯ã‚¹ã‚’è¨ˆç®—ã€‚
+			const Matrix& parentMatrix = m_bones.at(bone->GetParentBoneNo())->GetInvBindPoseMatrix();
+			Matrix localMatrix;
+			localMatrix = bone->GetBindPoseMatrix() * parentMatrix;
+			bone->SetLocalMatrix(localMatrix);
+		}
+		else {
+			bone->SetLocalMatrix(bone->GetBindPoseMatrix());
+		}
+	}
+
+
+	//ãƒœãƒ¼ãƒ³è¡Œåˆ—ã‚’ç¢ºä¿
+	m_boneMatrixs = std::make_unique<Matrix[]>(m_bones.size());
+	m_isInited = true;
+
 }
 
-void Skeleton::AnimationUpdate(const Matrix& matrix_world)
+void Skeleton::Update(const Matrix& mWorld)
 {
-    if (this->is_Play_Animation_)
-    {
-        //ƒ{[ƒ“s—ñ‚ğƒ‹[ƒgƒ{[ƒ“‚Ì‹óŠÔ‚©‚çƒ[ƒ‹ƒh‹óŠÔ‚ğ\’z‚µ‚Ä‚¢‚­
-        for (auto& bone : this->bones_)
-        {
-            Matrix bone_world;
-            Matrix local_matrix = bone->GetLocalMatrix();
-            //e‚Ìs—ñ‚Æƒ[ƒJƒ‹s—ñ‚ğæZ‚µ‚ÄCƒ[ƒ‹ƒhs—ñ‚ğŒvZ‚·‚é
-            bone_world = local_matrix * matrix_world;
-            bone->SetWorldMatrix(bone_world);
-        }
-    }
-    else
-    {
-        //ƒAƒjƒ[ƒVƒ‡ƒ“‚ª—¬‚µ‚Ü‚ê‚Ä‚¢‚é‚ÆAƒ{[ƒ“s—ñ‚ªƒ‹[ƒgƒ{[ƒ“‹óŠÔ‚É
-        //•ÏŠ·‚³‚ê‚Ä‚¢‚é‚ªA—¬‚³‚ê‚Ä‚¢‚È‚¢‚Æe‚Ìœ‚ÌÀ•WŒn‚Ì‚Ü‚Ü‚È‚Ì‚ÅA
-        //ƒ‹[ƒgƒ{[ƒ“‹óŠÔ¨ƒ[ƒ‹ƒh‹óŠÔ‚Ö‚Ì•ÏŠ·‚ğs‚¤B
-        for (auto& bone : this->bones_)
-        {
-            //‘¶İ‚µ‚È‚¢ê‡‚Í”ò‚Î‚·
-            if (bone->GetParentBoneNumber() != -1)continue;
-            //ƒ‹[ƒg
-            UpdateBoneWorldMatrix(*bone, matrix_world);
-        }
-    }
+	if (m_isPlayAnimation) {
+		//ãƒœãƒ¼ãƒ³è¡Œåˆ—ã‚’ãƒ«ãƒ¼ãƒˆãƒœãƒ¼ãƒ³ã®ç©ºé–“ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã‚’æ§‹ç¯‰ã—ã¦ã„ãã€‚
+		for (auto& bone : m_bones) {
+			Matrix mBoneWorld;
+			Matrix localMatrix = bone->GetLocalMatrix();
+			//è¦ªã®è¡Œåˆ—ã¨ãƒ­ãƒ¼ã‚«ãƒ«è¡Œåˆ—ã‚’ä¹—ç®—ã—ã¦ã€ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‚’è¨ˆç®—ã™ã‚‹ã€‚
+			mBoneWorld = localMatrix * mWorld;
+			bone->SetWorldMatrix(mBoneWorld);
+		}
+	}
+	else {
+		//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãŒæµã—è¾¼ã¾ã‚Œã¦ã„ã‚‹ã¨ã€ãƒœãƒ¼ãƒ³è¡Œåˆ—ãŒãƒ«ãƒ¼ãƒˆãƒœãƒ¼ãƒ³ç©ºé–“ã«
+		//å¤‰æ›ã•ã‚Œã¦ã„ã‚‹ãŒã€æµã•ã‚Œã¦ã„ãªã„ã¨è¦ªã®éª¨ã®åº§æ¨™ç³»ã®ã¾ã¾ãªã®ã§ã€
+		//ãƒ«ãƒ¼ãƒˆãƒœãƒ¼ãƒ³ç©ºé–“â†’ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã¸ã®å¤‰æ›ã‚’è¡Œã†ã€‚
+		for (auto& bone : m_bones) {
+			if (bone->GetParentBoneNo() != -1) {
+				continue;
+			}
+			//ãƒ«ãƒ¼ãƒˆã€‚
+			UpdateBoneWorldMatrix(*bone, mWorld);
+		}
+	}
+
+	//ãƒœãƒ¼ãƒ³è¡Œåˆ—ã‚’è¨ˆç®—ã€‚
+	int boneNo = 0;
+	for (auto& bonePtr : m_bones) {
+		Matrix mBone;
+		mBone = bonePtr->GetInvBindPoseMatrix() * bonePtr->GetWorldMatrix();
+		m_boneMatrixs[boneNo] = mBone;
+		boneNo++;
+	}	
 }

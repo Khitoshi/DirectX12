@@ -1,55 +1,28 @@
-#pragma once
+ï»¿#pragma once
 
-#include <map>
-#include <string>
 #include <memory>
 
-/// <summary>
-/// ƒŠƒ\[ƒX‚ğ’™‚ß‚éƒNƒ‰ƒX
-/// </summary>
-/// <typeparam name="TResource"></typeparam>
 template<class TResource>
-class TResourceBank
-{
+class TResourceBank {
 public:
-	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	/// </summary>
-	TResourceBank() :
-		resource_Map()
-	{
-
-	}
-
-	/// <summary>
-	/// ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
-	/// </summary>
-	~TResourceBank()
-	{
-
-	}
-
 	TResource* Get(const char* filePath)
 	{
-		auto it = this->resource_Map.find(filePath);
-		if (it != this->resource_Map.end()) {
+		auto it = m_resourceMap.find(filePath);
+		if (it != m_resourceMap.end()) {
 			return it->second.get();
 		}
 		return nullptr;
 	}
-
 	void Regist(const char* filePath, TResource* resource)
 	{
-		auto it = this->resource_Map.find(filePath);
-		if (it == this->resource_Map.end()) {
-			this->resource_Map.insert(
-				std::pair< std::string, std::unique_ptr<TResource>>(filePath, resource)
+		auto it = m_resourceMap.find(filePath);
+		if (it == m_resourceMap.end()) {
+			m_resourceMap.insert(
+				std::pair< std::string, TResourcePtr>(filePath, resource )
 			);
 		}
 	}
-
 private:
-	//ƒŠƒ\[ƒX
-	std::map<std::string, std::unique_ptr<TResource>> resource_Map;
+	using TResourcePtr = std::unique_ptr<TResource> ;
+	std::map<std::string, TResourcePtr> m_resourceMap;
 };
-

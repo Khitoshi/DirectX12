@@ -1,114 +1,81 @@
+Ôªø#include "stdafx.h"
 #include "StructuredBuffer.h"
-#include "GraphicsEngine.h"
-#include <Windows.h>
 
 
-//ÉfÉtÉHÉãÉg ÉRÉìÉXÉgÉâÉNÉ^
-StructuredBuffer::StructuredBuffer():
-    buffers_On_GPU_(),
-    buffers_On_CPU_(),
-
-    element_Number_(0),
-    element_Size_(0),
-
-    is_Inited_(false)
-{
-}
-
-//ÉfÉtÉHÉãÉg ÉfÉXÉgÉâÉNÉ^
 StructuredBuffer::~StructuredBuffer()
 {
+	//„Ç¢„É≥„Éû„Éº„ÉÉ„Éó
+	CD3DX12_RANGE readRange(0, 0);
+	for (auto& buffer : m_buffersOnGPU) {
+		if (buffer) {
+			buffer->Unmap(0, &readRange);
+			buffer->Release();
+		}
+	}
 }
-
-//èâä˙âª
-void StructuredBuffer::Init(GraphicsEngine*& graphicsEngine, int elementSize, int elementNumber, void* initData)
+void StructuredBuffer::Init(int sizeOfElement, int numElement, void* initData)
 {
-    
-    //ÉGÉåÉÅÉìÉgÉTÉCÉY éÊìæ
-    this->element_Size_ = elementSize;
-    //ÉGÉåÉÅÉìÉgóvëfêî éÊìæ
-    this->element_Number_ = elementNumber;
+	m_sizeOfElement = sizeOfElement;
+	m_numElement = numElement;
+	auto device = g_graphicsEngine->GetD3DDevice();
 
-    //ÉoÉbÉtÉ@î‘çÜ
-    int buffer_number = 0;
-    //ÉqÅ[ÉvèÓïÒ
-    auto heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    //ÉäÉ\Å[ÉXÉfÉXÉNÇÃÉoÉbÉtÉ@Å@éÊìæ
-    auto resource_desc = CD3DX12_RESOURCE_DESC::Buffer(this->element_Size_ * this->element_Number_);
+	int bufferNo = 0;
+	auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	auto rDesc = CD3DX12_RESOURCE_DESC::Buffer(m_sizeOfElement * m_numElement);
+	for (auto& buffer : m_buffersOnGPU) {
+		auto hr = device->CreateCommittedResource(
+			&heapProp,
+			D3D12_HEAP_FLAG_NONE,
+			&rDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&buffer)
+		);
 
-    for (auto& buffer : this->buffers_On_GPU_)
-    {
-        //ÉäÉ\Å[ÉX ê∂ê¨
-        graphicsEngine->CreateCommittedResource(
-            heap_prop,
-            D3D12_HEAP_FLAG_NONE,
-            resource_desc,
-            D3D12_RESOURCE_STATE_GENERIC_READ,
-            nullptr,
-            buffer
-        );
-
-        ////ê∂ê¨Å@É`ÉFÉbÉN
-        //if (FAILED(hr))
-        //{
-        //    MessageBox(nullptr, TEXT("GraphicsEngine::CreateSynchronizationWithGPUObjectÇÃê∂ê¨Ç…é∏îs"), TEXT("ÉGÉâÅ["), MB_OK);
-        //    std::abort();
-        //}
-
-        CD3DX12_RANGE read_range(0, 0);
-        buffer->Map(0, &read_range, reinterpret_cast<void**>(this->buffers_On_CPU_[buffer_number]));
-        
-        if (initData != nullptr)
-        {
-            memcpy(this->buffers_On_CPU_[buffer_number], initData, this->element_Size_ * this->element_Number_);
-        }
-        buffer_number++;
-    }
-    this->is_Inited_ = true;
+		
+		//ÊßãÈÄ†Âåñ„Éê„ÉÉ„Éï„Ç°„ÇíCPU„Åã„Çâ„Ç¢„ÇØ„Çª„ÇπÂèØËÉΩ„Å™‰ªÆÊÉ≥„Ç¢„Éâ„É¨„ÇπÁ©∫Èñì„Å´„Éû„ÉÉ„Éî„É≥„Ç∞„Åô„Çã„ÄÇ
+		//„Éû„ÉÉ„Éó„ÄÅ„Ç¢„É≥„Éû„ÉÉ„Éó„ÅÆ„Ç™„Éº„Éê„Éº„Éò„ÉÉ„Éâ„ÇíËªΩÊ∏õ„Åô„Çã„Åü„ÇÅ„Å´„ÅØ„Åì„ÅÆ„Ç§„É≥„Çπ„Çø„É≥„Çπ„ÅåÁîü„Åç„Å¶„ÅÑ„ÇãÈñì„ÅØË°å„Çè„Å™„ÅÑ„ÄÇ
+		{
+			CD3DX12_RANGE readRange(0, 0);        //     intend to read from this resource on the CPU.
+			buffer->Map(0, &readRange, reinterpret_cast<void**>(&m_buffersOnCPU[bufferNo]));
+		}
+		if (initData != nullptr) {
+			memcpy(m_buffersOnCPU[bufferNo], initData, m_sizeOfElement * m_numElement);
+		}
+		
+		bufferNo++;
+	}
+	m_isInited = true;
 }
-
-//SRVÇ…ìoò^
-void StructuredBuffer::RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNumber)
+void StructuredBuffer::Update(void* data)
 {
-    //èâä˙âªÉ`ÉFÉbÉN
-    if (!this->is_Inited_)return;
-
-    D3D12_SHADER_RESOURCE_VIEW_DESC shader_recouce_view_desc;
-    //ÉÅÉÇÉäÉuÉçÉbÉNÇÉ[ÉçÇ≈ñÑÇﬂÇÈ
-    //ZeroMemory(&shader_recouce_view_desc, sizeof(shader_recouce_view_desc));
-    SecureZeroMemory(&shader_recouce_view_desc, sizeof(shader_recouce_view_desc));
-
-    //ÉVÉFÅ[É_Å[ÉäÉ\Å[ÉXÉrÉÖÅ[ ê›íË
-    shader_recouce_view_desc.Format = DXGI_FORMAT_UNKNOWN;
-    shader_recouce_view_desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-    shader_recouce_view_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    shader_recouce_view_desc.Buffer.FirstElement = 0;
-    shader_recouce_view_desc.Buffer.NumElements = static_cast<UINT>(this->element_Number_);
-    shader_recouce_view_desc.Buffer.StructureByteStride = this->element_Size_;
-    shader_recouce_view_desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-
-    //ÉVÉFÅ[É_Å[ÉäÉ\Å[ÉXÉrÉÖÅ[ ê∂ê¨
-    //device.CreateShaderResourceView(
-    //    this->buffers_On_GPU_[bufferNumber].Get(), 
-    //    &shader_recouce_view_desc, 
-    //    descriptorHandle
-    //);
-
-    graphicsEngine->CreateShaderResourceView(this->buffers_On_GPU_[bufferNumber], shader_recouce_view_desc, descriptorHandle);
-
+	auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+	memcpy(m_buffersOnCPU[backBufferIndex], data, m_numElement * m_sizeOfElement);
 }
-
-//ç\ë¢âªÉoÉbÉtÉ@ÇÃì‡óeçXêV
-void StructuredBuffer::Update(GraphicsEngine*& graphicsEngine, void* data)
+ID3D12Resource* StructuredBuffer::GetD3DResoruce() 
 {
-    auto back_baffer_index = graphicsEngine->GetBackBufferIndex();
-    memcpy(this->buffers_On_CPU_[back_baffer_index], data, this->element_Number_ * this->element_Size_);
+	auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+	return m_buffersOnGPU[backBufferIndex];
 }
-
-ID3D12Resource* StructuredBuffer::GetResouce(GraphicsEngine*& graphicsEngine)
+void StructuredBuffer::RegistShaderResourceView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
 {
-
-    auto buck_buffer_index = graphicsEngine->GetBackBufferIndex();
-    return this->buffers_On_GPU_[buck_buffer_index].Get();
+	if (!m_isInited) {
+		return;
+	}
+	auto device = g_graphicsEngine->GetD3DDevice();
+	
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	ZeroMemory(&srvDesc, sizeof(srvDesc));
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Buffer.FirstElement = 0;
+	srvDesc.Buffer.NumElements = static_cast<UINT>(m_numElement);
+	srvDesc.Buffer.StructureByteStride = m_sizeOfElement;
+	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	device->CreateShaderResourceView(
+		m_buffersOnGPU[bufferNo],
+		&srvDesc,
+		descriptorHandle
+	);
 }
-

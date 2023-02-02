@@ -1,119 +1,107 @@
+ï»¿#include "stdafx.h"
 #include "Model.h"
-#include "Camera.h"
+#include "Material.h"
 
-//ƒfƒtƒHƒ‹ƒg ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-Model::Model():
-    is_Inited_(false),
-    world_(),
-    tkm_file_(nullptr),
-    skeleton_(),
-    mesh_parts_(),
-    model_up_axis_(EnModelUpAxis::enModelUpAxisY)
+void Model::Init(const ModelInitData& initData)
 {
+	/* ãƒ¬ã‚¤ãƒˆãƒ¬å‘ã‘ã®åˆæœŸåŒ–ã®æ™‚ã«ã¯m_fxFilePathã¯æŒ‡å®šã•ã‚Œã¦ã„ãªã„å ´åˆãŒã‚ã‚‹ã®ã§ã‚¹ãƒ«ãƒ¼ã™ã‚‹ã€‚
+	MY_ASSERT(
+		initData.m_fxFilePath, 
+		"error : initData.m_fxFilePathãŒæŒ‡å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚"
+	);
+	*/
+	MY_ASSERT(
+		initData.m_tkmFilePath,
+		"error : initData.m_tkmFilePathãŒæŒ‡å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚"
+	);
+	
+	
+	if (initData.m_skeleton != nullptr) {
+		//ã‚¹ã‚±ãƒ«ãƒˆãƒ³ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹ã€‚
+		m_meshParts.BindSkeleton(*initData.m_skeleton);
+	}
+	
+	m_modelUpAxis = initData.m_modelUpAxis;
+
+	//ã“ã“ã§ã¯tkmãƒ•ã‚¡ã‚¤ãƒ«ãŒé‡è¤‡ã—ã¦ã„ãªã„ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã—ã¦ã„ã‚‹
+	//é‡è¤‡ã—ã¦ã„ã‚‹å ´åˆå‰ã«ç™»éŒ²ã—ãŸæ–¹ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹
+	auto tkmFile = g_engine->GetTkmFileFromBank(initData.m_tkmFilePath);
+	if (tkmFile == nullptr) {
+		//æœªç™»éŒ²ãªã®ã§ç™»éŒ²ã™ã‚‹
+		tkmFile = new TkmFile;
+		tkmFile->Load(initData.m_tkmFilePath);
+		g_engine->RegistTkmFileToBank(initData.m_tkmFilePath, tkmFile);
+	}
+	m_tkmFile = tkmFile;
+	m_meshParts.InitFromTkmFile(
+		*m_tkmFile, 
+		initData.m_fxFilePath,
+		initData.m_vsEntryPointFunc,
+		initData.m_vsSkinEntryPointFunc,
+		initData.m_psEntryPointFunc,
+		initData.m_expandConstantBuffer,
+		initData.m_expandConstantBufferSize,
+		initData.m_expandShaderResoruceView,
+		initData.m_colorBufferFormat,
+		initData.m_samplerFilter
+	);
+
+	UpdateWorldMatrix(g_vec3Zero, g_quatIdentity, g_vec3One);
+
+	m_isInited = true;
+	
 }
 
-//ƒfƒtƒHƒ‹ƒg ƒfƒXƒgƒ‰ƒNƒ^
-Model::~Model()
-{
-    if (tkm_file_ != nullptr)
-    {
-        delete tkm_file_;
-    }
-}
 
-//‰Šú‰»
-void Model::Init(tkEngine*& tk, GraphicsEngine*& graphicsEngine, const ModelInitData& initData)
-{
-    //ƒtƒ@ƒCƒ‹ƒpƒX‚Ìƒ`ƒFƒbƒN
-    if (initData.model_File_Path_ == nullptr)
-    {
-        //ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ð•\Ž¦‚µ‚ÄCˆÙíI—¹‚·‚é
-        MessageBox(nullptr, TEXT("Model::Init‚Åƒ‚ƒfƒ‹‚Ìƒtƒ@ƒCƒ‹ƒpƒX‚ªŽw’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ"), TEXT("ƒGƒ‰["), MB_OK);
-        std::abort();
-    }
-
-    //ƒXƒPƒ‹ƒgƒ“‚Ìƒ`ƒFƒbƒN
-    if (initData.skeleton_ != nullptr) {
-        //ƒXƒPƒ‹ƒgƒ“‚ªŽw’è‚³‚ê‚Ä‚¢‚éB
-        this->mesh_parts_.BindSkeleton(graphicsEngine, *initData.skeleton_);
-    }
-
-    //ƒ‚ƒfƒ‹‚Ìã•ûŒüÝ’è
-    this->model_up_axis_ = initData.en_model_Up_Axis_;
-
-    //.tkm file ‚Ìd•¡‚ðƒ`ƒFƒbƒN
-    auto tkm_file = tk->GetTkmFileFromBank(initData.model_File_Path_);
-    if (tkm_file == nullptr) {
-        //–¢“o˜^‚È‚Ì‚Å“o˜^‚·‚é
-        tkm_file = new TkmFile;
-        tkm_file->Load(initData.model_File_Path_);
-        tk->RegistTkmFileToBank(initData.model_File_Path_, tkm_file);
-    }
-
-    this->tkm_file_ = tkm_file;
-
-    this->mesh_parts_.InitFromTkmFile(
-        tk,
-        graphicsEngine,
-        *this->tkm_file_,
-        initData.shader_File_Path,
-        initData.vs_Entry_Point_Func_,
-        initData.vs_Skin_Entry_Point_Func_,
-        initData.ps_entry_point_func_,
-        initData.expand_Constant_Buffer,
-        initData.expand_Constant_Buffer_Size,
-        initData.expand_Shader_Resoruce_View_,
-        initData.color_Buffer_Format_,
-        initData.sampler_Filter
-    );
-
-    //ƒ[ƒ‹ƒhs—ñ‚ðŒvŽZ‚µ‚ÄCƒƒ“ƒo•Ï”‚Ìworld‚ðXV‚·‚é
-    UpdateWorldMatrix(Vector3::GetVec3Zero(), Quaternion::GetIdentity(), Vector3::GetVec3One());
-
-    //‰Šú‰»‚µ‚½‚Ì‚Å‰Šú‰»ƒtƒ‰ƒO‚ðŒš‚Ä‚é
-    this->is_Inited_ = true;
-}
-
-//ƒ[ƒ‹ƒhs—ñ‚ðŒvŽZ‚µ‚ÄAƒƒ“ƒo•Ï”‚Ìworlds—ñ‚ðXV‚·‚é
 void Model::UpdateWorldMatrix(Vector3 pos, Quaternion rot, Vector3 scale)
 {
-    //XV
-    this->world_ = CalcWorldMatrix(pos, rot, scale);
+	m_world = CalcWorldMatrix(pos, rot, scale);
 }
 
-void Model::Draw(GraphicsEngine*& graphicsEngine, RenderContext& rc, Camera& camera)
+void Model::ChangeAlbedoMap(const char* materialName, Texture& albedoMap)
 {
-    Draw(
-        graphicsEngine,
-        rc, 
-        camera.GetViewMatrix(graphicsEngine), 
-        camera.GetProjectionMatrix(graphicsEngine)
-    );
+	m_meshParts.QueryMeshs([&](const SMesh& mesh) {
+		//todo ãƒžãƒ†ãƒªã‚¢ãƒ«åã‚’tkmãƒ•ã‚¡ã‚¤ãƒ«ã«å‡ºåŠ›ã—ã¦ãªã‹ã£ãŸã€‚
+		//todo ä»Šã¯å…¨ãƒžãƒ†ãƒªã‚¢ãƒ«å·®ã—æ›¿ãˆã¾ã™
+		for (Material* material : mesh.m_materials) {
+			material->GetAlbedoMap().InitFromD3DResource(albedoMap.Get());
+		}
+	});
+	//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®å†ä½œæˆã€‚
+	m_meshParts.CreateDescriptorHeaps();
+	
 }
-
-//•`‰æ(ƒJƒƒ‰s—ñŽw’è”Å)
-void Model::Draw(GraphicsEngine*& graphicsEngine, RenderContext& rc, const Matrix& viewMatrix, const Matrix& projMatrix)
+void Model::Draw(RenderContext& rc)
 {
-    this->mesh_parts_.Draw(
-        graphicsEngine,
-        rc,
-        this->world_,
-        viewMatrix,
-        projMatrix
-    );
+	m_meshParts.Draw(
+		rc, 
+		m_world, 
+		g_camera3D->GetViewMatrix(), 
+		g_camera3D->GetProjectionMatrix()
+	);
 }
-
-//ƒCƒ“ƒXƒ^ƒ“ƒVƒ“ƒO•`‰æ
-void Model::DrawInstancing(GraphicsEngine*& graphicsEngine,RenderContext& rc, int numInstance, Camera* camera)
+void Model::Draw(RenderContext& rc, Camera& camera)
 {
-    this->mesh_parts_.DrawInstancing(
-        graphicsEngine,
-        rc,
-        numInstance,
-        camera->GetViewMatrix(graphicsEngine),
-        camera->GetProjectionMatrix(graphicsEngine)
-    );
+	Draw(rc, camera.GetViewMatrix(), camera.GetProjectionMatrix());
 }
 
+void Model::Draw(RenderContext& rc, const Matrix& viewMatrix, const Matrix& projMatrix)
+{
+	m_meshParts.Draw(
+		rc,
+		m_world,
+		viewMatrix,
+		projMatrix
+	);
+}
 
-
+void Model::DrawInstancing(RenderContext& rc, int numInstance)
+{
+	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®æ•°ãŒ0ä»¥ä¸Šãªã‚‰æç”»ã€‚
+	m_meshParts.DrawInstancing(
+		rc, 
+		numInstance, 
+		g_camera3D->GetViewMatrix(), 
+		g_camera3D->GetProjectionMatrix()
+	);
+}

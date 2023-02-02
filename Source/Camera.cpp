@@ -1,111 +1,68 @@
+ï»¿/*!
+* @brief	ã‚«ãƒ¡ãƒ©
+*/
+#include "stdafx.h"
 #include "Camera.h"
 
-Camera::Camera():
-    position_(Vector3(0.0f, 0.0f, 1.0f)),
-    up_(Vector3::GetVec3Up()),
-    target_(),
-    forward_(Vector3::GetVec3Front()),
-    right_(Vector3::GetVec3Right()),
 
-    view_matrix_(),
-    projection_matrix_(),
-    view_projection_matrix(),
-    view_matrix_inv(),
-    camera_rotation_(),
-    target_to_position_len_(1.0f),
-    near_(1.0f),
-    far_(5000.0f),
-    view_angle_(Math::DegToRad(60.0f)),
-    aspect_(1.0f),
-    width_(1280.0f),
-    height_(720.0f),
-    update_Projection_matrix_func(EnUpdateProjMatrixFunc::enUpdateProjMatrixFunc_Perspective),
-    
-    is_Need_Update_Projection_matrix(true),
-    is_dirty_(false)
 
+void Camera::Update()
 {
-}
+	//ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‚’è¨ˆç®—ã™ã‚‹ã€‚
+	m_aspect = (float)g_graphicsEngine->GetFrameBufferWidth() / (float)g_graphicsEngine->GetFrameBufferHeight();
+	if(m_isNeedUpdateProjectionMatrix){
+		if (m_updateProjMatrixFunc == enUpdateProjMatrixFunc_Perspective) {
+			//é€è¦–å¤‰æ›è¡Œåˆ—ã‚’è¨ˆç®—ã€‚
+			m_projectionMatrix.MakeProjectionMatrix(
+				m_viewAngle,
+				m_aspect,
+				m_near,
+				m_far
+			);
+		}
+		else {
+			//å¹³è¡ŒæŠ•å½±è¡Œåˆ—ã‚’è¨ˆç®—ã€‚
+			m_projectionMatrix.MakeOrthoProjectionMatrix(m_width, m_height, m_near, m_far);
+		}
+	}
+	//ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã®ç®—å‡º
+	m_viewMatrix.MakeLookAt( m_position, m_target, m_up );
+	//ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã®ä½œæˆã€‚
+	m_viewProjectionMatrix = m_viewMatrix * m_projectionMatrix;
+	//ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã®é€†è¡Œåˆ—ã‚’è¨ˆç®—ã€‚
+	m_viewMatrixInv.Inverse( m_viewMatrix );
 
-Camera::~Camera()
+	m_forward.Set(m_viewMatrixInv.m[2][0], m_viewMatrixInv.m[2][1], m_viewMatrixInv.m[2][2]);
+	m_right.Set(m_viewMatrixInv.m[0][0], m_viewMatrixInv.m[0][1], m_viewMatrixInv.m[0][2]);
+	//ã‚«ãƒ¡ãƒ©ã®å›žè»¢è¡Œåˆ—ã‚’å–å¾—ã€‚
+	m_cameraRotation = m_viewMatrixInv;
+	m_cameraRotation.m[3][0] = 0.0f;
+	m_cameraRotation.m[3][1] = 0.0f;
+	m_cameraRotation.m[3][2] = 0.0f;
+	m_cameraRotation.m[3][3] = 1.0f;
+
+	Vector3 toPos;
+	toPos.Subtract(m_position, m_target);
+	m_targetToPositionLen = toPos.Length();
+
+	m_isDirty = false;
+}
+void Camera::CalcScreenPositionFromWorldPosition(Vector2& screenPos, const Vector3& worldPos) const
 {
+	float half_w = (float)g_graphicsEngine->GetFrameBufferWidth() * 0.5f;
+	float half_h = (float)g_graphicsEngine->GetFrameBufferHeight() * 0.5f;
+	Vector4 _screenPos;
+	_screenPos.Set(worldPos.x, worldPos.y, worldPos.z, 1.0f);
+	m_viewProjectionMatrix.Apply(_screenPos);
+	screenPos.x = (_screenPos.x / _screenPos.w)*half_w;
+	screenPos.y = (_screenPos.y / _screenPos.w)*half_h;
 }
-
-//ƒrƒ…[s—ñAƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚ðXV‚·‚é
-void Camera::Update(const GraphicsEngine* graphicsEngine)
-{
-    //ƒAƒXƒyƒNƒg”ä‚ðŒvŽZ
-    this->aspect_ = (float)graphicsEngine->GetFrameBufferWidth() / (float) graphicsEngine->GetFrameBufferHeight();
-    if (this->is_Need_Update_Projection_matrix)
-    {
-        switch (this->update_Projection_matrix_func)
-        {
-        case EnUpdateProjMatrixFunc::enUpdateProjMatrixFunc_Perspective:
-            //“§Ž‹•ÏŠ·s—ñ‚ðŒvŽZB
-            this->projection_matrix_.MakeProjectionMatrix(
-                this->view_angle_,
-                this->aspect_,
-                this->near_,
-                this->far_
-            );
-            break;
-
-        //case EnUpdateProjMatrixFunc::enUpdateProjMatrixFunc_Ortho:
-        //    break;
-
-        default:
-            //•½s“Š‰es—ñ‚ðŒvŽZ
-            this->projection_matrix_.MakeOrthoProjectionMatrix(
-                this->width_, 
-                this->height_, 
-                this->near_, 
-                this->far_
-            );
-        }
-    }
-
-    //ƒrƒ…[s—ñ‚ÌŽZo
-    this->view_matrix_.MakeLookAt(this->position_, this->target_, this->up_);
-    //ƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚Ìì¬B
-    this->view_projection_matrix = this->view_matrix_ * this->projection_matrix_;
-    //ƒrƒ…[s—ñ‚Ì‹ts—ñ‚ðŒvŽZB
-    this->view_matrix_inv.Inverse(this->view_matrix_);
-
-    this->forward_.Set(this->view_matrix_inv.m[2][0], this->view_matrix_inv.m[2][1], this->view_matrix_inv.m[2][2]);
-    this->right_.Set(this->view_matrix_inv.m[0][0], this->view_matrix_inv.m[0][1], this->view_matrix_inv.m[0][2]);
-    //ƒJƒƒ‰‚Ì‰ñ“]s—ñ‚ðŽæ“¾B
-    this->camera_rotation_ = this->view_matrix_inv;
-    this->camera_rotation_.m[3][0] = 0.0f;
-    this->camera_rotation_.m[3][1] = 0.0f;
-    this->camera_rotation_.m[3][2] = 0.0f;
-    this->camera_rotation_.m[3][3] = 1.0f;
-
-    Vector3 toPos;
-    toPos.Subtract(this->position_, this->target_);
-    this->target_to_position_len_ = toPos.Length();
-
-    this->is_dirty_ = false;
-}
-
-//’Ž‹“_‚ðŒ´“_‚Æ‚µ‚ÄƒJƒƒ‰‚ð‰ñ“]‚³‚¹‚é
 void Camera::RotateOriginTarget(const Quaternion& qRot)
 {
-    Vector3 camera_pos = this->position_;
-    Vector3 camera_target = this->target_;
-    Vector3 toPos = camera_pos - camera_target;
-    qRot.Apply(toPos);
-    this->position_ = this->target_ + toPos;
-    this->is_dirty_ = true;
-}
-
-//ƒ[ƒ‹ƒhÀ•W‚©‚çƒXƒNƒŠ[ƒ“À•W‚ðŒvŽZ‚·‚é
-void Camera::CalcScreenPositionFromWorldPosition(GraphicsEngine*& graphicsEngine, Vector2& screenPos, const Vector3& worldPos) const
-{
-    float half_w = (float)graphicsEngine->GetFrameBufferWidth() * 0.5f;
-    float half_h = (float)graphicsEngine->GetFrameBufferHeight() * 0.5f;
-    Vector4 _screenPos;
-    _screenPos.Set(worldPos.x, worldPos.y, worldPos.z, 1.0f);
-    this->view_projection_matrix.Apply(_screenPos);
-    screenPos.x = (_screenPos.x / _screenPos.w) * half_w;
-    screenPos.y = (_screenPos.y / _screenPos.w) * half_h;
+	Vector3 cameraPos = m_position;
+	Vector3 cameraTarget = m_target;
+	Vector3 toPos = cameraPos - cameraTarget;
+	qRot.Apply(toPos);
+	m_position = m_target + toPos;
+	m_isDirty = true;
 }
