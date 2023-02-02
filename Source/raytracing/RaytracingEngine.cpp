@@ -1,7 +1,7 @@
-﻿#include "stdafx.h"
+﻿#include "../stdafx.h"
 
 #include "RaytracingEngine.h"
-#include "Material.h"
+#include "../Material.h"
 
 namespace raytracing {
 	using namespace std;

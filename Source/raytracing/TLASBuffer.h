@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "RaytracingInstance.h"
+#include "Raytracing.h"
 class RenderContext;
+class AccelerationStructureBuffers;
 
 namespace raytracing {
 	/// <summary>

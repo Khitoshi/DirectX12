@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "../stdafx.h"
 #include "RaytracingShaderTable.h"
 #include "RaytracingPSO.h"
 

@@ -1,7 +1,7 @@
 ﻿/*!
 *@brief	パッド。
 */
-#include "stdafx.h"
+#include "../stdafx.h"
 #include "GamePad.h"
 #include <limits.h>
 

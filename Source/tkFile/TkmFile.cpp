@@ -1,5 +1,5 @@
-﻿#include "stdafx.h"
-#include "tkFile/TkmFile.h"
+﻿#include "../stdafx.h"
+#include "../tkFile/TkmFile.h"
 
 
 //法線スムージング。

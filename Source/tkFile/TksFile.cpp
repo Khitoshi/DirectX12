@@ -1,5 +1,5 @@
-﻿#include "stdafx.h"
-#include "tkFile/TksFile.h"
+﻿#include "../stdafx.h"
+#include "../tkFile/TksFile.h"
 
 bool TksFile::Load(const char* filePath)
 {

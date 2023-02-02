@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 class Material;
-
+class RWStructuredBuffer;
 namespace raytracing {
 	using ID3D12DescriptorHeapPtr = CComPtr<ID3D12DescriptorHeap>;
 

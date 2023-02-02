@@ -1,10 +1,12 @@
 ﻿#pragma once
 
+#include <d3dx12.h>
+
 class ConstantBuffer;
 class Texture;
 class DescriptorHeap;
 class RenderTarget;
-
+class IndexBuffer;
 namespace raytracing{
 	class PSO;
 }

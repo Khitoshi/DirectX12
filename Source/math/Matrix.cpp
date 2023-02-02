@@ -2,7 +2,7 @@
  * @brief	行列。
  */
 
-#include "stdafx.h"
+#include "../stdafx.h"
 #include "Matrix.h"
 
 const Matrix Matrix::Identity(

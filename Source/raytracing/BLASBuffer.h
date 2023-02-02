@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "RaytracingInstance.h"
+#include "Raytracing.h"
 namespace raytracing {
 	/// <summary>
 	/// BLASBuffer

@@ -3,7 +3,7 @@
 */
 
 #pragma once
-
+#include "math\Vector.h"
 /// <summary>
 /// カメラクラス。
 /// </summary>

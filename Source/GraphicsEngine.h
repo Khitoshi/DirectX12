@@ -6,8 +6,10 @@
 #include <dxgi1_2.h>
 #include <dxgi1_3.h>
 #include <dxgi1_4.h>
-#include "DirectXTK/Inc/DDSTextureLoader.h"
-#include "DirectXTK/Inc/ResourceUploadBatch.h"
+//#include "DirectXTK/Inc/DDSTextureLoader.h"
+#include <DDSTextureLoader.h>
+//#include "DirectXTK/Inc/ResourceUploadBatch.h"
+#include <ResourceUploadBatch.h>
 #include "RenderContext.h"
 #include "rayTracing/RaytracingEngine.h"
 #include "Camera.h"

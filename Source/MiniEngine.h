@@ -25,9 +25,12 @@
 #include <dxgiformat.h>
 
 
-#include "DirectXTK/Inc/CommonStates.h"
-#include "DirectXTK/Inc/SpriteBatch.h"
-#include "DirectXTK/Inc/SpriteFont.h"
+//#include "DirectXTK/Inc/CommonStates.h"
+//#include "DirectXTK/Inc/SpriteBatch.h"
+//#include "DirectXTK/Inc/SpriteFont.h"
+#include <CommonStates.h>
+#include <SpriteBatch.h>
+#include <SpriteFont.h>
 
 #include "d3dx12.h"
 

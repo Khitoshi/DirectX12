@@ -1,7 +1,7 @@
 ﻿
-#include "stdafx.h"
+#include "../stdafx.h"
 #include "RaytracingWorld.h"
-#include "Material.h"
+#include "../Material.h"
 
 #define align_to(_alignment, _val) (((_val + _alignment - 1) / _alignment) * _alignment)
 namespace raytracing {

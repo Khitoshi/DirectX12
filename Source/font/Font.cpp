@@ -1,7 +1,8 @@
 ﻿/*!
 * @brief	フォント。
 */
-#include "stdafx.h"
+//#include "./stdafx.h"
+#include "../stdafx.h"
 #include "FontEngine.h"
 #include "font.h"
 

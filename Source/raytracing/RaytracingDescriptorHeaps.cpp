@@ -1,6 +1,6 @@
-﻿#include "stdafx.h"
+﻿#include "../stdafx.h"
 #include "RaytracingDescriptorHeaps.h"
-#include "Material.h"
+#include "../Material.h"
 
 namespace raytracing {
 	void DescriptorHeaps::Init(

@@ -2,8 +2,8 @@
  * @brief	ベクトルクラス。
  */
 
-#include "stdafx.h"
-#include "math/Vector.h"
+#include "../stdafx.h"
+#include "../math/Vector.h"
 
 
 
