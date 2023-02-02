@@ -69,23 +69,23 @@ void Texture::RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CP
     shader_resource_view_desc.Texture2D.MipLevels = this->texture_Desc_.MipLevels;
     
     ////シェーダーリソースビュー 生成
-    auto device = graphicsEngine->GetDevice();
+    graphicsEngine->CreateShaderResourceView(
+        this->texture_,
+        shader_resource_view_desc,
+        descriptorHandle);
+    /*
+    const auto& device = graphicsEngine->GetDevice();
     device->CreateShaderResourceView(
         this->texture_, 
         &shader_resource_view_desc, 
         descriptorHandle);
     
-    /*
     graphicsEngine->GetDevice()->CreateShaderResourceView(
         this->texture_,
         &shader_resource_view_desc,
         descriptorHandle);
 
     
-    graphicsEngine->CreateShaderResourceView(
-        this->texture_,
-        shader_resource_view_desc,
-        descriptorHandle);
         */
     return;
 }

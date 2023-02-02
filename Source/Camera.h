@@ -32,7 +32,7 @@ public:
 	/// <summary>
 	/// ビュー行列、プロジェクション行列を更新する
 	/// </summary>
-	void Update(GraphicsEngine* graphicsEngine);
+	void Update(const GraphicsEngine* graphicsEngine);
 
 	/// <summary>
 	/// 注視点を原点としてカメラを回転させる
@@ -121,7 +121,7 @@ public:
 	/// </remarks>
 	/// <param name="screenPos">スクリーン座標の格納先</param>
 	/// <param name="worldPos">ワールド座標</param>
-	void CalcScreenPositionFromWorldPosition(GraphicsEngine* graphicsEngine, Vector2& screenPos, const Vector3& worldPos) const;
+	void CalcScreenPositionFromWorldPosition(GraphicsEngine*& graphicsEngine, Vector2& screenPos, const Vector3& worldPos) const;
 
 public:
 #pragma region Get Method
@@ -156,7 +156,7 @@ public:
 	/// <summary>
 	/// ビュー行列の逆行列 取得
 	/// </summary>
-	const Matrix& GetViewMatrixInv(GraphicsEngine* graphicEngine)
+	const Matrix& GetViewMatrixInv(GraphicsEngine*& graphicEngine)
 	{
 		if (this->is_dirty_) {
 			//更新する必要がある。
@@ -168,7 +168,7 @@ public:
 	/// <summary>
 	/// ビュー行列 取得
 	/// </summary>
-	const Matrix& GetViewMatrix(GraphicsEngine* graphicEngine)
+	const Matrix& GetViewMatrix(GraphicsEngine*& graphicEngine)
 	{
 		if (this->is_dirty_) {
 			//更新する必要がある。
@@ -180,7 +180,7 @@ public:
 	/// <summary>
 	/// プロジェクション行列 取得
 	/// </summary>
-	const Matrix& GetProjectionMatrix(GraphicsEngine* graphicEngine)
+	const Matrix& GetProjectionMatrix(GraphicsEngine*& graphicEngine)
 	{
 		if (this->is_dirty_) {
 			//更新する必要がある。
@@ -192,7 +192,7 @@ public:
 	/// <summary>
 	/// ビュー×プロジェクション行列 取得
 	/// </summary>
-	const Matrix& GetViewProjectionMatrix(GraphicsEngine* graphicEngine)
+	const Matrix& GetViewProjectionMatrix(GraphicsEngine*& graphicEngine)
 	{
 		if (this->is_dirty_) {
 			//更新する必要がある。
@@ -204,7 +204,7 @@ public:
 	/// <summary>
 	/// カメラの回転行列 取得
 	/// </summary>
-	const Matrix& GetCameraRotation(GraphicsEngine* graphicEngine)
+	const Matrix& GetCameraRotation(GraphicsEngine*& graphicEngine)
 	{
 		if (this->is_dirty_) {
 			//更新する必要がある

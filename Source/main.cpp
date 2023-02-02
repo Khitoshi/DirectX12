@@ -21,9 +21,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     //graphicsEngine = std::make_unique<GraphicsEngine>();
     // 
     //DirectXTK エンジン
-    std::unique_ptr<tkEngine> engine;
-    engine = std::make_unique<tkEngine>();
-    
+    //std::unique_ptr<tkEngine> engine;
+    //engine = std::make_unique<tkEngine>();
+    tkEngine* engine;
+    engine = new tkEngine();
     std::unique_ptr<System>system;
     system = std::make_unique<System>();
 
@@ -80,7 +81,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
     Model* model;
     model = new Model();
-    model->Init(engine.get(), engine->GetGraphicsEngine(), modelInitData);
+    model->Init(engine, engine->GetGraphicsEngine(), modelInitData);
 
     //以下更新コード
     auto& renderContext = engine->GetGraphicsEngine()->GetRenderContext();
@@ -89,7 +90,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     while (system->DispatchWindowMessage())
     {
         //レンダリング開始
-        engine->BeginFrame();
+        engine->BeginFrame(engine->GetGraphicsEngine(),*camera_3d.get());
 
         //ここから絵を書くコードを記述
         //Quaternion qRot;

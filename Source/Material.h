@@ -34,8 +34,8 @@ public:
 	/// </summary>
 	/// <param name="tkmMat">tkmマテリアル</param>
 	void InitFromTkmMaterila(
-		tkEngine* tkEngine,
-		GraphicsEngine* graphicsEngine,
+		tkEngine*& tkEngine,
+		GraphicsEngine*& graphicsEngine,
 		const TkmFile::SMaterial& tkmMat,
 		const char* fxFilePath,
 		const char* vsEntryPointFuncName,
@@ -61,7 +61,7 @@ private:
 	/// <summary>
 	/// パイプラインステートの初期化
 	/// </summary>
-	void InitPipelineState(GraphicsEngine* graphicsEngine,const std::array < DXGI_FORMAT, static_cast<int>(D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT)>& colorBufferFormat);
+	void InitPipelineState(GraphicsEngine*& graphicsEngine,const std::array < DXGI_FORMAT, static_cast<int>(D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT)>& colorBufferFormat);
 
 	/// <summary>
 	/// シェーダー初期化
@@ -71,7 +71,7 @@ private:
 	/// <param name="vsSkinEntriyPointFuncName">スキンありマテリアル用の頂点シェーダーのエントリーポイントの関数名</param>
 	/// <param name="psEntryPointFuncName">ピクセルシェーダーのエントリーポイントの関数名</param>
 	void InitShaders(
-		tkEngine* tkEngine,
+		tkEngine*& tkEngine,
 		const char* fxFilePath,
 		const char* vsEntryPointFuncName,
 		const char* vsSkinEntriyPointFuncName,
@@ -82,7 +82,7 @@ private:
 	/// テクスチャを初期化。
 	/// </summary>
 	/// <param name="tkmMat"></param>
-	void InitTexture(tkEngine* tk,GraphicsEngine* graphicsEngine, const TkmFile::SMaterial& tkmMat);
+	void InitTexture(tkEngine*& tk,GraphicsEngine*& graphicsEngine, const TkmFile::SMaterial& tkmMat);
 
 public:
 #pragma region Get Method
@@ -154,19 +154,19 @@ private:
 private:
 #pragma region Map
 	//アルベドマップ
-	std::unique_ptr<Texture> albedo_Map_;
+	Texture* albedo_Map_;
 
 	//法線マップ
-	std::unique_ptr<Texture> normal_Map_;
+	Texture* normal_Map_;
 
 	//スペキュラマップ
-	std::unique_ptr<Texture> specular_Map_;
+	Texture* specular_Map_;
 
 	//リフレクションマップ
-	std::unique_ptr<Texture> reflection_Map_;
+	Texture* reflection_Map_;
 
 	//屈折マップ
-	std::unique_ptr<Texture> refraction_Map_;
+	Texture* refraction_Map_;
 
 #pragma endregion
 

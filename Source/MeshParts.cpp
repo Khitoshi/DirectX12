@@ -24,8 +24,8 @@ MeshParts::~MeshParts()
 
 //.tkm file 初期化
 void MeshParts::InitFromTkmFile(
-    tkEngine* tk,
-    GraphicsEngine* graphicsEngine,
+    tkEngine*& tk,
+    GraphicsEngine*& graphicsEngine,
     const TkmFile& tkmFile, 
     const char* fxFilePath, 
     const char* vsEntryPointFuncName, 
@@ -75,7 +75,7 @@ void MeshParts::InitFromTkmFile(
 
 //描画
 void MeshParts::Draw(
-    GraphicsEngine* graphicsEngine,
+    GraphicsEngine*& graphicsEngine,
     RenderContext& renderContext, 
     const Matrix& matrixWorld, 
     const Matrix& matrixView, 
@@ -108,7 +108,7 @@ void MeshParts::Draw(
 }
 
 //インスタンシング描画
-void MeshParts::DrawInstancing(GraphicsEngine* graphicsEngine,RenderContext& renderContext, int numInstance, const Matrix& matrixView, const Matrix& matrixProjection)
+void MeshParts::DrawInstancing(GraphicsEngine*& graphicsEngine,RenderContext& renderContext, int numInstance, const Matrix& matrixView, const Matrix& matrixProjection)
 {
     //定数バッファの設定、更新など描画の共通処理を実行する。
     DrawCommon(graphicsEngine,renderContext, Matrix::GetIdentity(), matrixView, matrixProjection);
@@ -126,11 +126,10 @@ void MeshParts::DrawInstancing(GraphicsEngine* graphicsEngine,RenderContext& ren
             mesh->materials[materialNo]->BeginRender(renderContext, mesh->skinFlags[materialNo]);
 
             //ディスクリプタヒープ 設定
-            //renderContext.SetDescriptorHeap(graphicsEngine, this->descriptor_Heap_);
+            renderContext.SetDescriptorHeap(graphicsEngine, this->descriptor_Heap_);
 
             //インデックスバッファ設定
             auto& ib = mesh->indexBufferArray[materialNo];
-
             renderContext.SetIndexBuffer(*ib);
 
             //ドローコールを実行
@@ -141,7 +140,7 @@ void MeshParts::DrawInstancing(GraphicsEngine* graphicsEngine,RenderContext& ren
 }
 
 //スケルトンを関連付ける
-void MeshParts::BindSkeleton(GraphicsEngine* graphicsEngine, Skeleton& skeleton)
+void MeshParts::BindSkeleton(GraphicsEngine*& graphicsEngine, Skeleton& skeleton)
 {
     this->skelton_ = &skeleton;
 
@@ -155,7 +154,7 @@ void MeshParts::BindSkeleton(GraphicsEngine* graphicsEngine, Skeleton& skeleton)
 }
 
 //ディスクリプタヒープ作成
-void MeshParts::CreateDescriptorHeaps(GraphicsEngine* graphicsEngine)
+void MeshParts::CreateDescriptorHeaps(GraphicsEngine*& graphicsEngine)
 {
     //ディスクリプタヒープを構築していく。
     int srv_no = 0;
@@ -194,8 +193,8 @@ void MeshParts::CreateDescriptorHeaps(GraphicsEngine* graphicsEngine)
 }
 
 void MeshParts::CreateMeshFromTkmMesh(
-    tkEngine* tk,
-    GraphicsEngine * graphicsEngine,
+    tkEngine*& tk,
+    GraphicsEngine *& graphicsEngine,
     const TkmFile::SMesh& tkmMesh,
     int meshNo, 
     int& materialNum,
@@ -289,7 +288,7 @@ void MeshParts::CreateMeshFromTkmMesh(
 
 
 //描画処理の共通処理
-void MeshParts::DrawCommon(GraphicsEngine* graphicsEngine,RenderContext& renderContext, const Matrix& matrixWorld, const Matrix& matrixView, const Matrix& matrixProjection)
+void MeshParts::DrawCommon(GraphicsEngine*& graphicsEngine,RenderContext& renderContext, const Matrix& matrixWorld, const Matrix& matrixView, const Matrix& matrixProjection)
 {
     //メッシュごとにドロー
     //プリミティブのトポロジーはトライアングルリストのみ

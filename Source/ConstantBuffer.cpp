@@ -70,27 +70,6 @@ void ConstantBuffer::Init(GraphicsEngine*& graphicsEngine, int constantBufferSiz
             constant_Buffer
         );
 
-        ////生成
-        //graphicsEngine->CreateCommittedResource(
-        //    heap_Prop,
-        //    D3D12_HEAP_FLAG_NONE,
-        //    resource_Desc,
-        //    D3D12_RESOURCE_STATE_GENERIC_READ,
-        //    nullptr,
-        //    constant_Buffer
-        //);
-
-        //生成 チェック
-        /*
-        if (FAILED(hr))
-        {
-            //生成 失敗
-            //メッセージボックス生成
-            MessageBox(nullptr, TEXT("ConstantBuffer::Initで生成に失敗しました"), L"エラー", MB_OK);
-            //プログラムを異常終了させる。
-            std::abort();
-        }*/
-
         //定数バッファをCPUからアクセス可能な仮想アドレス空間にマッピングする。
         //マップ、アンマップのオーバーヘッドを軽減するためにはこのインスタンスが生きている間は行わない。
         {

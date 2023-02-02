@@ -25,7 +25,7 @@ public:
 	/// <summary>
 	/// フレームの開始時に呼ばれる処理
 	/// </summary>
-	void BeginFrame();
+	void BeginFrame(GraphicsEngine*& graphicsEngine,Camera& camera);
 
 	/// <summary>
 	/// フレームの終了時に呼ばれる処理
@@ -113,14 +113,14 @@ public:
 		return this->shader_Bank_.Get(programName.c_str());
 	}
 
-	GraphicsEngine* GetGraphicsEngine() { return this->graphics_Engine_.get(); }
+	GraphicsEngine*& GetGraphicsEngine() { return this->graphics_Engine_; }
 
 #pragma endregion
 
 private:
 
 	//グラフィックエンジン。
-	std::unique_ptr<GraphicsEngine> graphics_Engine_;
+	GraphicsEngine* graphics_Engine_;
 	//.tkm fileバンク。
 	TResourceBank<TkmFile> tkm_File_Bank_;
 	//シェーダーバンク

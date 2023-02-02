@@ -68,8 +68,8 @@ public:
     /// <param name="colorBufferFormat">このモデルをレンダリングするカラーバッファのフォーマット</param>
     /// <param name="samplerFilter">サンプラフィルタ</param>
     void InitFromTkmFile(
-        tkEngine* tk,
-        GraphicsEngine* graphicsEngine,
+        tkEngine*& tk,
+        GraphicsEngine*& graphicsEngine,
         const TkmFile& tkmFile,
         const char* fxFilePath,
         const char* vsEntryPointFuncName,
@@ -90,7 +90,7 @@ public:
     /// <param name="matrixView">ビュー 行列</param>
     /// <param name="matrixProjection">プロジェクション 行列</param>
     void Draw(
-        GraphicsEngine* graphicsEngine,
+        GraphicsEngine*& graphicsEngine,
         RenderContext& renderContext,
         const Matrix& matrixWorld,
         const Matrix& matrixView,
@@ -104,13 +104,13 @@ public:
     /// <param name="numInstance">インスタンス数</param>
     /// <param name="mView">ビュー行列</param>
     /// <param name="mProj">プロジェクション行列</param>
-    void DrawInstancing(GraphicsEngine* graphicsEngine,RenderContext& renderContext, int numInstance, const Matrix& matrixView, const Matrix& matrixProjection);
+    void DrawInstancing(GraphicsEngine*& graphicsEngine,RenderContext& renderContext, int numInstance, const Matrix& matrixView, const Matrix& matrixProjection);
 
     /// <summary>
     /// スケルトンを関連付ける
     /// </summary>
     /// <param name="skeleton">スケルトン</param>
-    void BindSkeleton(GraphicsEngine* graphicsEngine,Skeleton& skeleton);
+    void BindSkeleton(GraphicsEngine*& graphicsEngine,Skeleton& skeleton);
 
     /// <summary>
     /// メッシュに対して問い合わせを行う。
@@ -134,7 +134,7 @@ public:
     /// ディスクリプタヒープを作成。
     /// </summary>
     /// <param name = "graphicsEngine">デバイスを格納している</param>
-    void CreateDescriptorHeaps(GraphicsEngine* graphicsEngine);
+    void CreateDescriptorHeaps(GraphicsEngine*& graphicsEngine);
 
 private:
     /// <summary>
@@ -149,8 +149,8 @@ private:
     /// <param name="colorBufferFormat">このモデルをレンダリングするカラーバッファのフォーマット</param>
     /// <param name="samplerFilter">サンプラフィルタ</param>
     void CreateMeshFromTkmMesh(
-        tkEngine* tk,
-        GraphicsEngine* graphicsEngine,
+        tkEngine*& tk,
+        GraphicsEngine*& graphicsEngine,
         const TkmFile::SMesh& mesh,
         int meshNo,
         int& materialNum,
@@ -169,7 +169,7 @@ private:
     /// <param name="mWorld">ワールド行列</param>
     /// <param name="mView">ビュー行列</param>
     /// <param name="mProj">プロジェクション行列</param>
-    void DrawCommon(GraphicsEngine* graphicsEngine,RenderContext& renderContext, const Matrix& matrixWorld, const Matrix& matrixView, const Matrix& matrixProjection);
+    void DrawCommon(GraphicsEngine*& graphicsEngine,RenderContext& renderContext, const Matrix& matrixWorld, const Matrix& matrixView, const Matrix& matrixProjection);
 
 public:
 #pragma region Get method

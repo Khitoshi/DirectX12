@@ -32,10 +32,10 @@ Camera::~Camera()
 }
 
 //ビュー行列、プロジェクション行列を更新する
-void Camera::Update(GraphicsEngine* graphicsEngine)
+void Camera::Update(const GraphicsEngine* graphicsEngine)
 {
     //アスペクト比を計算
-    this->aspect_ = (float)graphicsEngine->GetFrameBufferWidth();
+    this->aspect_ = (float)graphicsEngine->GetFrameBufferWidth() / (float) graphicsEngine->GetFrameBufferHeight();
     if (this->is_Need_Update_Projection_matrix)
     {
         switch (this->update_Projection_matrix_func)
@@ -99,7 +99,7 @@ void Camera::RotateOriginTarget(const Quaternion& qRot)
 }
 
 //ワールド座標からスクリーン座標を計算する
-void Camera::CalcScreenPositionFromWorldPosition(GraphicsEngine* graphicsEngine, Vector2& screenPos, const Vector3& worldPos) const
+void Camera::CalcScreenPositionFromWorldPosition(GraphicsEngine*& graphicsEngine, Vector2& screenPos, const Vector3& worldPos) const
 {
     float half_w = (float)graphicsEngine->GetFrameBufferWidth() * 0.5f;
     float half_h = (float)graphicsEngine->GetFrameBufferHeight() * 0.5f;

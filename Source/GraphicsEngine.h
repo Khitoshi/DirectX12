@@ -301,7 +301,7 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	ID3D12Device5* GetDevice() { return this->device_.Get(); }
-
+	ID3D12Device5** GetDeviceAdd() { return this->device_.GetAddressOf(); }
 #pragma endregion
 
 
@@ -409,9 +409,9 @@ public:
 	const NullTextureMaps& GetNullTextureMaps()const { return *this->null_Texture_Maps_; }
 
 	//フレームバッファの幅 取得
-	const UINT GetFrameBufferWidth() { return this->frame_Buffer_Width_; }
+	UINT GetFrameBufferWidth() const { return this->frame_Buffer_Width_; }
 	//フレームバッファの高さ 取得
-	const UINT GetFrameBufferHeight() { return this->frame_Buffer_Width_; }
+	UINT GetFrameBufferHeight() const { return this->frame_Buffer_Height_; }
 
 	//フレームバッファの数 取得
 	const static UINT GetFrameBufferCount() { return FRAME_BUFFER_COUNT; }

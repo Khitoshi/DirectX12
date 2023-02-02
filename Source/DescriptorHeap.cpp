@@ -92,12 +92,22 @@ void DescriptorHeap::Commit(GraphicsEngine*& graphicsEngine)
     srv_Heap_Desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     srv_Heap_Desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
+    const auto& device = graphicsEngine->GetDevice();
+
     //ディスクリプタ 生成 loop
     for (auto& descriptor_Heap : this->descriptor_Heap_) 
     {
         //ディスクリプタヒープ 生成
         //HRESULT hr = device.CreateDescriptorHeap(&srv_Heap_Desc, IID_PPV_ARGS(&descriptor_Heap));
-        graphicsEngine->CreateDescriptorHeap(srv_Heap_Desc, descriptor_Heap);
+        //graphicsEngine->CreateDescriptorHeap(srv_Heap_Desc, descriptor_Heap);
+
+        HRESULT hr = device->CreateDescriptorHeap(&srv_Heap_Desc, IID_PPV_ARGS(&descriptor_Heap));
+
+        if (FAILED(hr))
+        {
+            return;
+        }
+
         //ディスクリプタ数 インクリメント
         this->num_Descriptor_Heap_++;
     }
@@ -111,21 +121,8 @@ void DescriptorHeap::Commit(GraphicsEngine*& graphicsEngine)
         //GPU ハンドル所得
         auto gpu_Handle = descriptor_heap->GetGPUDescriptorHandleForHeapStart();
 
-
-        //定数バッファを登録
-        /*
-        for (auto& constant_buffer:this->constant_Buffers_)
-        {
-            if (constant_buffer != nullptr)
-            {
-                constant_buffer->RegistConstantBufferView(graphicsEngine, cpu_Handle, buffer_Index);
-            }
-            //次に進める。
-            cpu_Handle.ptr += graphicsEngine->GetCbrSrvDescriptorSize();
-        }
-        */
+        //定数バッファ
         for (int i = 0; i < this->num_Constant_Buffer_; i++) {
-            //@todo bug
             if (this->constant_Buffers_[i] != nullptr) {
                 this->constant_Buffers_[i]->RegistConstantBufferView(graphicsEngine,cpu_Handle, buffer_Index);
             }
@@ -139,6 +136,7 @@ void DescriptorHeap::Commit(GraphicsEngine*& graphicsEngine)
         {
             if (this->shader_Resources_[i] != nullptr) 
             {
+
                 this->shader_Resources_[i]->RegistShaderResourceView(graphicsEngine,cpu_Handle, buffer_Index);
             }
             //次に進める。
@@ -186,14 +184,6 @@ void DescriptorHeap::CommitSamplerHeap(GraphicsEngine*& graphicsEngine)
     for (auto& descriptor_Heap : this->descriptor_Heap_) {
         //生成
         graphicsEngine->CreateDescriptorHeap(srv_Heap_Desc, descriptor_Heap);
-
-        //生成 チェック
-        //if (FAILED(hr)) {
-        //    //失敗
-        //    MessageBox(nullptr, L"DescriptorHeap::Commit ディスクリプタヒープの作成に失敗しました。", L"エラー", MB_OK);
-        //    //異常終了
-        //    std::abort();
-        //}
     }
 
     int buffer_Index = 0;

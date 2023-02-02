@@ -20,7 +20,7 @@ public:
 	/// <param name="tk">DirectXtk関係を保有</param>
 	/// <param name="graphicsEngine">デバイスを格納している</param>
 	/// <param name="initData">初期化データ</param>
-	void Init(tkEngine* tk,GraphicsEngine* graphicsEngine,const ModelInitData& initData);
+	void Init(tkEngine*& tk,GraphicsEngine*& graphicsEngine,const ModelInitData& initData);
 
 	/// <summary>
 	/// ワールド行列を計算して、メンバ変数のworld行列を更新する
@@ -35,7 +35,7 @@ public:
 	/// </summary>
 	/// <param name="renderContext">レンダリングコンテキスト</param>
 	/// <param name="camera">カメラ</param>
-	void Draw(GraphicsEngine* graphicsEngine, RenderContext& rc, Camera& camera);
+	void Draw(GraphicsEngine*& graphicsEngine, RenderContext& rc, Camera& camera);
 
 	/// <summary>
 	/// 描画(カメラ行列指定版)
@@ -43,14 +43,14 @@ public:
 	/// <param name="renderContext">レンダリングコンテキスト</param>
 	/// <param name="viewMatrix">ビュー行列</param>
 	/// <param name="projMatrix">プロジェクション行列</param>
-	void Draw(GraphicsEngine* graphicsEngine, RenderContext& rc, const Matrix& viewMatrix, const Matrix& projMatrix);
+	void Draw(GraphicsEngine*& graphicsEngine, RenderContext& rc, const Matrix& viewMatrix, const Matrix& projMatrix);
 
 	/// <summary>
 	/// インスタンシング描画
 	/// </summary>
 	/// <param name="renderContext">レンダリングコンテキスト</param>
 	/// <param name="numInstance">インスタンスの数</param>
-	void DrawInstancing(GraphicsEngine* graphicsEngine, RenderContext& renderContext, int numInstance, Camera* camera);
+	void DrawInstancing(GraphicsEngine*& graphicsEngine, RenderContext& renderContext, int numInstance, Camera* camera);
 
 	/// <summary>
 	/// メッシュに対して問い合わせを行う。

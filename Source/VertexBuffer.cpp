@@ -11,7 +11,7 @@ VertexBuffer::~VertexBuffer()
 }
 
 //‰Šú‰»
-void VertexBuffer::Init(GraphicsEngine* graphicsEngine, int size, int stride)
+void VertexBuffer::Init(GraphicsEngine*& graphicsEngine, int size, int stride)
 {
     //ƒq[ƒv‚Ìİ’è æ“¾
     auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);

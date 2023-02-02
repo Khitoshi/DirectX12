@@ -176,7 +176,8 @@ private:
 
 private:
     //ディスクリプタヒープ
-    ComPtr<ID3D12DescriptorHeap> descriptor_Heap_[2];
+    //ComPtr<ID3D12DescriptorHeap> descriptor_Heap_[2];
+    ID3D12DescriptorHeap* descriptor_Heap_[2];
     //シェーダーリソース。
     std::vector<IShaderResource*> shader_Resources_;
     //UAVリソース。

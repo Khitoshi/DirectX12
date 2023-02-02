@@ -30,8 +30,8 @@ Material::~Material()
 
 //tkm file のマテリアル情報から初期化する
 void Material::InitFromTkmMaterila(
-    tkEngine* tkEngine,
-    GraphicsEngine* graphicsEngine,
+    tkEngine*& tkEngine,
+    GraphicsEngine*& graphicsEngine,
     const TkmFile::SMaterial& tkmMat, 
     const char* fxFilePath,
     const char* vsEntryPointFuncName, 
@@ -51,8 +51,8 @@ void Material::InitFromTkmMaterila(
 
     //定数バッファ 生成
     SMaterialParam material_param;
-    material_param.hasNormalMap = this->normal_Map_.get()->IsValid() ? 1 : 0;
-    material_param.hasSpecMap = this->specular_Map_.get()->IsValid() ? 1 : 0;
+    material_param.hasNormalMap = this->normal_Map_->IsValid() ? 1 : 0;
+    material_param.hasSpecMap = this->specular_Map_->IsValid() ? 1 : 0;
     this->constant_Buffer_.Init(graphicsEngine, sizeof(SMaterialParam), &material_param);
 
     //ルートシグネチャを初期化(デフォルトとシャドウの2つ)
@@ -123,7 +123,7 @@ void Material::BeginRender(RenderContext& rc, int hasSkin)
     }
 }
 
-void Material::InitPipelineState(GraphicsEngine* graphicsEngine,const std::array<DXGI_FORMAT, static_cast<int>(D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT)>& colorBufferFormat)
+void Material::InitPipelineState(GraphicsEngine*& graphicsEngine,const std::array<DXGI_FORMAT, static_cast<int>(D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT)>& colorBufferFormat)
 {
     // 頂点レイアウトを定義する。
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -192,7 +192,7 @@ void Material::InitPipelineState(GraphicsEngine* graphicsEngine,const std::array
 }
 
 void Material::InitShaders(
-    tkEngine* tk,
+    tkEngine*& tk,
     const char* fxFilePath, 
     const char* vsEntryPointFuncName, 
     const char* vsSkinEntriyPointFuncName, 
@@ -222,8 +222,8 @@ void Material::InitShaders(
 }
 
 void Material::InitTexture(
-    tkEngine* tk,
-    GraphicsEngine* graphicsEngine,
+    tkEngine*& tk,
+    GraphicsEngine*& graphicsEngine,
     const TkmFile::SMaterial& tkmMat)
 {
     const auto& nullTextureMaps = graphicsEngine->GetNullTextureMaps();
@@ -254,7 +254,7 @@ void Material::InitTexture(
             albedoMap->InitFromMemory(graphicsEngine,map, mapSize);
             tk->RegistTextureToBank(filePath, albedoMap);
         }
-        this->albedo_Map_.reset(albedoMap);
+        this->albedo_Map_ = albedoMap;
     }
 
 
@@ -280,7 +280,7 @@ void Material::InitTexture(
             normalMap->InitFromMemory(graphicsEngine,map, mapSize);
             tk->RegistTextureToBank(filePath, normalMap);
         }
-        this->normal_Map_.reset(normalMap);
+        this->normal_Map_ = normalMap;
     }
 
 
@@ -307,7 +307,7 @@ void Material::InitTexture(
             specularMap->InitFromMemory(graphicsEngine,map, mapSize);
             tk->RegistTextureToBank(filePath, specularMap);
         }
-        this->specular_Map_.reset(specularMap);
+        this->specular_Map_ = specularMap;
     }
 
     //反射マップ。
@@ -332,7 +332,7 @@ void Material::InitTexture(
             reflectionMap->InitFromMemory(graphicsEngine,map, mapSize);
             tk->RegistTextureToBank(filePath, reflectionMap);
         }
-        this->reflection_Map_.reset(reflectionMap);
+        this->reflection_Map_ = reflectionMap;
     }
 
     //屈折マップ。
@@ -357,7 +357,7 @@ void Material::InitTexture(
             refractionMap->InitFromMemory(graphicsEngine,map, mapSize);
             tk->RegistTextureToBank(filePath, refractionMap);
         }
-        this->refraction_Map_.reset(refractionMap);
+        this->refraction_Map_ = refractionMap;
     }
 
 

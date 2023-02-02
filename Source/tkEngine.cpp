@@ -13,11 +13,13 @@ tkEngine::tkEngine():
 //デフォルト コンストラクタ
 tkEngine::~tkEngine()
 {
+    delete graphics_Engine_;
 }
 
 //フレームの開始時に呼ばれる処理
-void tkEngine::BeginFrame()
+void tkEngine::BeginFrame(GraphicsEngine*& graphicsEngine, Camera& camera)
 {
+    graphicsEngine->BeginRender(camera);
 }
 
 //フレームの終了時に呼ばれる処理
@@ -36,7 +38,7 @@ void tkEngine::Init(
 {
     //this->graphics_Engine_.reset(&graphicsEngine);
 
-    graphics_Engine_ = std::make_unique<GraphicsEngine>(hwnd, frameBufferWidth, frameBufferHeight);
+    graphics_Engine_ = new GraphicsEngine(hwnd, frameBufferWidth, frameBufferHeight);
 
     graphics_Engine_->Init(camera);
     //ゲームパッドの初期化。

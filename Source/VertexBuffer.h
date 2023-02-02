@@ -25,7 +25,7 @@ public:
 	/// <param name="size">頂点サイズ</param>
 	/// <param name="stride">頂点バッファのストライド、1個の頂点のサイズ</param>
 	/// <param name="graphicsEngine">デバイス取得用</param>
-	void Init(GraphicsEngine* graphicsEngine,int size, int stride);
+	void Init(GraphicsEngine*& graphicsEngine,int size, int stride);
 
 	/// <summary>
 	/// 頂点データを頂点バッファにコピー

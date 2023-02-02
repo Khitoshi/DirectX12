@@ -5,7 +5,7 @@
 inline ID3D12DescriptorHeap* DescriptorHeap::GetDescriptorHeap(GraphicsEngine*& graphicsEngine)const
 {
 	auto back_Buffer_Index= graphicsEngine->GetBackBufferIndex();
-	return this->descriptor_Heap_[back_Buffer_Index].Get();
+	return this->descriptor_Heap_[back_Buffer_Index];
 }
 
 inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetConstantBufferGpuDescriptorStartHandle(GraphicsEngine*& graphicsEngine) const

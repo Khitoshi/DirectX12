@@ -246,7 +246,7 @@ public:
         this->descriptor_Heap_[0] = descHeap;
         this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
     }
-    void SetDescriptorHeap(GraphicsEngine* graphicsEngine,DescriptorHeap& descriptorHeap)
+    void SetDescriptorHeap(GraphicsEngine*& graphicsEngine,DescriptorHeap& descriptorHeap)
     {
         this->descriptor_Heap_[0] = descriptorHeap.GetDescriptorHeap(graphicsEngine);
         this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
@@ -262,7 +262,7 @@ public:
             SetGraphicsRootDescriptorTable(2, descriptorHeap.GetUavResourceGpuDescriptorStartHandle(graphicsEngine));
         }
     }
-    void SetComputeDescriptorHeap(GraphicsEngine* graphicsEngine, DescriptorHeap& descriptorHeap)
+    void SetComputeDescriptorHeap(GraphicsEngine*& graphicsEngine, DescriptorHeap& descriptorHeap)
     {
         this->descriptor_Heap_[0] = descriptorHeap.GetDescriptorHeap(graphicsEngine);
         this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());

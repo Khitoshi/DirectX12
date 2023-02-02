@@ -22,7 +22,7 @@ Model::~Model()
 }
 
 //初期化
-void Model::Init(tkEngine* tk, GraphicsEngine* graphicsEngine, const ModelInitData& initData)
+void Model::Init(tkEngine*& tk, GraphicsEngine*& graphicsEngine, const ModelInitData& initData)
 {
     //ファイルパスのチェック
     if (initData.model_File_Path_ == nullptr)
@@ -81,7 +81,7 @@ void Model::UpdateWorldMatrix(Vector3 pos, Quaternion rot, Vector3 scale)
     this->world_ = CalcWorldMatrix(pos, rot, scale);
 }
 
-void Model::Draw(GraphicsEngine* graphicsEngine, RenderContext& rc, Camera& camera)
+void Model::Draw(GraphicsEngine*& graphicsEngine, RenderContext& rc, Camera& camera)
 {
     Draw(
         graphicsEngine,
@@ -92,7 +92,7 @@ void Model::Draw(GraphicsEngine* graphicsEngine, RenderContext& rc, Camera& came
 }
 
 //描画(カメラ行列指定版)
-void Model::Draw(GraphicsEngine* graphicsEngine, RenderContext& rc, const Matrix& viewMatrix, const Matrix& projMatrix)
+void Model::Draw(GraphicsEngine*& graphicsEngine, RenderContext& rc, const Matrix& viewMatrix, const Matrix& projMatrix)
 {
     this->mesh_parts_.Draw(
         graphicsEngine,
@@ -104,7 +104,7 @@ void Model::Draw(GraphicsEngine* graphicsEngine, RenderContext& rc, const Matrix
 }
 
 //インスタンシング描画
-void Model::DrawInstancing(GraphicsEngine* graphicsEngine,RenderContext& rc, int numInstance, Camera* camera)
+void Model::DrawInstancing(GraphicsEngine*& graphicsEngine,RenderContext& rc, int numInstance, Camera* camera)
 {
     this->mesh_parts_.DrawInstancing(
         graphicsEngine,
