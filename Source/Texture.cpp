@@ -44,7 +44,7 @@ void Texture::InitFromMemory(GraphicsEngine*& graphicsEngine,const char* memory,
 }
 
 //D3Dリソースからテクスチャを初期化する
-void Texture::InitFromD3DResource(ID3D12Resource*& texture)
+void Texture::InitFromD3DResource(ID3D12Resource* texture)
 {
     //すでに存在している場合は解放する
     if (this->texture_)texture->Release();
@@ -62,11 +62,10 @@ void Texture::RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CP
     if (!this->texture_) return;
 
     //シェーダーリソースビュー　設定
-    D3D12_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc;
+    D3D12_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc = {};
     shader_resource_view_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     shader_resource_view_desc.Format = this->texture_Desc_.Format;
     shader_resource_view_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    shader_resource_view_desc.Texture2D.MipLevels = this->texture_Desc_.MipLevels;
     
     ////シェーダーリソースビュー 生成
     graphicsEngine->CreateShaderResourceView(
@@ -97,7 +96,8 @@ void Texture::LoadTextureFromDDSFile(GraphicsEngine*& graphicsEngine, const wcha
     ResourceUploadBatch resouce_upload_batch(graphicsEngine->GetDevice());
     resouce_upload_batch.Begin();
 
-    ComPtr<ID3D12Resource> texture;
+    //ComPtr<ID3D12Resource> texture;
+    ID3D12Resource* texture;
     
     //DDSテクスチャを生成する
     HRESULT hr = DirectX::CreateDDSTextureFromFileEx(
@@ -122,7 +122,8 @@ void Texture::LoadTextureFromDDSFile(GraphicsEngine*& graphicsEngine, const wcha
         std::abort();
     }
 
-    this->texture_ = texture.Get();
+    //this->texture_ = texture.Get();
+    this->texture_ = texture;
     this->texture_Desc_ = this->texture_->GetDesc();
 
     //texture->Release();

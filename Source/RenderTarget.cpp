@@ -225,8 +225,8 @@ void RenderTarget::CreateDescriptorRTV(GraphicsEngine*& graphicsEngine)
 {
     //カラーテクスチャのディスクリプタを作成。
     auto rtv_handle = this->rtv_Heap_->GetCPUDescriptorHandleForHeapStart();
-    graphicsEngine->CreateRenderTargetView(
-        this->render_Target_Texture_.GetTexture(),
+    graphicsEngine->GetDevice()->CreateRenderTargetView(
+    this->render_Target_Texture_.GetTexture(),
         nullptr, 
         rtv_handle
     );

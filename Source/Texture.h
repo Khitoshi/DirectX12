@@ -43,7 +43,7 @@ public:
     /// D3Dリソースからテクスチャを初期化する。
     /// </summary>
     /// <param name="resrouce">D3Dリソース。</param>
-    void InitFromD3DResource(ID3D12Resource*& texture);
+    void InitFromD3DResource(ID3D12Resource* texture);
     
     /// <summary>
     /// SRVに登録。
@@ -86,7 +86,7 @@ public:
     /// テクスチャ取得
     /// </summary>
     /// <returns></returns>
-    ID3D12Resource*& GetTexture()
+    ID3D12Resource* GetTexture()
     {
         return this->texture_;
     }
