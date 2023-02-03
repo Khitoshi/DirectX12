@@ -40,7 +40,7 @@ private:
     //１つのマテリアルで使用されるSRVの数
     enum { NUM_SRV_ONE_MATERIAL = EXPAND_SRV_REG__START_NO + MAX_MODEL_EXPAND_SRV };
     //１つのマテリアルで使用されるCBVの数
-    enum { NUM_CBV_ONE_MATERIAL = 6 };
+    enum { NUM_CBV_ONE_MATERIAL = 2 };
 public:
 
     /// <summary>

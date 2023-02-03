@@ -3,6 +3,7 @@
 #include "ConstantBuffer.h"
 #include "IShaderResource.h"
 #include "IUnorderAccessResrouce.h"
+#include "DescriptorHeap_inline.h"
 
 //デフォルト コンストラクタ
 DescriptorHeap::DescriptorHeap():
@@ -206,36 +207,3 @@ void DescriptorHeap::CommitSamplerHeap(GraphicsEngine*& graphicsEngine)
     }
 }
 
-//リソースをディスクリプタヒープに登録
-template<class T>
-void DescriptorHeap::RegistResource(int registerIndex, T res, T resTable[], int& numRes, const int MAX_RESOURCE, const wchar_t* errorMessage)
-{
-    if (registerIndex == -1)
-    {
-        //-1が指定されているので，
-        //現在登録されているリソースの一番後ろに登録
-        registerIndex = numRes;
-    }
-
-    //登録番号がリソース最大値以下の場合
-    if (registerIndex < MAX_RESOURCE)
-    {
-        //登録
-        resTable[registerIndex] = res;
-
-        if(numRes < registerIndex + 1)
-        {
-            //登録されているリソース数を増やす
-            numRes = registerIndex + 1;
-        }
-    }
-    else
-    {
-        //リソースの最大値より多い場合
-        //エラーメッセージを出す
-        MessageBox(nullptr, errorMessage, L"DescriptorHeap::RegistResourceで失敗", MB_OK);
-        std::abort();
-        //強制終了
-        std::abort();
-    }
-}

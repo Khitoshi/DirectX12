@@ -134,10 +134,10 @@ void Texture::LoadTextureFromMemory(GraphicsEngine*& graphicsEngine, const char*
     
     ResourceUploadBatch resouce_upload_batch(graphicsEngine->GetDevice());
     resouce_upload_batch.Begin();
-    ComPtr<ID3D12Resource> texture;
-    
+    //ComPtr<ID3D12Resource> texture;
+    ID3D12Resource* texture;
     //DDSテクスチャメモリ 生成
-    HRESULT hr = CreateDDSTextureFromMemoryEx(
+    HRESULT hr = DirectX::CreateDDSTextureFromMemoryEx(
         graphicsEngine->GetDevice(),
         resouce_upload_batch,
         (const uint8_t*)memory,
@@ -159,6 +159,6 @@ void Texture::LoadTextureFromMemory(GraphicsEngine*& graphicsEngine, const char*
         std::abort();
     }
 
-    this->texture_ = texture.Get();
+    this->texture_ = texture;
     this->texture_Desc_ = this->texture_->GetDesc();
 }
