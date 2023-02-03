@@ -104,7 +104,7 @@ bool GraphicsEngine::Init(Camera& camera)
 	this->cbr_Srv_Descriptor_Size_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	//Samplerのディスクリプタのサイズを取得
-	this->sampler_Descriptor_Size_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+	this->sampler_Descriptor_Size_ = this->device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 
 	this->null_Texture_Maps_ = std::make_unique<NullTextureMaps>();
 	this->null_Texture_Maps_->Init();
@@ -119,6 +119,8 @@ bool GraphicsEngine::Init(Camera& camera)
 	camera_3d->GetTarget().Set(0.0f, 50.0f, 0.0f);
 	
 	camera = *camera_3d;
+
+	this->directXTKG_Fx_Memroy_ = std::make_unique<DirectX::GraphicsMemory>(this->device_.Get());
 
     return true;
 }
