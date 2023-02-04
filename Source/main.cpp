@@ -83,6 +83,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     model = new Model();
     model->Init(engine, engine->GetGraphicsEngine(), modelInitData);
 
+
+
     //以下更新コード
     auto& renderContext = engine->GetGraphicsEngine()->GetRenderContext();
 
@@ -103,6 +105,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
         engine->EndFrame();
     }
-    delete model;
+    //delete model;
     return 0;
 }

@@ -20,6 +20,14 @@ tkEngine::~tkEngine()
 void tkEngine::BeginFrame(GraphicsEngine*& graphicsEngine, Camera& camera)
 {
     graphicsEngine->BeginRender(camera);
+
+    //pad‚Ì‰Šú‰»
+    for (auto& pad : this->pad_)
+    {
+        pad.BeginFrame();
+        pad.Update();
+    }
+
 }
 
 //ƒtƒŒ[ƒ€‚ÌI—¹‚ÉŒÄ‚Î‚ê‚éˆ—

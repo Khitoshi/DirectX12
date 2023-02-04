@@ -154,6 +154,7 @@
     <ClCompile Include="Source\Bone.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\ConstantBuffer.cpp" />
+    <ClCompile Include="Source\DebugModel.cpp" />
     <ClCompile Include="Source\DescriptorHeap.cpp" />
     <ClCompile Include="Source\GamePad.cpp" />
     <ClCompile Include="Source\GraphicsEngine.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="Source\Bone.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\ConstantBuffer.h" />
+    <ClInclude Include="Source\DebugModel.h" />
     <ClInclude Include="Source\DescriptorHeap.h" />
     <ClInclude Include="Source\DescriptorHeap_inline.h" />
     <ClInclude Include="Source\GamePad.h" />

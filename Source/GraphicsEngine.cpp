@@ -106,6 +106,9 @@ bool GraphicsEngine::Init(Camera& camera)
 	//Samplerのディスクリプタのサイズを取得
 	this->sampler_Descriptor_Size_ = this->device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 
+	//dxgi factory リリース
+	this->factory_->Release();
+
 	this->null_Texture_Maps_ = std::make_unique<NullTextureMaps>();
 	this->null_Texture_Maps_->Init();
 
@@ -128,6 +131,8 @@ bool GraphicsEngine::Init(Camera& camera)
 //レンダリング開始
 void GraphicsEngine::BeginRender(Camera& camera)
 {
+	this->frame_Index = this->swap_Chain_->GetCurrentBackBufferIndex();
+
 	//カメラ更新
 	camera.Update(this);
 

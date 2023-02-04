@@ -63,10 +63,15 @@ void Texture::RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CP
 
     //シェーダーリソースビュー　設定
     D3D12_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc = {};
+    //shader_resource_view_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    //shader_resource_view_desc.Format = this->texture_Desc_.Format;
+    //shader_resource_view_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    
     shader_resource_view_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     shader_resource_view_desc.Format = this->texture_Desc_.Format;
     shader_resource_view_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    
+    shader_resource_view_desc.Texture2D.MipLevels = this->texture_Desc_.MipLevels;
+
     ////シェーダーリソースビュー 生成
     graphicsEngine->CreateShaderResourceView(
         this->texture_,
