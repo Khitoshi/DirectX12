@@ -11,8 +11,10 @@ private:
 	{
 		//•ûŒü
 		Vector3 direction;
+		float pad0;
 		//F
 		Vector3 color;
+		float pad1;
 	};
 
 public:

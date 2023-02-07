@@ -25,7 +25,7 @@ Model::~Model()
 void Model::Init(tkEngine*& tk, GraphicsEngine*& graphicsEngine, const ModelInitData& initData)
 {
     //ファイルパスのチェック
-    if (initData.model_File_Path_ == nullptr)
+    if (!initData.model_File_Path_)
     {
         //メッセージボックスを表示して，異常終了する
         MessageBox(nullptr, TEXT("Model::Initでモデルのファイルパスが指定されていません"), TEXT("エラー"), MB_OK);
@@ -33,7 +33,7 @@ void Model::Init(tkEngine*& tk, GraphicsEngine*& graphicsEngine, const ModelInit
     }
 
     //スケルトンのチェック
-    if (initData.skeleton_ != nullptr) {
+    if (initData.skeleton_) {
         //スケルトンが指定されている。
         this->mesh_parts_.BindSkeleton(graphicsEngine, *initData.skeleton_);
     }

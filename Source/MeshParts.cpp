@@ -104,7 +104,6 @@ void MeshParts::Draw(
             descriptorHeapNo++;
         }
     }
-    return;
 }
 
 //インスタンシング描画
@@ -131,7 +130,7 @@ void MeshParts::DrawInstancing(GraphicsEngine*& graphicsEngine,RenderContext& re
             //インデックスバッファ設定
             auto& ib = mesh->indexBufferArray[materialNo];
             renderContext.SetIndexBuffer(*ib);
-
+            
             //ドローコールを実行
             renderContext.DrawIndexedInstanced(ib->GetIndexCount(), numInstance);
             descriptor_heap_no++;

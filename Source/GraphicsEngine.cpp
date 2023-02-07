@@ -46,6 +46,9 @@ GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, co
 //デフォルト デストラクタ
 GraphicsEngine::~GraphicsEngine()
 {
+	if (command_List_)command_List_->Release();
+
+	if (fence_)fence_->Release();
 }
 
 //初期化
@@ -82,7 +85,7 @@ bool GraphicsEngine::Init(Camera& camera)
 	this->CreateSynchronizationWithGPUObject();
 
 	this->render_Conext_ = std::make_unique<RenderContext>();
-	this->render_Conext_->Init(this->command_List_.Get());
+	this->render_Conext_->Init(this->command_List_);
 
 	//ビューポート初期化
 	//TODO: 関数にする
@@ -113,15 +116,9 @@ bool GraphicsEngine::Init(Camera& camera)
 	this->null_Texture_Maps_->Init();
 
 	//std::unique_ptr<Camera> camera_2d;
-	std::unique_ptr<Camera> camera_3d;
 
-	//camera_2d = std::make_unique<Camera>();
-	//camera_2d->set
-	camera_3d = std::make_unique<Camera>();
-	camera_3d->GetPosition().Set(0.0f, 50.0f, 200.0f);
-	camera_3d->GetTarget().Set(0.0f, 50.0f, 0.0f);
-	
-	camera = *camera_3d;
+	camera.SetPosition(0.0f, 50.0f, 200.0f);
+	camera.SetTarget(0.0f, 50.0f, 0.0f);
 
 	this->directXTKG_Fx_Memroy_ = std::make_unique<DirectX::GraphicsMemory>(this->device_.Get());
 
@@ -156,7 +153,7 @@ void GraphicsEngine::BeginRender(Camera& camera)
 	this->render_Conext_->SetRenderTarget(this->current_Frame_Buffer_RTV_Handle_, this->current_Frame_Buffer_DSV_Handle_);
 
 	//画面クリアカラー設定
-	const float clearColor[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	const float clearColor[] = { .5f, .5f, .5f, 1.0f };//灰
 	this->render_Conext_->ClearRenderTargetView(this->current_Frame_Buffer_RTV_Handle_, clearColor);
 	this->render_Conext_->ClearDepthStencilView(this->current_Frame_Buffer_DSV_Handle_, 1.0f);
 }
@@ -174,7 +171,7 @@ void GraphicsEngine::EndRender()
 	this->render_Conext_->Close();
 
 	//コマンドを実行。
-	ID3D12CommandList* ppCommandLists[] = { this->command_List_.Get() };
+	ID3D12CommandList* ppCommandLists[] = { this->command_List_ };
 	this->command_Queue_->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 	this->swap_Chain_->Present(1, 0);
@@ -191,7 +188,8 @@ void GraphicsEngine::WaitDraw()
 	
 	// Signal and increment the fence value.
 	const UINT64 fence = this->fence_Value_;
-	this->command_Queue_->Signal(this->fence_.Get(), fence);
+	//this->command_Queue_->Signal(this->fence_.Get(), fence);
+	this->command_Queue_->Signal(this->fence_, fence);
 	this->fence_Value_++;
 
 	// Wait until the previous frame is finished.

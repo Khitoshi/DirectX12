@@ -17,6 +17,14 @@ RenderContext::RenderContext():
 //デフォルト デストラクタ
 RenderContext::~RenderContext()
 {
+    for (auto& dh : descriptor_Heap_)
+    {
+        if(dh)dh->Release();
+    }
+
+    if (command_List_)command_List_->Release();
+    
+
 }
 
 //初期化
@@ -54,10 +62,10 @@ void RenderContext::SetViewportAndScissor(D3D12_VIEWPORT& viewport)
 {
     //シザリング矩形
     D3D12_RECT scissorRect;
-    scissorRect.bottom = static_cast<LONG>(viewport.MaxDepth);
+    scissorRect.bottom = static_cast<LONG>(viewport.Height);
     scissorRect.top = 0;
     scissorRect.left = 0;
-    scissorRect.right = static_cast<LONG>(viewport.MaxDepth);
+    scissorRect.right = static_cast<LONG>(viewport.Width);
     SetScissorRect(scissorRect);
 
     this->command_List_->RSSetViewports(1, &viewport);

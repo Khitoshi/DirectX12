@@ -145,6 +145,7 @@ void Material::InitPipelineState(GraphicsEngine*& graphicsEngine,const std::arra
     pso_desc.PS = CD3DX12_SHADER_BYTECODE(this->ps_Model_->GetCompiledBlob());
     pso_desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     pso_desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+    //pso_desc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
     pso_desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
     pso_desc.DepthStencilState.DepthEnable = TRUE;

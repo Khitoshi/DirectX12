@@ -454,11 +454,13 @@ private:
 	//コマンドアロケータ
 	ComPtr<ID3D12CommandAllocator> command_Allocator_;
 	//コマンドリスト
-	ComPtr<ID3D12GraphicsCommandList4> command_List_;
+	//ComPtr<ID3D12GraphicsCommandList4> command_List_;
+	ID3D12GraphicsCommandList4* command_List_;
 	//パイプラインステート
 	ComPtr<ID3D12PipelineState> pipeline_State_;
 	//フェンス
-	ComPtr<ID3D12Fence> fence_;
+	//ComPtr<ID3D12Fence> fence_;
+	ID3D12Fence* fence_;
 	//レンダーコンテキスト
 	std::unique_ptr<RenderContext> render_Conext_;
 	//ビューポート。

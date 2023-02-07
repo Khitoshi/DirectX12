@@ -56,8 +56,8 @@ bool RootSignature::Init(
 		enNumDescriptorHeap
 	};
 
-	CD3DX12_DESCRIPTOR_RANGE1 ranges[enNumDescriptorHeap];
-	CD3DX12_ROOT_PARAMETER1 rootParameters[enNumDescriptorHeap];
+	CD3DX12_DESCRIPTOR_RANGE1 ranges[enNumDescriptorHeap] = {};
+	CD3DX12_ROOT_PARAMETER1 rootParameters[enNumDescriptorHeap] = {};
 
 	ranges[enDescriptorHeap_CB].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, maxCbvDescriptor, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, offsetInDescriptorsFromTableStartCB);
 	rootParameters[enDescriptorHeap_CB].InitAsDescriptorTable(1, &ranges[enDescriptorHeap_CB]);
@@ -77,18 +77,15 @@ bool RootSignature::Init(
 
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
 	rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, numSampler, samplerDescArray, rootSignatureFlags);
+	
 	Microsoft::WRL::ComPtr<ID3DBlob> signature;
 	Microsoft::WRL::ComPtr<ID3DBlob> error;
+
 	D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
 	//auto hr = device.CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&this->root_Signature_));
 
 	graphicsEngine->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), this->root_Signature_);
 
-	//if (FAILED(hr)) {
-	//	//TODO: MYASSERTを実装する
-	//	//ルートシグネチャの作成に失敗した。
-	//	return false;
-	//}
 	return true;
 
 }

@@ -157,7 +157,7 @@ void DescriptorHeap::Commit(GraphicsEngine*& graphicsEngine)
         this->const_Buffer_Gpu_Descriptor_Start_[buffer_Index] = gpu_Handle;
         //シェーダーリソースのディスクリプタヒープの開始ハンドルを計算。
         this->shader_Resource_Gpu_Descriptor_Start_[buffer_Index] = gpu_Handle;
-        this->uav_Gpu_Descriptor_Start_[buffer_Index].ptr += (UINT64)graphicsEngine->GetCbrSrvDescriptorSize() * this->num_Constant_Buffer_;
+        this->shader_Resource_Gpu_Descriptor_Start_[buffer_Index].ptr += (UINT64)graphicsEngine->GetCbrSrvDescriptorSize() * this->num_Constant_Buffer_;
         //UAVリソースのディスクリプタヒープの開始ハンドルを計算。
         this->uav_Gpu_Descriptor_Start_[buffer_Index] = gpu_Handle;
         this->uav_Gpu_Descriptor_Start_[buffer_Index].ptr += (UINT64)graphicsEngine->GetCbrSrvDescriptorSize() * (this->num_Shader_Resource_ + this->num_Constant_Buffer_);

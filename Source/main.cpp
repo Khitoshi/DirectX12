@@ -49,15 +49,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
     //3D用　カメラ
     //カメラの位置を設定
-    camera_3d->GetPosition().Set(0.0f, 0.0f, 100.0f);
+    camera_3d->SetPosition(0.0f, 0.0f, 100.0f);
     //カメラのターゲットを設定
-    camera_3d->GetTarget().Set(0.0f, 0.0f, 0.0f);
-
-
+    //camera_3d->GetTarget().Set(0.0f, 0.0f, 0.0f);
+    camera_3d->SetTarget(0.0f, 0.0f, 0.0f);
 
     //ライト
-    std::unique_ptr<Light> light;
-    light = std::make_unique<Light>();
+    //std::unique_ptr<Light> light;
+    //light = std::make_unique<Light>();
+    Light light;
+    
+    /*
     //ライトは右から当たっている
     light->GetDirectionLight().direction.Set(1.0f, -1.0f, -1.0f);
     light->GetDirectionLight().direction.Normalize();
@@ -65,6 +67,24 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     light->GetDirectionLight().color.Set(0.5f, 0.5f, 0.5f);
     //視点の位置を設定する
     light->GetEyePosition().Set(camera_3d->GetPosition());
+    */
+
+    //ライトは右から当たっている
+    //light.GetDirectionLight().direction.Set(1.0f, -1.0f, -1.0f);
+    light.direction_Light_.direction.x = 1.0f;
+    light.direction_Light_.direction.y = -1.0f;
+    light.direction_Light_.direction.z = -1.0f;
+    light.GetDirectionLight().direction.Normalize();
+
+    //ライトの色は白
+    //light.GetDirectionLight().color.Set(0.5f, 0.5f, 0.5f);
+    light.direction_Light_.color.x = 1.0f;
+    light.direction_Light_.color.y = 1.0f;
+    light.direction_Light_.color.z = 1.0f;
+
+    //視点の位置を設定する
+    //light.GetEyePosition().Set(camera_3d->GetPosition());
+    light.eye_Position_ = camera_3d->GetPosition();
 
     // モデルを初期化する
     // モデルを初期化するための情報を構築する
@@ -79,11 +99,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     modelInitData.expand_Constant_Buffer = &light;
     modelInitData.expand_Constant_Buffer_Size = sizeof(light);
 
-    Model* model;
-    model = new Model();
-    model->Init(engine, engine->GetGraphicsEngine(), modelInitData);
-
-
+    Model model = {};
+    //model = new Model();
+    model.Init(engine, engine->GetGraphicsEngine(), modelInitData);
 
     //以下更新コード
     auto& renderContext = engine->GetGraphicsEngine()->GetRenderContext();
@@ -92,7 +110,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     while (system->DispatchWindowMessage())
     {
         //レンダリング開始
-        engine->BeginFrame(engine->GetGraphicsEngine(),*camera_3d.get());
+        engine->BeginFrame(engine->GetGraphicsEngine(),*camera_3d);
 
         //ここから絵を書くコードを記述
         //Quaternion qRot;
@@ -101,7 +119,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         //qRot.SetRotationDegX(g_pad[0]->GetLStickYF());
         //qRot.Apply(light.directionLight.direction);
 
-        model->Draw(engine->GetGraphicsEngine(), renderContext, *camera_3d);
+        model.Draw(engine->GetGraphicsEngine(), renderContext, *camera_3d);
 
         engine->EndFrame();
     }

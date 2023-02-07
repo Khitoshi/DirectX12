@@ -13,7 +13,7 @@ tkEngine::tkEngine():
 //デフォルト コンストラクタ
 tkEngine::~tkEngine()
 {
-    delete graphics_Engine_;
+    if (graphics_Engine_)delete graphics_Engine_;
 }
 
 //フレームの開始時に呼ばれる処理
