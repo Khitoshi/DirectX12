@@ -10,7 +10,10 @@
 RenderContext::RenderContext():
     command_List_(),
     current_Viewport_(),
-    descriptor_Heap_()
+    descriptor_Heap_(),
+    scratch_Resource_List_(),
+    constant_Buffer_(),
+    shader_Resources_()
 {
 }
 
@@ -24,6 +27,16 @@ RenderContext::~RenderContext()
 
     if (command_List_)command_List_->Release();
     
+
+    for (auto& resouce : shader_Resources_)
+    {
+        if (resouce)delete resouce;
+    }
+
+    for (auto& buffer : constant_Buffer_)
+    {
+        if (buffer)delete buffer;
+    }
 
 }
 

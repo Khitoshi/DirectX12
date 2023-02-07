@@ -144,8 +144,8 @@ void Material::InitPipelineState(GraphicsEngine*& graphicsEngine,const std::arra
     pso_desc.VS = CD3DX12_SHADER_BYTECODE(this->vs_Skin_Model_->GetCompiledBlob());
     pso_desc.PS = CD3DX12_SHADER_BYTECODE(this->ps_Model_->GetCompiledBlob());
     pso_desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    pso_desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-    //pso_desc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+    //pso_desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+    pso_desc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
     pso_desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
     pso_desc.DepthStencilState.DepthEnable = TRUE;
@@ -258,7 +258,6 @@ void Material::InitTexture(
         this->albedo_Map_ = albedoMap;
     }
 
-
     //法線マップ。
     {
         if (tkmMat.normalMap != nullptr)
@@ -283,8 +282,6 @@ void Material::InitTexture(
         }
         this->normal_Map_ = normalMap;
     }
-
-
 
     //スペキュラマップ。
     {
@@ -360,6 +357,4 @@ void Material::InitTexture(
         }
         this->refraction_Map_ = refractionMap;
     }
-
-
 }

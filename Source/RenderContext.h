@@ -299,7 +299,7 @@ public:
     /// <param name="renderTarget">レンダリングターゲットの配列。</param>
     void SetRenderTargets(UINT numRT, RenderTarget* renderTargets[])
     {
-        D3D12_CPU_DESCRIPTOR_HANDLE rtDSHandleTbl[32];
+        D3D12_CPU_DESCRIPTOR_HANDLE rtDSHandleTbl[32] = {};
         int rtNo = 0;
         for (UINT rtNo = 0; rtNo < numRT; rtNo++) {
             rtDSHandleTbl[rtNo] = renderTargets[rtNo]->GetRTVCpuDescriptorHandle();

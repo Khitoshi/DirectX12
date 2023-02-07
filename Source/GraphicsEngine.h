@@ -376,6 +376,7 @@ private:
 	/// </summary>
 	void CreateSynchronizationWithGPUObject();
 
+
 #pragma endregion
 
 public:
@@ -405,7 +406,7 @@ public:
 	UINT GetCbrSrvDescriptorSize() const { return this->cbr_Srv_Descriptor_Size_; }
 
 	ID3D12CommandQueue* GetCommandQueue()const { return this->command_Queue_.Get(); }
-
+	ID3D12GraphicsCommandList4* GetCommandList() { return this->command_List_; }
 	const NullTextureMaps& GetNullTextureMaps()const { return *this->null_Texture_Maps_; }
 
 	//フレームバッファの幅 取得
@@ -416,11 +417,15 @@ public:
 	//フレームバッファの数 取得
 	const static UINT GetFrameBufferCount() { return FRAME_BUFFER_COUNT; }
 
+	ID3D12Resource*& GetRender_Targets_() { return *this->render_Targets_[frame_Index].GetAddressOf(); }
+
 	//レンダーコンテキスト 取得
 	RenderContext& GetRenderContext()
 	{
 		return *this->render_Conext_;
 	}
+#pragma endregion
+#pragma region Set Method
 
 #pragma endregion
 

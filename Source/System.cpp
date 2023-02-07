@@ -3,10 +3,13 @@
 #include <memory>
 #include "Camera.h"
 #include "tkEngine.h"
+#include "RenderContext.h"
 
 //メッセージプロシージャ
 LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+	if (imguiSystem::WindowProcHandler(hwnd, msg, wparam, lparam))return true;
+
     if (msg == WM_DESTROY)
     {
         //OSに終了を伝える
@@ -20,41 +23,17 @@ LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 
 System::System():
-	hWnd_(NULL)
+	frame_Buffer_width_(1280),
+	frame_Buffer_height_(720),
+	hWnd_(NULL),
+	imgui_System_()
 {
+	imgui_System_ = std::make_unique<imguiSystem>();
 }
 
 System::~System()
 {
 }
-
-/*
-void System::InitGraphicSystem(
-	HINSTANCE hInstance,
-	HINSTANCE hPrevInstance,
-	LPWSTR lpCmdLine,
-	int nCmdShow, 
-	const TCHAR* appName
-)
-{
-	InitWindow(hInstance, hPrevInstance, lpCmdLine, nCmdShow, appName);
-	
-	//std::unique_ptr<GraphicsEngine>graphics_engine;
-	//graphics_engine = std::make_unique<GraphicsEngine>(hWnd_,frame_Buffer_width_, frame_Buffer_height_);
-	//graphics_engine->Init(camera);
-	//std::unique_ptr<tkEngine> engine;
-	//engine = std::make_unique<tkEngine>();
-	//graphicsEngine = new GraphicsEngine(this->hWnd_, this->frame_Buffer_width_, this->frame_Buffer_height_);
-	//tk.Init(
-	//	this->hWnd_, 
-	//	this->frame_Buffer_width_, 
-	//	this->frame_Buffer_height_,
-	//	graphicsEngine,
-	//	camera);
-
-	return;
-}
-*/
 
 //ウィンドウメッセージをディスパッチ
 bool System::DispatchWindowMessage()
@@ -76,9 +55,11 @@ bool System::DispatchWindowMessage()
 		}
 	}
 
+
 	return msg.message != WM_QUIT;
 }
 
+//window 初期化
 void System::InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName)
 {
 	//ウィンドウクラスのパラメータを設定
@@ -115,7 +96,6 @@ void System::InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpC
 	//ウィンドウクラスの登録。
 	RegisterClassEx(&wc);
 
-
 	//ウィンドウ作成
 	// ウィンドウの作成。
 	this->hWnd_ = CreateWindow(
@@ -135,3 +115,23 @@ void System::InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpC
 	//window表示
 	ShowWindow(this->hWnd_, nCmdShow);
 }
+
+//初期化
+void System::Init(GraphicsEngine*& graphicsEngine)
+{
+	//imgui 初期化
+	imgui_System_->Init(graphicsEngine, this->hWnd_);
+}
+
+//更新
+void System::Update(tkEngine*& engine)
+{
+	imgui_System_->Update();
+}
+
+//描画
+void System::Render(tkEngine*& engine)
+{
+	imgui_System_->Drow(engine->GetGraphicsEngine());
+}
+

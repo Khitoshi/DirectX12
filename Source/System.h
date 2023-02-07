@@ -1,49 +1,70 @@
 #pragma once
 #include <Windows.h>
+#include <d3dx12.h>
+#include <wrl.h>
+#include "imgui\imguiSystem.h"
+
 class tkEngine;
 class GraphicsEngine;
 class Camera;
+
 class System
 {
 public:
     System();
     ~System();
 
-    /*
-    void InitGraphicSystem(
-        HINSTANCE hInstance, 
-        HINSTANCE hPrevInstance, 
-        LPWSTR lpCmdLine, 
-        int nCmdShow, 
-        const TCHAR* appName
-        //tkEngine& tk,
-        //GraphicsEngine& graphicsEngine,
-        //Camera& camera
-    );
-    */
     /// <summary>
     /// ウィンドウメッセージをディスパッチ
     /// </summary>
     /// <returns>false = ゲーム終了</returns>
     bool DispatchWindowMessage();
 
+    /// <summary>
+    /// ウィンドウ 初期化
+    /// </summary>
+    /// <param name="hInstance"></param>
+    /// <param name="hPrevInstance"></param>
+    /// <param name="lpCmdLine"></param>
+    /// <param name="nCmdShow"></param>
+    /// <param name="appName"></param>
     void InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName);
+
+    void Init(GraphicsEngine*& GraphicsEngine);
+
+    void Update(tkEngine*& engine);
+
+    void Render(tkEngine*& engine);
+
 private:
 
 public:
 #pragma region Get Method
+    /// <summary>
+    /// 横 フレームバッファ
+    /// </summary>
+    /// <returns></returns>
     const UINT GetFrameBufferWidth() { return this->frame_Buffer_width_; }
+
+    /// <summary>
+    /// 高さ　フレームバッファ
+    /// </summary>
+    /// <returns></returns>
     const UINT GetFrameBufferHeight() { return this->frame_Buffer_height_; }
+
     const HWND GetHWnd() { return this->hWnd_; }
 #pragma endregion
 
-
 private:
+
     //フレームバッファの幅
-    const UINT frame_Buffer_width_ = 1280;				
+    const UINT frame_Buffer_width_;				
     //フレームバッファの高さ
-    const UINT frame_Buffer_height_ = 720;
+    const UINT frame_Buffer_height_;
 
     //ウィンドウハンドル。
     HWND hWnd_;
+
+    std::unique_ptr<imguiSystem> imgui_System_;
+
 };

@@ -96,6 +96,9 @@ bool GraphicsEngine::Init(Camera& camera)
 	this->view_Port_.MaxDepth = D3D12_MAX_DEPTH;
 	this->view_Port_.MinDepth = D3D12_MIN_DEPTH;
 
+
+
+
 	//ƒVƒUƒŠƒ“ƒO‰Šú‰»
 	//TODO: ŠÖ”‚É‚·‚é
 	this->scissor_Rect_.left = 0;

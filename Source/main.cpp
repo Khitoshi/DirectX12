@@ -7,6 +7,11 @@
 #include "System.h"
 #include "Camera.h"
 #include "Light.h"
+#include "imgui\imgui.h"
+#include "imgui\imgui_impl_dx12.h"
+#include "imgui\imgui_impl_win32.h"
+
+
 
 #pragma warning(disable : 4996)
 
@@ -36,6 +41,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         TEXT("DirectX12 自作ライブラリ")
         );
 
+
     //graphicsEngine = std::make_unique<GraphicsEngine>(system->GetHWnd(), system->GetFrameBufferWidth(), system->GetFrameBufferHeight());
 
     engine->Init(
@@ -46,6 +52,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         *camera_3d
     );
 
+    system->Init(engine->GetGraphicsEngine());
 
     //3D用　カメラ
     //カメラの位置を設定
@@ -106,11 +113,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     //以下更新コード
     auto& renderContext = engine->GetGraphicsEngine()->GetRenderContext();
 
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    float f = 0.0f;
+
+    
+    float*position[3] = {};
+    position[0] = &camera_3d->GetPosition().x;
+    position[1] = &camera_3d->GetPosition().x;
+    position[2] = &camera_3d->GetPosition().x;
+
     // ここからゲームループ
     while (system->DispatchWindowMessage())
     {
         //レンダリング開始
         engine->BeginFrame(engine->GetGraphicsEngine(),*camera_3d);
+        system->Update(engine);
+
 
         //ここから絵を書くコードを記述
         //Quaternion qRot;
@@ -118,11 +136,29 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         //qRot.Apply(light.directionLight.direction);
         //qRot.SetRotationDegX(g_pad[0]->GetLStickYF());
         //qRot.Apply(light.directionLight.direction);
+        /*
+        
+        */
+
+        ImGui::Begin("Hello, world!");
+
+        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+
+        ImGui::DragFloat3("camera", *position);
+
+        //camera_3d->SetPosition(position[0], position[1], position[2]);
+
+        ImGui::End();
+
 
         model.Draw(engine->GetGraphicsEngine(), renderContext, *camera_3d);
 
+        system->Render(engine);
         engine->EndFrame();
     }
+
     //delete model;
     return 0;
 }
