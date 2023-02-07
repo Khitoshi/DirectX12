@@ -20,6 +20,21 @@ MeshParts::MeshParts():
 //デストラクタ
 MeshParts::~MeshParts()
 {
+    if (skelton_)delete skelton_;
+
+    for (auto& mesh : this->meshs_) {
+        //インデックスバッファを削除。
+        for (auto& ib : mesh->indexBufferArray) {
+            if (ib != nullptr)delete ib;
+        }
+        //マテリアルを削除。
+        for (auto& mat : mesh->materials) {
+            if(mat != nullptr)delete mat;
+        }
+        //メッシュを削除。
+        if(mesh != nullptr)delete mesh;
+    }
+
 }
 
 //.tkm file 初期化
@@ -232,6 +247,7 @@ void MeshParts::CreateMeshFromTkmMesh(
         mesh->indexBufferArray.reserve(tkmMesh.indexBuffer16Array.size());
         for (auto& tkIb : tkmMesh.indexBuffer16Array) {
             auto ib = new IndexBuffer;
+            //std::unique_ptr<IndexBuffer>ib = std::make_unique<IndexBuffer>();
             ib->Init(graphicsEngine,static_cast<int>(tkIb.indices.size()) * 2, 2);
             ib->Copy((uint16_t*)&tkIb.indices.at(0));
 
@@ -239,6 +255,7 @@ void MeshParts::CreateMeshFromTkmMesh(
             SetSkinFlag(tkIb.indices[0]);
 
             mesh->indexBufferArray.push_back(ib);
+            //delete  ib;
         }
     }
     else
@@ -260,7 +277,7 @@ void MeshParts::CreateMeshFromTkmMesh(
     //マテリアル作成
     mesh->materials.reserve(tkmMesh.materials.size());
     for (auto& tkmMat : tkmMesh.materials) {
-        auto mat = new Material;
+        auto* mat = new Material();
         mat->InitFromTkmMaterila(
             tk,
             graphicsEngine,
@@ -281,7 +298,7 @@ void MeshParts::CreateMeshFromTkmMesh(
         mesh->materials.push_back(mat);
     }
 
-    this->meshs_[meshNo].reset(mesh);
+    this->meshs_[meshNo] = mesh;
 
 }
 

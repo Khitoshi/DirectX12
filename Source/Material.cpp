@@ -26,6 +26,36 @@ Material::Material():
 //デフォルト デストラクタ
 Material::~Material()
 {
+#pragma region MapRelease
+    //アルベドマップ
+    if (albedo_Map_ != nullptr)delete albedo_Map_;
+
+    //法線マップ
+    if (normal_Map_ != nullptr)delete normal_Map_;
+
+    //スペキュラマップ
+    if (specular_Map_ != nullptr)delete specular_Map_;
+
+    //リフレクションマップ
+    if (reflection_Map_ != nullptr)delete reflection_Map_;
+
+    //屈折マップ
+    if (refraction_Map_ != nullptr)delete refraction_Map_;
+
+#pragma endregion
+
+#pragma region ShaderRelease
+    //スキンなしモデル用の頂点シェーダー
+    if(vs_Non_Skin_Model_)delete vs_Non_Skin_Model_;
+
+    //スキンありモデル用の頂点シェーダー
+    if(vs_Skin_Model_)delete vs_Skin_Model_;
+
+    //モデル用のピクセルシェーダー
+    if (ps_Model_ != nullptr)delete ps_Model_;
+#pragma endregion
+
+
 }
 
 //tkm file のマテリアル情報から初期化する

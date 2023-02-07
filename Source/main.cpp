@@ -11,25 +11,25 @@
 #include "imgui\imgui_impl_dx12.h"
 #include "imgui\imgui_impl_win32.h"
 
-
-
 #pragma warning(disable : 4996)
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
+#ifdef _DEBUG
+    //メモリリーク検出用
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    //_CrtSetBreakAlloc(393639);
+#endif // _DEBUG
+
     //カメラ
     std::unique_ptr<Camera> camera_3d;
     camera_3d = std::make_unique<Camera>();
 
-    //graphicエンジン
-    //std::unique_ptr<GraphicsEngine> graphicsEngine;
-    //graphicsEngine = std::make_unique<GraphicsEngine>();
-    // 
-    //DirectXTK エンジン
     //std::unique_ptr<tkEngine> engine;
     //engine = std::make_unique<tkEngine>();
     tkEngine* engine;
     engine = new tkEngine();
+
     std::unique_ptr<System>system;
     system = std::make_unique<System>();
 
@@ -39,7 +39,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         lpCmdLine,
         nCmdShow,
         TEXT("DirectX12 自作ライブラリ")
-        );
+    );
 
 
     //graphicsEngine = std::make_unique<GraphicsEngine>(system->GetHWnd(), system->GetFrameBufferWidth(), system->GetFrameBufferHeight());
@@ -65,7 +65,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     //std::unique_ptr<Light> light;
     //light = std::make_unique<Light>();
     Light light;
-    
+
     /*
     //ライトは右から当たっている
     light->GetDirectionLight().direction.Set(1.0f, -1.0f, -1.0f);
@@ -96,8 +96,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     // モデルを初期化する
     // モデルを初期化するための情報を構築する
     ModelInitData modelInitData;
+    //モデルファイルパス
     modelInitData.model_File_Path_ = "./Assets/Model/teapot.tkm";
-
     // 使用するシェーダーファイルパスを設定する
     modelInitData.shader_File_Path = "./Assets/Shader/sample.fx";
 
@@ -107,26 +107,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     modelInitData.expand_Constant_Buffer_Size = sizeof(light);
 
     Model model = {};
-    //model = new Model();
     model.Init(engine, engine->GetGraphicsEngine(), modelInitData);
+    //model = new Model();
 
     //以下更新コード
+    auto graphicsEngine = engine->GetGraphicsEngine();
     auto& renderContext = engine->GetGraphicsEngine()->GetRenderContext();
-
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    float f = 0.0f;
-
-    
-    float*position[3] = {};
-    position[0] = &camera_3d->GetPosition().x;
-    position[1] = &camera_3d->GetPosition().x;
-    position[2] = &camera_3d->GetPosition().x;
 
     // ここからゲームループ
     while (system->DispatchWindowMessage())
     {
         //レンダリング開始
-        engine->BeginFrame(engine->GetGraphicsEngine(),*camera_3d);
+        engine->BeginFrame(graphicsEngine,*camera_3d);
         system->Update(engine);
 
 
@@ -142,23 +134,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
         ImGui::Begin("Hello, world!");
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+        ImGui::DragFloat3("camera position", (float*)&camera_3d->GetPosition());
 
-
-        ImGui::DragFloat3("camera", *position);
+        ImGui::DragFloat3("light direction", (float*)&light.direction_Light_.direction);
+        ImGui::ColorEdit3("light color", (float*)&light.direction_Light_.color); // Edit 3 floats representing a color
 
         //camera_3d->SetPosition(position[0], position[1], position[2]);
 
         ImGui::End();
 
 
-        model.Draw(engine->GetGraphicsEngine(), renderContext, *camera_3d);
+        model.Draw(graphicsEngine, renderContext, *camera_3d);
 
         system->Render(engine);
         engine->EndFrame();
     }
-
+    delete engine;
     //delete model;
     return 0;
 }

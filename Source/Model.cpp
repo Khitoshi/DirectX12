@@ -15,14 +15,11 @@ Model::Model():
 //デフォルト デストラクタ
 Model::~Model()
 {
-    if (tkm_file_ != nullptr)
-    {
-        delete tkm_file_;
-    }
+    //if (this->tkm_file_ != nullptr) delete this->tkm_file_;
 }
 
 //初期化
-void Model::Init(tkEngine*& tk, GraphicsEngine*& graphicsEngine, const ModelInitData& initData)
+void Model::Init(tkEngine* tk, GraphicsEngine* graphicsEngine, const ModelInitData& initData)
 {
     //ファイルパスのチェック
     if (!initData.model_File_Path_)

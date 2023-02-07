@@ -45,6 +45,7 @@ public:
 
 
 public:
+#pragma region Get Method
     /// <summary>
     /// インデックスバッファビューを取得
     /// </summary>
@@ -74,6 +75,8 @@ public:
     /// </summary>
     /// <returns>return this Resouce</returns>
     ID3D12Resource* GetResouceAddress()const { return this->index_Buffer_.Get(); }
+
+#pragma endregion
 
 private:
     //インデックスバッファ

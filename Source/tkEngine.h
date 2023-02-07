@@ -113,14 +113,14 @@ public:
 		return this->shader_Bank_.Get(programName.c_str());
 	}
 
-	GraphicsEngine*& GetGraphicsEngine() { return this->graphics_Engine_; }
+	GraphicsEngine* GetGraphicsEngine()const { return this->graphics_Engine_.get(); }
 
 #pragma endregion
 
 private:
 
 	//グラフィックエンジン。
-	GraphicsEngine* graphics_Engine_;
+	std::unique_ptr<GraphicsEngine> graphics_Engine_;
 	//.tkm fileバンク。
 	TResourceBank<TkmFile> tkm_File_Bank_;
 	//シェーダーバンク

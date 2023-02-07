@@ -222,7 +222,7 @@ private:
     StructuredBuffer bone_Matrices_Structure_Buffer_;
 
     //メッシュ
-    std::vector<std::unique_ptr<SMesh>> meshs_;
+    std::vector<SMesh*> meshs_;
 
     //ディスクリプタヒープ
     DescriptorHeap descriptor_Heap_;

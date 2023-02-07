@@ -24,7 +24,7 @@ public:
     /// </summary>
     /// <param name="graphicsEngine"></param>
     /// <param name="hWnd"></param>
-    void Init(GraphicsEngine* graphicsEngine, HWND hWnd);
+    void Init(const GraphicsEngine* graphicsEngine, HWND hWnd);
 
     /// <summary>
     /// çXêV

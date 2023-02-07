@@ -88,7 +88,7 @@ public:
     /// <returns></returns>
     ID3D12Resource* GetTexture()
     {
-        return this->texture_;
+        return this->texture_.Get();
     }
 
     /// <summary>
@@ -122,8 +122,8 @@ public:
 
 private:
     //テクスチャ。
-    //ComPtr<ID3D12Resource> texture_ = nullptr;	
-    ID3D12Resource* texture_;
+    ComPtr<ID3D12Resource> texture_ = nullptr;	
+    //ID3D12Resource* texture_;
     //テクスチャ情報
     D3D12_RESOURCE_DESC texture_Desc_;	
 };

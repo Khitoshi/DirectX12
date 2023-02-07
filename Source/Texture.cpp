@@ -71,7 +71,7 @@ void Texture::RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CP
     //シェーダーリソースビュー 生成
     const auto& device = graphicsEngine->GetDevice();
     device->CreateShaderResourceView(
-        this->texture_, 
+        this->texture_.Get(), 
         &shader_resource_view_desc, 
        descriptorHandle);
 

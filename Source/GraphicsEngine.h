@@ -300,8 +300,9 @@ public:
 	/// デバイス取得
 	/// </summary>
 	/// <returns></returns>
-	ID3D12Device5* GetDevice() { return this->device_.Get(); }
-	ID3D12Device5** GetDeviceAdd() { return this->device_.GetAddressOf(); }
+	ID3D12Device5* GetDevice()const { return this->device_.Get(); }
+	ID3D12Device5** GetDeviceAddress() { return this->device_.GetAddressOf(); }
+
 #pragma endregion
 
 
@@ -391,7 +392,7 @@ public:
 	/// バックバッファの番号を取得。
 	/// </summary>
 	/// <returns>バックバッファの番号。</returns>
-	UINT GetBackBufferIndex() const { return this->frame_Index; }
+	UINT GetBackBufferIndex() const { return this->frame_Index_; }
 
 	/// <summary>
 	/// サンプラのディスクリプタヒープサイズを取得。
@@ -406,7 +407,7 @@ public:
 	UINT GetCbrSrvDescriptorSize() const { return this->cbr_Srv_Descriptor_Size_; }
 
 	ID3D12CommandQueue* GetCommandQueue()const { return this->command_Queue_.Get(); }
-	ID3D12GraphicsCommandList4* GetCommandList() { return this->command_List_; }
+	ID3D12GraphicsCommandList4* GetCommandList() { return this->command_List_.Get(); }
 	const NullTextureMaps& GetNullTextureMaps()const { return *this->null_Texture_Maps_; }
 
 	//フレームバッファの幅 取得
@@ -417,7 +418,7 @@ public:
 	//フレームバッファの数 取得
 	const static UINT GetFrameBufferCount() { return FRAME_BUFFER_COUNT; }
 
-	ID3D12Resource*& GetRender_Targets_() { return *this->render_Targets_[frame_Index].GetAddressOf(); }
+	ID3D12Resource*& GetRender_Targets_() { return *this->render_Targets_[frame_Index_].GetAddressOf(); }
 
 	//レンダーコンテキスト 取得
 	RenderContext& GetRenderContext()
@@ -434,7 +435,7 @@ private:
 	enum { FRAME_BUFFER_COUNT = 2 };
 private:
 	//Windows ハンドル
-	HWND hWnd;
+	HWND hWnd_;
 	//フレームバッファの幅
 	UINT frame_Buffer_Width_;
 	//フレームバッファの高さ
@@ -459,15 +460,15 @@ private:
 	//コマンドアロケータ
 	ComPtr<ID3D12CommandAllocator> command_Allocator_;
 	//コマンドリスト
-	//ComPtr<ID3D12GraphicsCommandList4> command_List_;
-	ID3D12GraphicsCommandList4* command_List_;
+	ComPtr<ID3D12GraphicsCommandList4> command_List_;
 	//パイプラインステート
 	ComPtr<ID3D12PipelineState> pipeline_State_;
 	//フェンス
-	//ComPtr<ID3D12Fence> fence_;
 	ID3D12Fence* fence_;
+
 	//レンダーコンテキスト
 	std::unique_ptr<RenderContext> render_Conext_;
+
 	//ビューポート。
 	D3D12_VIEWPORT view_Port_;
 	//シザリング矩形。
@@ -489,7 +490,7 @@ private:
 	UINT sampler_Descriptor_Size_;
 	UINT64 fence_Value_;
 	// GPUとの同期で使用する変数。
-	UINT frame_Index;
+	UINT frame_Index_;
 
 	HANDLE fence_Event_;
 

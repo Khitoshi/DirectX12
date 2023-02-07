@@ -8,7 +8,10 @@
 //メッセージプロシージャ
 LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+#ifdef _DEBUG
 	if (imguiSystem::WindowProcHandler(hwnd, msg, wparam, lparam))return true;
+#endif // _DEBUG
+
 
     if (msg == WM_DESTROY)
     {
@@ -117,21 +120,28 @@ void System::InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpC
 }
 
 //初期化
-void System::Init(GraphicsEngine*& graphicsEngine)
+void System::Init(const GraphicsEngine* graphicsEngine)
 {
+#ifdef _DEBUG
 	//imgui 初期化
 	imgui_System_->Init(graphicsEngine, this->hWnd_);
+#endif
 }
 
 //更新
-void System::Update(tkEngine*& engine)
+void System::Update(const tkEngine* engine)
 {
+#ifdef _DEBUG
 	imgui_System_->Update();
+#endif
 }
 
 //描画
-void System::Render(tkEngine*& engine)
+void System::Render(const tkEngine* engine)
 {
+#ifdef _DEBUG
 	imgui_System_->Drow(engine->GetGraphicsEngine());
+#endif // _DEBUG
+
 }
 

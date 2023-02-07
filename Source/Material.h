@@ -171,15 +171,6 @@ private:
 #pragma endregion
 
 #pragma region Shader
-	////スキンなしモデル用の頂点シェーダー
-	//std::unique_ptr<Shader> vs_Non_Skin_Model_;
-	//
-	////スキンありモデル用の頂点シェーダー
-	//std::unique_ptr<Shader> vs_Skin_Model_;
-	//
-	////モデル用のピクセルシェーダー
-	//std::unique_ptr<Shader> ps_Model_;
-
 	//スキンなしモデル用の頂点シェーダー
 	Shader* vs_Non_Skin_Model_;
 

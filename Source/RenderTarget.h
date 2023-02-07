@@ -190,14 +190,16 @@ public:
 private:
 	//テクスチャ
 	Texture render_Target_Texture_;
+
 	//レンダリングターゲットとなるテクスチャ
-	ID3D12Resource* render_Target_Texture_Dx12_;
+	ComPtr<ID3D12Resource> render_Target_Texture_Dx12_;
 	//深度ステンシルバッファとなるテクスチャ
-	ID3D12Resource* depth_Stencil_Texture_;
+	ComPtr<ID3D12Resource> depth_Stencil_Texture_;
+
 	//RTV用のディスクリプタヒープ
-	ID3D12DescriptorHeap* rtv_Heap_;
+	ComPtr<ID3D12DescriptorHeap> rtv_Heap_;
 	//深度ステンシルバッファビューのディスクリプタヒープ
-	ID3D12DescriptorHeap* dsv_Heap_;
+	ComPtr<ID3D12DescriptorHeap> dsv_Heap_;
 
 	//フレームバッファのディスクリプタのサイズ
 	UINT rtv_Descriptor_Size_;

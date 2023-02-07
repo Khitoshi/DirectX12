@@ -78,7 +78,7 @@ private:
     void RegistResource(int registerIndex, T res, T resTable[], int& numRes, const int MAX_RESOURCE, const wchar_t* errorMessage);
 
 public://get method
-
+#pragma region GetMethod
     /// <summary>
     /// ディスクリプタヒープ 取得
     /// </summary>
@@ -165,7 +165,8 @@ public://get method
     /// 定数バッファディスクリプタは配列の15番目から登録されていることになる。
     /// この関数は現在レイトレエンジンで使用されている。
     /// <returns></returns>
-    int GetOffsetConstantBufferDescriptorFromTableStart() const{return this->num_Shader_Resource_ + this->num_Uav_Resource_;}
+    int GetOffsetConstantBufferDescriptorFromTableStart() const { return this->num_Shader_Resource_ + this->num_Uav_Resource_; }
+#pragma endregion
 
 private:
     enum {
@@ -176,8 +177,8 @@ private:
 
 private:
     //ディスクリプタヒープ
-    //ComPtr<ID3D12DescriptorHeap> descriptor_Heap_[2];
-    ID3D12DescriptorHeap* descriptor_Heap_[2];
+    ComPtr<ID3D12DescriptorHeap> descriptor_Heap_[2];
+    //ID3D12DescriptorHeap* descriptor_Heap_[2];
     //シェーダーリソース。
     std::vector<IShaderResource*> shader_Resources_;
     //UAVリソース。

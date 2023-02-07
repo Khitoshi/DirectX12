@@ -28,6 +28,12 @@ Bone::Bone(
 //デストラクタ
 Bone::~Bone()
 {
+    //ボーンの子供 解放
+    for (auto& bone :bone_children_)
+    {
+        if (bone)delete bone;
+    }
+    
 }
 
 //このボーンのワールド空間での位置と回転とスケールを計算する

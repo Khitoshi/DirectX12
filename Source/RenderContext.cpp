@@ -19,23 +19,17 @@ RenderContext::RenderContext():
 
 //デフォルト デストラクタ
 RenderContext::~RenderContext()
-{
-    for (auto& dh : descriptor_Heap_)
-    {
-        if(dh)dh->Release();
-    }
-
-    if (command_List_)command_List_->Release();
-    
-
-    for (auto& resouce : shader_Resources_)
-    {
-        if (resouce)delete resouce;
-    }
-
+{   
+    //定数バッファ 解放
     for (auto& buffer : constant_Buffer_)
     {
         if (buffer)delete buffer;
+    }
+
+    //シェーダーリソース 解放
+    for (auto& resouce : shader_Resources_)
+    {
+        if (resouce)delete resouce;
     }
 
 }

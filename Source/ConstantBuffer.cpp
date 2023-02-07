@@ -42,6 +42,7 @@ ConstantBuffer::ConstantBuffer(ConstantBuffer&& cb)
 //デフォルト デストラクタ
 ConstantBuffer::~ConstantBuffer()
 {
+
 }
 
 //初期化

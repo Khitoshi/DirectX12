@@ -35,8 +35,6 @@ public:
 	void Init();
 
 public://get method
-
-
 #pragma region Get this AlbedoMap Infomation
 	
 	/// <summary> 

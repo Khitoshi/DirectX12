@@ -45,9 +45,6 @@ public:
     /// <param name="data"></param>
     void Update(GraphicsEngine*& graphicsEngine,void* data);
 
-    
-private:
-
 public:
 #pragma region Get method
 
@@ -61,7 +58,6 @@ public:
     ID3D12Resource* GetResouce(GraphicsEngine*& graphicsEngine);
 
 #pragma endregion
-
 
 private:
     //GPUからアクセスできるバッファー

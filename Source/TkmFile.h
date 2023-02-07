@@ -160,6 +160,6 @@ public://get method
 
 private:
 	//メッシュパーツ
-	std::vector< SMesh>	mesh_Parts_;
+	std::vector<SMesh> mesh_Parts_;
 
 };

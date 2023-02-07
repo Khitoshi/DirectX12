@@ -60,6 +60,21 @@ private:
 	void AnimationUpdate(const Matrix& matrix_world);
 
 public:
+#pragma region Set method
+	/// <summary>
+	/// ボーンをローカル行列に設定
+	/// </summary>
+	/// <param name="boneNo">ボーン番号</param>
+	/// <param name="matrix">行列</param>
+	//void SetBoneLocalMatrix(int boneNumber, const Matrix& matrix);
+	
+	/// <summary>
+	/// アニメーションが再生されているフラグを付ける
+	/// </summary>
+	void SetMarkPlayAnimation() { this->is_Play_Animation_ = true; }
+
+#pragma endregion
+
 #pragma region Get method
 	/// <summary>
 	/// ボーンの数を取得
@@ -87,24 +102,6 @@ public:
 	Matrix* GetBoneMatricesTopAddress()const { return this->bone_Matrixs_.get(); };
 
 #pragma endregion
-
-public:
-#pragma region Set method
-	/// <summary>
-	/// ボーンをローカル行列に設定
-	/// </summary>
-	/// <param name="boneNo">ボーン番号</param>
-	/// <param name="matrix">行列</param>
-	void SetBoneLocalMatrix(int boneNumber, const Matrix& matrix);
-	
-	/// <summary>
-	/// アニメーションが再生されているフラグを付ける
-	/// </summary>
-	void SetMarkPlayAnimation() { this->is_Play_Animation_ = true; }
-
-#pragma endregion
-
-
 
 private:
 	//ボーンの最大数

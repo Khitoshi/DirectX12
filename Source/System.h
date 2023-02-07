@@ -30,13 +30,23 @@ public:
     /// <param name="appName"></param>
     void InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName);
 
-    void Init(GraphicsEngine*& GraphicsEngine);
+    /// <summary>
+    /// èâä˙âª
+    /// </summary>
+    /// <param name="GraphicsEngine"></param>
+    void Init(const GraphicsEngine* GraphicsEngine);
 
-    void Update(tkEngine*& engine);
+    /// <summary>
+    /// çXêV
+    /// </summary>
+    /// <param name="engine"></param>
+    void Update(const tkEngine* engine);
 
-    void Render(tkEngine*& engine);
-
-private:
+    /// <summary>
+    /// ï`âÊ
+    /// </summary>
+    /// <param name="engine"></param>
+    void Render(const tkEngine* engine);
 
 public:
 #pragma region Get Method

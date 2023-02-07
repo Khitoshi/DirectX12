@@ -110,7 +110,6 @@ public:
 
 #pragma endregion
 
-
 private:
 	//コンパイル済みのシェーダーデータ
 	ComPtr<ID3DBlob> blob_;

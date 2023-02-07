@@ -53,7 +53,7 @@ void imguiSystem::CreateDescriptorHeapForImgui(ID3D12Device5* device)
 }
 
 //imgui èâä˙âª
-void imguiSystem::Init(GraphicsEngine* graphicsEngine,HWND hWnd)
+void imguiSystem::Init(const GraphicsEngine* graphicsEngine,HWND hWnd)
 {
 	ImGui::CreateContext();
 	ImGui_ImplWin32_Init(hWnd);

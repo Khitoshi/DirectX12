@@ -20,7 +20,7 @@ public:
 	/// <param name="tk">DirectXtk関係を保有</param>
 	/// <param name="graphicsEngine">デバイスを格納している</param>
 	/// <param name="initData">初期化データ</param>
-	void Init(tkEngine*& tk,GraphicsEngine*& graphicsEngine,const ModelInitData& initData);
+	void Init(tkEngine* tk,GraphicsEngine* graphicsEngine,const ModelInitData& initData);
 
 	/// <summary>
 	/// ワールド行列を計算して、メンバ変数のworld行列を更新する
@@ -138,7 +138,7 @@ public:
 	/// </remarks>
 	/// <param name="materialName">変更しいたマテリアルの名前</param>
 	/// <param name="albedoMap">アルベドマップ</param>
-	void ChangeAlbedoMap(const char* materialName, Texture& albedoMap);
+	//void ChangeAlbedoMap(const char* materialName, Texture& albedoMap);
 
 #pragma endregion
 

@@ -121,9 +121,6 @@
     <ClCompile Include="Source\RenderTarget.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
-    <ClCompile Include="Source\DebugModel.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Source\imgui\imgui.cpp">
       <Filter>ソース ファイル\imgui</Filter>
     </ClCompile>
@@ -145,8 +142,11 @@
     <ClCompile Include="Source\imgui\imgui_widgets.cpp">
       <Filter>ソース ファイル\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="Source\DebugModel.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
     <ClCompile Include="Source\imgui\imguiSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\System</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -274,7 +274,6 @@
     <ClInclude Include="Source\RenderTarget.h">
       <Filter>ソース ファイル\System</Filter>
     </ClInclude>
-    <ClInclude Include="Source\DebugModel.h" />
     <ClInclude Include="Source\imgui\imconfig.h">
       <Filter>ソース ファイル\imgui</Filter>
     </ClInclude>
@@ -299,6 +298,11 @@
     <ClInclude Include="Source\imgui\imstb_truetype.h">
       <Filter>ソース ファイル\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Source\imgui\imguiSystem.h" />
+    <ClInclude Include="Source\imgui\imguiSystem.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DebugModel.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

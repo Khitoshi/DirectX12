@@ -6,7 +6,7 @@
 
 //デフォルト コンストラクタ
 GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, const UINT frameBufferHeight):
-	hWnd(hwnd),
+	hWnd_(hwnd),
     frame_Buffer_Width_(frameBufferWidth),
     frame_Buffer_Height_(frameBufferHeight),
 
@@ -32,7 +32,7 @@ GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, co
 	cbr_Srv_Descriptor_Size_(0),
 	sampler_Descriptor_Size_(0),
 	fence_Value_(0),
-	frame_Index(0),
+	frame_Index_(0),
 
 	fence_Event_(),
 
@@ -46,9 +46,7 @@ GraphicsEngine::GraphicsEngine(const HWND& hwnd, const UINT frameBufferWidth, co
 //デフォルト デストラクタ
 GraphicsEngine::~GraphicsEngine()
 {
-	if (command_List_)command_List_->Release();
-
-	if (fence_)fence_->Release();
+	if (fence_ != nullptr)fence_->Release();
 }
 
 //初期化
@@ -85,7 +83,7 @@ bool GraphicsEngine::Init(Camera& camera)
 	this->CreateSynchronizationWithGPUObject();
 
 	this->render_Conext_ = std::make_unique<RenderContext>();
-	this->render_Conext_->Init(this->command_List_);
+	this->render_Conext_->Init(this->command_List_.Get());
 
 	//ビューポート初期化
 	//TODO: 関数にする
@@ -131,7 +129,7 @@ bool GraphicsEngine::Init(Camera& camera)
 //レンダリング開始
 void GraphicsEngine::BeginRender(Camera& camera)
 {
-	this->frame_Index = this->swap_Chain_->GetCurrentBackBufferIndex();
+	this->frame_Index_ = this->swap_Chain_->GetCurrentBackBufferIndex();
 
 	//カメラ更新
 	camera.Update(this);
@@ -146,11 +144,11 @@ void GraphicsEngine::BeginRender(Camera& camera)
 	this->render_Conext_->SetViewportAndScissor(this->view_Port_);
 
 	this->current_Frame_Buffer_RTV_Handle_ = this->rtv_Heap_->GetCPUDescriptorHandleForHeapStart();
-	this->current_Frame_Buffer_RTV_Handle_.ptr += this->frame_Index * this->rtv_Descriptor_Size_;
+	this->current_Frame_Buffer_RTV_Handle_.ptr += this->frame_Index_ * this->rtv_Descriptor_Size_;
 	//深度ステンシルバッファのディスクリプタヒープの開始アドレスを取得。
 	this->current_Frame_Buffer_DSV_Handle_ = this->dsv_Heap_->GetCPUDescriptorHandleForHeapStart();
 	//バックバッファがレンダリングターゲットとして設定可能になるまで待つ。
-	this->render_Conext_->WaitUntilToPossibleSetRenderTarget(this->render_Targets_[this->frame_Index].Get());
+	this->render_Conext_->WaitUntilToPossibleSetRenderTarget(this->render_Targets_[this->frame_Index_].Get());
 
 	//レンダリングターゲットを設定。
 	this->render_Conext_->SetRenderTarget(this->current_Frame_Buffer_RTV_Handle_, this->current_Frame_Buffer_DSV_Handle_);
@@ -165,7 +163,7 @@ void GraphicsEngine::BeginRender(Camera& camera)
 void GraphicsEngine::EndRender()
 {
 	// レンダリングターゲットへの描き込み完了待ち
-	this->render_Conext_->WaitUntilFinishDrawingToRenderTarget(this->render_Targets_[this->frame_Index].Get());
+	this->render_Conext_->WaitUntilFinishDrawingToRenderTarget(this->render_Targets_[this->frame_Index_].Get());
 
 
 	this->directXTKG_Fx_Memroy_->Commit(this->command_Queue_.Get());
@@ -174,7 +172,7 @@ void GraphicsEngine::EndRender()
 	this->render_Conext_->Close();
 
 	//コマンドを実行。
-	ID3D12CommandList* ppCommandLists[] = { this->command_List_ };
+	ID3D12CommandList* ppCommandLists[] = { this->command_List_.Get() };
 	this->command_Queue_->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 	this->swap_Chain_->Present(1, 0);
@@ -226,7 +224,7 @@ void GraphicsEngine::CreateDXGIFactory()
 	//生成確認
     if (FAILED(hr))
     {
-        MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateDXGIFactoryで生成に失敗しました"), TEXT("エラー"), MB_OK);
+        MessageBox(this->hWnd_, TEXT("GraphicsEngine::CreateDXGIFactoryで生成に失敗しました"), TEXT("エラー"), MB_OK);
 		std::abort();
     }
 }
@@ -360,7 +358,7 @@ void GraphicsEngine::CreateD3DDevice()
 	//生成確認
 	if (!this->device_) {
 		//D3Dデバイスの作成に失敗した。
-		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateD3DDeviceで生成に失敗しました"), TEXT("エラー"), MB_OK);
+		MessageBox(this->hWnd_, TEXT("GraphicsEngine::CreateD3DDeviceで生成に失敗しました"), TEXT("エラー"), MB_OK);
 		std::abort();
 	}
 }
@@ -378,7 +376,7 @@ void GraphicsEngine::CreateCommandQueue()
 	//生成をチェック
 	if (FAILED(hr))
 	{
-		MessageBox(this->hWnd, TEXT("コマンドキューの作成に失敗しました。"), TEXT("エラー"), MB_OK);
+		MessageBox(this->hWnd_, TEXT("コマンドキューの作成に失敗しました。"), TEXT("エラー"), MB_OK);
 		std::abort();
 	}
 }
@@ -402,7 +400,7 @@ void GraphicsEngine::CreateSwapChain()
 	//スワップチェーン生成
 	HRESULT hr = this->factory_->CreateSwapChainForHwnd(
 		this->command_Queue_.Get(), 
-		this->hWnd, 
+		this->hWnd_, 
 		&swap_chain_desc, 
 		nullptr, 
 		nullptr, 
@@ -411,7 +409,7 @@ void GraphicsEngine::CreateSwapChain()
 
 	if (FAILED(hr))
 	{
-		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateSwapChainの生成に失敗しました"), TEXT("エラー"), MB_OK);
+		MessageBox(this->hWnd_, TEXT("GraphicsEngine::CreateSwapChainの生成に失敗しました"), TEXT("エラー"), MB_OK);
 		std::abort();
 	}
 
@@ -436,7 +434,7 @@ void GraphicsEngine::CreateDescriptorHeapForFrameBuffer()
 	HRESULT hr = this->device_->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->rtv_Heap_));
 	if (FAILED(hr)) {
 		//レンダリングターゲットビューのディスクリプタヒープ用のディスクリプタヒープの作成に失敗した。
-		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateDescriptorHeapForFrameBufferの生成に失敗しました"), TEXT("エラー"), MB_OK);
+		MessageBox(this->hWnd_, TEXT("GraphicsEngine::CreateDescriptorHeapForFrameBufferの生成に失敗しました"), TEXT("エラー"), MB_OK);
 		std::abort();
 	}
 	//ディスクリプタのサイズを取得。
@@ -449,7 +447,7 @@ void GraphicsEngine::CreateDescriptorHeapForFrameBuffer()
 	hr = this->device_->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->dsv_Heap_));
 	if (FAILED(hr)) {
 		//深度ステンシルビューのディスクリプタヒープ用のディスクリプタヒープの作成に失敗した。
-		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateDescriptorHeapForFrameBufferの生成に失敗しました"), TEXT("エラー"), MB_OK);
+		MessageBox(this->hWnd_, TEXT("GraphicsEngine::CreateDescriptorHeapForFrameBufferの生成に失敗しました"), TEXT("エラー"), MB_OK);
 		std::abort();
 	}
 	//ディスクリプタのサイズを取得。
@@ -477,7 +475,7 @@ void GraphicsEngine::CreateRTVForFameBuffer()
 		if (!rt)
 		{
 			//中身がnullの場合
-			MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateRTVForFameBufferの生成に失敗"), TEXT("エラー"), MB_OK);
+			MessageBox(this->hWnd_, TEXT("GraphicsEngine::CreateRTVForFameBufferの生成に失敗"), TEXT("エラー"), MB_OK);
 			std::abort();
 		}
 	}
@@ -518,7 +516,7 @@ void GraphicsEngine::CreateDSVForFrameBuffer()
 	//生成チェック
 	if (FAILED(hr))
 	{
-		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateDSVForFrameBufferの生成に失敗"), TEXT("エラー"), MB_OK);
+		MessageBox(this->hWnd_, TEXT("GraphicsEngine::CreateDSVForFrameBufferの生成に失敗"), TEXT("エラー"), MB_OK);
 		std::abort();
 	}
 
@@ -539,7 +537,7 @@ void GraphicsEngine::CreateCommandAllocator()
 
 	//生成チェック
 	if (FAILED(hr)) {
-		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateCommandAllocatorの生成に失敗"), TEXT("エラー"), MB_OK);
+		MessageBox(this->hWnd_, TEXT("GraphicsEngine::CreateCommandAllocatorの生成に失敗"), TEXT("エラー"), MB_OK);
 		std::abort();
 	}
 }
@@ -553,7 +551,7 @@ void GraphicsEngine::CreateCommandList()
 	//生成チェック
 	if (FAILED(hr))
 	{
-		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateCommandListの生成に失敗"), TEXT("エラー"), MB_OK);
+		MessageBox(this->hWnd_, TEXT("GraphicsEngine::CreateCommandListの生成に失敗"), TEXT("エラー"), MB_OK);
 		std::abort();
 	}
 
@@ -570,7 +568,7 @@ void GraphicsEngine::CreateSynchronizationWithGPUObject()
 	//生成チェック
 	if (FAILED(hr))
 	{
-		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateSynchronizationWithGPUObjectの生成に失敗"), TEXT("エラー"), MB_OK);
+		MessageBox(this->hWnd_, TEXT("GraphicsEngine::CreateSynchronizationWithGPUObjectの生成に失敗"), TEXT("エラー"), MB_OK);
 		std::abort();
 	}
 	this->fence_Value_ = 1;
@@ -578,7 +576,7 @@ void GraphicsEngine::CreateSynchronizationWithGPUObject()
 	//同期を行う時のイベントハンドラを作成する
 	this->fence_Event_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	if (this->fence_Event_ == nullptr) {
-		MessageBox(this->hWnd, TEXT("GraphicsEngine::CreateSynchronizationWithGPUObjectの生成に失敗"), TEXT("エラー"), MB_OK);
+		MessageBox(this->hWnd_, TEXT("GraphicsEngine::CreateSynchronizationWithGPUObjectの生成に失敗"), TEXT("エラー"), MB_OK);
 		std::abort();
 	}
 }

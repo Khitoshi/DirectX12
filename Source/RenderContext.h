@@ -244,14 +244,12 @@ public:
     void SetDescriptorHeap(ID3D12DescriptorHeap* descHeap)
     {
         this->descriptor_Heap_[0] = descHeap;
-        //this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
-        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_);
+        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
     }
     void SetDescriptorHeap(GraphicsEngine*& graphicsEngine,DescriptorHeap& descriptorHeap)
     {
         this->descriptor_Heap_[0] = descriptorHeap.GetDescriptorHeap(graphicsEngine);
-        //this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->Get());
-        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_);
+        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
 
         //ディスクリプタテーブルに登録する。
         if (descriptorHeap.IsRegistConstantBuffer()) {
@@ -267,8 +265,7 @@ public:
     void SetComputeDescriptorHeap(GraphicsEngine*& graphicsEngine, DescriptorHeap& descriptorHeap)
     {
         this->descriptor_Heap_[0] = descriptorHeap.GetDescriptorHeap(graphicsEngine);
-        //this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
-        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_);
+        this->command_List_->SetDescriptorHeaps(1, this->descriptor_Heap_->GetAddressOf());
 
         //ディスクリプタテーブルに登録する。
         if (descriptorHeap.IsRegistConstantBuffer()) {
@@ -347,16 +344,17 @@ private:
 
 #pragma endregion
 
-
 private:
     //コマンド リスト
-    //ComPtr<ID3D12GraphicsCommandList4> command_List_;
-    ID3D12GraphicsCommandList4* command_List_;
+    ComPtr<ID3D12GraphicsCommandList4> command_List_;
+    //ID3D12GraphicsCommandList4* command_List_;
+
     //現在のビューポート。
     D3D12_VIEWPORT current_Viewport_;
+
     //ディスクリプタヒープ
-    //ComPtr<ID3D12DescriptorHeap> descriptor_Heap_[MAX_DESCRIPTOR_HEAP];
-    ID3D12DescriptorHeap* descriptor_Heap_[MAX_DESCRIPTOR_HEAP];
+    ComPtr<ID3D12DescriptorHeap> descriptor_Heap_[MAX_DESCRIPTOR_HEAP];
+    //ID3D12DescriptorHeap* descriptor_Heap_[MAX_DESCRIPTOR_HEAP];
     std::vector<ComPtr<ID3D12Resource>> scratch_Resource_List_;
 
     //定数バッファ

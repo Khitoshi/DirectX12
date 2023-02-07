@@ -24,25 +24,6 @@ RenderTarget::RenderTarget() :
 //デフォルト デストラクタ
 RenderTarget::~RenderTarget()
 {
-    if (render_Target_Texture_Dx12_ != nullptr)
-    {
-        render_Target_Texture_Dx12_->Release();
-    }
-
-    if (depth_Stencil_Texture_ != nullptr)
-    {
-        depth_Stencil_Texture_->Release();
-    }
-
-    if (rtv_Heap_ != nullptr)
-    {
-        rtv_Heap_->Release();
-    }
-
-    if (dsv_Heap_ != nullptr)
-    {
-        dsv_Heap_->Release();
-    }
 }
 
 // レンダリングターゲットの作成
@@ -177,7 +158,7 @@ void RenderTarget::CreateRenderTargetTexture(
         this->render_Target_Texture_Dx12_
     );
 
-    this->render_Target_Texture_.InitFromD3DResource(this->render_Target_Texture_Dx12_);
+    this->render_Target_Texture_.InitFromD3DResource(this->render_Target_Texture_Dx12_.Get());
 }
 
 //深度ステンシルバッファとなるテクスチャを作成
@@ -249,7 +230,7 @@ void RenderTarget::CreateDescriptorDSV(GraphicsEngine*& graphicsEngine)
     //深度テクスチャのディスクリプタを作成
     auto dsvHandle = this->dsv_Heap_->GetCPUDescriptorHandleForHeapStart();
     graphicsEngine->CreateDepthStencilView(
-        this->depth_Stencil_Texture_,
+        *this->depth_Stencil_Texture_.GetAddressOf(),
         nullptr,
         dsvHandle
     );
