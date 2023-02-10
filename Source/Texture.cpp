@@ -56,7 +56,11 @@ void Texture::InitFromD3DResource(ID3D12Resource* texture)
 }
 
 //SRVに登録
-void Texture::RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
+void Texture::RegistShaderResourceView(
+    GraphicsEngine*& graphicsEngine,
+    D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle,
+    int bufferNo
+)
 {
     //テクスチャが存在しない場合
     if (!this->texture_) return;
@@ -65,21 +69,22 @@ void Texture::RegistShaderResourceView(GraphicsEngine*& graphicsEngine, D3D12_CP
     D3D12_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc = {};
     shader_resource_view_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     shader_resource_view_desc.Format = this->texture_Desc_.Format;
+    //shader_resource_view_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
     shader_resource_view_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     shader_resource_view_desc.Texture2D.MipLevels = this->texture_Desc_.MipLevels;
 
     //シェーダーリソースビュー 生成
+    graphicsEngine->CreateShaderResourceView(
+        this->texture_,
+        shader_resource_view_desc,
+        descriptorHandle);
     const auto& device = graphicsEngine->GetDevice();
+    /*
     device->CreateShaderResourceView(
         this->texture_.Get(), 
         &shader_resource_view_desc, 
        descriptorHandle);
 
-    /*
-    graphicsEngine->CreateShaderResourceView(
-        this->texture_,
-        shader_resource_view_desc,
-        descriptorHandle);
     
     graphicsEngine->GetDevice()->CreateShaderResourceView(
         this->texture_,

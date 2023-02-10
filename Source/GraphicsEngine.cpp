@@ -186,7 +186,6 @@ void GraphicsEngine::EndRender()
 //•`‰æI—¹‘Ò‚¿
 void GraphicsEngine::WaitDraw()
 {
-	
 	// Signal and increment the fence value.
 	const UINT64 fence = this->fence_Value_;
 	//this->command_Queue_->Signal(this->fence_.Get(), fence);

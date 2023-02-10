@@ -4,6 +4,27 @@
 #include "Vector3.h"
 using namespace DirectX;
 
+/// <summary>
+/// ディレクションライト構造体
+/// </summary>
+struct DirectionLight
+{
+	Vector3 direction;  //ライトの方向
+	float pad0;
+	Vector3 color;      //ライトのカラー
+	float pad1;
+};
+
+/// <summary>
+/// ライト構造体
+/// </summary>
+struct Light
+{
+	DirectionLight directionLight;  // ディレクションライト
+	Vector3 eyePos;                 // 視点の位置
+};
+
+/*
 class Light
 {
 private:
@@ -41,3 +62,4 @@ public:
 	//ディレクションライト
 	DirectionLight direction_Light_;
 };
+*/

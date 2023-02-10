@@ -66,32 +66,23 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     //light = std::make_unique<Light>();
     Light light;
 
-    /*
-    //ライトは右から当たっている
-    light->GetDirectionLight().direction.Set(1.0f, -1.0f, -1.0f);
-    light->GetDirectionLight().direction.Normalize();
-    //ライトの色は白
-    light->GetDirectionLight().color.Set(0.5f, 0.5f, 0.5f);
-    //視点の位置を設定する
-    light->GetEyePosition().Set(camera_3d->GetPosition());
-    */
-
     //ライトは右から当たっている
     //light.GetDirectionLight().direction.Set(1.0f, -1.0f, -1.0f);
-    light.direction_Light_.direction.x = 1.0f;
-    light.direction_Light_.direction.y = -1.0f;
-    light.direction_Light_.direction.z = -1.0f;
-    light.GetDirectionLight().direction.Normalize();
+    light.directionLight.direction.x = 1.0f;
+    light.directionLight.direction.y = -1.0f;
+    light.directionLight.direction.z = -1.0f;
+    //light.GetDirectionLight().direction.Normalize();
+    light.directionLight.direction.Normalize();
 
     //ライトの色は白
-    //light.GetDirectionLight().color.Set(0.5f, 0.5f, 0.5f);
-    light.direction_Light_.color.x = 1.0f;
-    light.direction_Light_.color.y = 1.0f;
-    light.direction_Light_.color.z = 1.0f;
+    //light.GetDirectionLight().color.Set(0.5f, 0.5f, );
+    light.directionLight.color.x = 0.5f;
+    light.directionLight.color.y = 0.5f;
+    light.directionLight.color.z = 0.5f;
 
     //視点の位置を設定する
     //light.GetEyePosition().Set(camera_3d->GetPosition());
-    light.eye_Position_ = camera_3d->GetPosition();
+    light.eyePos = camera_3d->GetPosition();
 
     // モデルを初期化する
     // モデルを初期化するための情報を構築する
@@ -128,22 +119,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         //qRot.Apply(light.directionLight.direction);
         //qRot.SetRotationDegX(g_pad[0]->GetLStickYF());
         //qRot.Apply(light.directionLight.direction);
-        /*
-        
-        */
 
         ImGui::Begin("Hello, world!");
 
         ImGui::DragFloat3("camera position", (float*)&camera_3d->GetPosition());
 
-        ImGui::DragFloat3("light direction", (float*)&light.direction_Light_.direction);
-        ImGui::ColorEdit3("light color", (float*)&light.direction_Light_.color); // Edit 3 floats representing a color
+        //ImGui::DragFloat3("light direction", (float*)&light.direction_Light_.direction);
+        //ImGui::ColorEdit3("light color", (float*)&light.direction_Light_.color); // Edit 3 floats representing a color
 
         //camera_3d->SetPosition(position[0], position[1], position[2]);
 
         ImGui::End();
 
 
+        
         model.Draw(graphicsEngine, renderContext, *camera_3d);
 
         system->Render(engine);
